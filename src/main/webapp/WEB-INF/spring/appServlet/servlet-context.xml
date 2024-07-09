@@ -9,7 +9,9 @@
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
-	<!-- Enables the Spring MVC @Controller programming model -->
+	<!-- Enables the Spring MVC @Controller programming model 
+		annotation방식으로 설정 하겠다.의미
+	-->
 	<annotation-driven />
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
@@ -21,6 +23,7 @@
 		<beans:property name="suffix" value=".jsp" />
 	</beans:bean>
 	
+	<!--  아래의 패키지를 조사하여 필요한 컨트롤러 객체를 컨테이너에 적재 -->
 	<context:component-scan base-package="com.miniproj.controller" />
 	
 	
