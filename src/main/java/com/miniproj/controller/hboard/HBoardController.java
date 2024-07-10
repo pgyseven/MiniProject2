@@ -21,7 +21,8 @@ public class HBoardController {
 
 	@Autowired
 	private HBoardService service;
-	
+
+	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
 	public void listAll(Model model) {
 		logger.info("HboardController.listAll()..............");
@@ -34,4 +35,13 @@ public class HBoardController {
 		
 		// return "/hboard/listAll";    // /hboard/listAll.jsp 으로 포워딩 됨
 	}
+	
+	
+	// 게시판 글 저장페이지를 출력하는 메서드
+	@RequestMapping("/saveBoard")
+	public String showSaveBoardForm() {
+		return "/hboard/saveBoardForm";
+	}
+	
+	
 }
