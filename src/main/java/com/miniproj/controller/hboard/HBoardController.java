@@ -28,10 +28,14 @@ public class HBoardController {
 		logger.info("HboardController.listAll()..............");
 		
 		// 서비스 단 호출
-		List<HBoardVO> list = service.getAllBoard();
+		List<HBoardVO> list = null;
+		try {
+			list = service.getAllBoard();
+			model.addAttribute("boardList", list);  // 데이터 바인딩
+		} catch (Exception e) {
+			model.addAttribute("exception", "error");
+		}
 
-		
-		model.addAttribute("boardList", list);  // 데이터 바인딩
 		
 		// return "/hboard/listAll";    // /hboard/listAll.jsp 으로 포워딩 됨
 	}

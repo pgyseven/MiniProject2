@@ -8,7 +8,7 @@ import com.miniproj.model.HBoardVO;
 public interface HBoardService {
 	
 	// 게시판 전제 리스트 조회
-	public List<HBoardVO> getAllBoard();
+	public List<HBoardVO> getAllBoard() throws Exception;
 	
 	// 게시판 글 작성
 	
