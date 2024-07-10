@@ -52,4 +52,40 @@ update member set mobile=?
 where userId = ?;
 
 -- userId가 ?인 회원 삭제 (회원 탈퇴)
-delete from member where userId = ? 
+delete from member where userId = ?; 
+
+
+-- 계층형 게시판 생성
+CREATE TABLE `webshjin`.`hboard` (
+  `boardNo` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(20) NOT NULL,
+  `content` VARCHAR(2000) NULL,
+  `writer` VARCHAR(8) NULL,
+  `postDate` DATETIME NULL DEFAULT now(),
+  `readCount` INT NULL DEFAULT 0,
+  `ref` INT NULL DEFAULT 0,
+  `step` INT NULL DEFAULT 0,
+  `refOrder` INT NULL DEFAULT 0,
+  PRIMARY KEY (`boardNo`),
+  INDEX `hboard_member_fk_idx` (`writer` ASC) VISIBLE,
+  CONSTRAINT `hboard_member_fk`
+    FOREIGN KEY (`writer`)
+    REFERENCES `webshjin`.`member` (`userId`)
+    ON DELETE SET NULL
+    ON UPDATE NO ACTION)
+COMMENT = '계층형 게시판';
+
+
+-- 계층형 게시판의 모든 게시글을 가져오는 쿼리문
+select * from hboard order by boardNo desc;
+
+-- 계층형 게시판에 게시글을 등록하는 쿼리문
+insert into hboard(title, content, writer)
+values('아싸~~~ 1등이다', '내용 무..', 'dooly');
+
+insert into hboard(title, content, writer)
+values('에이', '1등 놓쳤네..', 'kildong');
+
+insert into hboard(title, content, writer)
+values(?, ?, ?);
+
