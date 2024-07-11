@@ -2,6 +2,7 @@ package com.miniproj.service.hboard;
 
 import java.util.List;
 
+import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 
 
@@ -11,6 +12,7 @@ public interface HBoardService {
 	public List<HBoardVO> getAllBoard() throws Exception;
 	
 	// 게시판 글 작성
+	boolean saveBoard(HBoardDTO newBoard) throws Exception;
 	
 	
 	// 게시판 글 수정
