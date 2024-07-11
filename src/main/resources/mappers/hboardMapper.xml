@@ -8,4 +8,11 @@
 	<select id="getAllHBoard" resultType="com.miniproj.model.HBoardVO">
 		select * from hboard order by boardNo desc
 	</select>
+	
+	<!-- 새로운 게시글을 저장하는 쿼리문 -->
+	<insert id="saveNewBoard">
+		insert into hboard(title, content, writer) values(#{title}, #{content}, #{writer})
+	</insert>
+	
+	
 </mapper> 
