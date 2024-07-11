@@ -89,3 +89,39 @@ values('에이', '1등 놓쳤네..', 'kildong');
 insert into hboard(title, content, writer)
 values(?, ?, ?);
 
+-- 유저에게 지급되는 포인트를 정의한 테이블 생성
+CREATE TABLE `webshjin`.`pointdef` (
+  `pointWhy` VARCHAR(20) NOT NULL,
+  `pointScore` INT NULL,
+  PRIMARY KEY (`pointWhy`))
+COMMENT = '유저에게 적립할 포인트에 대한 정의 테이블.\n어떤 사유로 몇 포인트를 지급하는지에 대해 정의\n';
+
+-- pointdef 테이블의 기초 데이터
+INSERT INTO `webshjin`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('회원가입', '100');
+INSERT INTO `webshjin`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('로그인', '1');
+INSERT INTO `webshjin`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('글작성', '10');
+INSERT INTO `webshjin`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('댓글작성', '2');
+INSERT INTO `webshjin`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('게시글신고', '-10');
+
+-- 유저의 포인트 적립 내역을 기록하는 poinlog 테이블 생성
+CREATE TABLE `webshjin`.`pointlog` (
+  `pointLogNo` INT NOT NULL AUTO_INCREMENT,
+  `pointWho` VARCHAR(8) NOT NULL,
+  `pointWhen` DATETIME NULL DEFAULT now(),
+  `pointWhy` VARCHAR(20) NOT NULL,
+  `pointScore` INT NOT NULL,
+  PRIMARY KEY (`pointLogNo`),
+  CONSTRAINT `pointdef_member_fk`
+    FOREIGN KEY (`pointWho`)
+    REFERENCES `webshjin`.`member` (`userId`)
+    ON DELETE CASCADE
+    ON UPDATE NO ACTION)
+COMMENT = '어떤유저에게 어떤 사유로 몇 포인트가 언제 지급되었는지를 기록 테이블';
+
+-- 계층형 게시판 글 삭제 쿼리문
+DELETE FROM hboard WHERE boardNo=1;
+
+
+-- 유저에게 포인트를 지급하는 쿼리문 
+insert into pointlog(pointWho, pointWhy, pointScore)
+values(?, ?, (select pointScore from pointdef where pointWhy = ?));
