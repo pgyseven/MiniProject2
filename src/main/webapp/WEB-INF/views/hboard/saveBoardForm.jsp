@@ -18,18 +18,18 @@
 	<c:import url="./../header.jsp" />
 
     <h2>게시글 작성</h2>
-    <form>
+    <form action="saveBoard" method="POST">
         <div class="mb-3">
             <label for="title" class="form-label">글제목</label>
-            <input type="text" class="form-control" id="title" placeholder="글제목을 입력하세요">
+            <input type="text" class="form-control" id="title" name="title" placeholder="글제목을 입력하세요" >
         </div>
         <div class="mb-3">
             <label for="writer" class="form-label">작성자</label>
-            <input type="text" class="form-control" id="writer" placeholder="작성자를 입력하세요">
+            <input type="text" class="form-control" id="writer"  name="writer" placeholder="작성자를 입력하세요">
         </div>
         <div class="mb-3">
             <label for="content" class="form-label">내용</label>
-            <textarea class="form-control" id="content" rows="5" placeholder="내용을 입력하세요"></textarea>
+            <textarea class="form-control" id="content" rows="5" name="content" placeholder="내용을 입력하세요"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">저장</button>
     </form>
