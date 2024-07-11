@@ -72,7 +72,7 @@
 									<td>${board.boardNo }</td>
 									<td>${board.title }</td>
 									<td>${board.writer }</td>
-									<td>${board.postDate }</td>
+									<td class="postDate">${board.postDate }</td>
 									<td>${board.readCount }</td>
 								</tr>
 							</c:forEach>
