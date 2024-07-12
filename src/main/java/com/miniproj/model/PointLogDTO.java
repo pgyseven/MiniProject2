@@ -1,6 +1,4 @@
-package com.miniproj.model;
-
-
+ package com.miniproj.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
