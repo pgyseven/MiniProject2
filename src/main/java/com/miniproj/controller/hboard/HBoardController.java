@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
@@ -60,15 +61,22 @@ public class HBoardController {
 	
 	// 게시글 저장 버튼을 눌렀을때 해당 게시글을 db에 저장하는 메서드
 	@RequestMapping(value="/saveBoard", method = RequestMethod.POST)
-	public void saveBoard(HBoardDTO boardDTO) {
+	public String saveBoard(HBoardDTO boardDTO, RedirectAttributes redirectAttributes) {
 		System.out.println("let's save this board... : " + boardDTO.toString());
+		
+		String returnPage = "redirect:/hboard/listAll";
+		
 		try {
-			service.saveBoard(boardDTO);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+			if (service.saveBoard(boardDTO)) {  // 게시글 저장에 성공했다면
+				redirectAttributes.addAttribute("status", "success");
+			} 
+		} catch (Exception e) {   // 게시글 저장에 실패했다면..
 			e.printStackTrace();
+			
+			redirectAttributes.addAttribute("status", "fail");
 		}
 		
+		return returnPage;  // 게시글 전체 목록 페이지로 돌아감
 	}
 	
 	
