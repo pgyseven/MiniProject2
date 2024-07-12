@@ -5,12 +5,15 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.PointLogDTO;
 import com.miniproj.persistence.HBoardDAO;
+import com.miniproj.persistence.MemberDAO;
 import com.miniproj.persistence.PointLogDAO;
 
 // Service단에서 해야할 작업
@@ -26,6 +29,10 @@ public class HBoardServiceImpl implements HBoardService {
 	private HBoardDAO bDao;
 	@Autowired
 	private PointLogDAO pDao;
+	@Autowired
+	private MemberDAO mDao;
+	
+	
 	
 	@Override
 	public List<HBoardVO> getAllBoard() throws Exception {
@@ -39,20 +46,22 @@ public class HBoardServiceImpl implements HBoardService {
 	}
 
 	@Override
-	
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveBoard(HBoardDTO newBoard) throws Exception {
+		boolean result = false;
+		
 		// 1) newBoard를 DAO단을 통해 insert 해본다 - insert  close 
 		if(bDao.insertNewBoard(newBoard)==1) {
 			// 2) 1번에서 insert가 성공했을 때 글작성자의 point를 부여한다.  - (select)  close - insert close			
-			System.out.println(pDao.insertPointLog(new PointLogDTO(newBoard.getWriter(), "글작성", 0)));
-			
-			
-			// 3) 작성자의 userpoint값 update  close
+			if (pDao.insertPointLog(new PointLogDTO(newBoard.getWriter(), "글작성", 0)) == 1) {
+				// 3) 작성자의 userpoint값 update  close
+				if (mDao.updateUserPoint(newBoard.getWriter()) == 1) {
+					result = true;
+				}	
+			}	
 		}
 		
-		
-		
-		return false;
+		return result;
 	}
 
 }
