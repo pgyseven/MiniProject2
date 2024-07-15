@@ -13,10 +13,32 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 	// 8344c161e851343f33ceb78f3de3fc62
-	let baseUrl = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=8344c161e851343f33ceb78f3de3fc62&targetDt=20240714";
+	// 기본적인 박스오피스를 가져올 날짜는 현재날짜 - 1일을 가져오게 한다
+	let now = new Date();
+	console.log(now);
+	now.setDate(now.getDate() - 1);
+	   // 2024. 7. 14. => 20240714 형식으로 변환
+	let targetDt = toTargetDt(now.toLocaleDateString());
+	let baseUrl = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=8344c161e851343f33ceb78f3de3fc62&targetDt=" + targetDt;
 	$(function(){
 		getMovieApi();
 	});
+
+	function toTargetDt(now) {
+		let dateArr = now.split('.');
+		let targetDt = '';
+		for (let i = 0; i < 3; i++) {
+			targetDt = dateArr[0].trim();
+			if (parseInt(dateArr[1]) < 10) {
+				targetDt += '0' + dateArr[1].trim();
+			}
+			targetDt += dateArr[2].trim();
+		}
+
+		console.log('변환된 값 : ' + targetDt);
+		return targetDt;
+	}
+
 
 
 	function getMovieApi() {
