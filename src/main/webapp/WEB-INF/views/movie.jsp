@@ -19,9 +19,18 @@
 	now.setDate(now.getDate() - 1);
 	   // 2024. 7. 14. => 20240714 형식으로 변환
 	let targetDt = toTargetDt(now.toLocaleDateString());
-	let baseUrl = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=8344c161e851343f33ceb78f3de3fc62&targetDt=" + targetDt;
+	
 	$(function(){
-		getMovieApi();
+		getMovieApi(targetDt);
+
+		$('#selecDate').change(function(){
+			// alert('선택한 태그의 값이 변경됨 : ' + $(this).val());
+			let selectDate = new Date($(this).val());
+
+			let targetDt = toTargetDt(selectDate.toLocaleDateString());
+			console.log(targetDt);
+			getMovieApi(targetDt);
+		});
 	});
 
 	function toTargetDt(now) {
@@ -31,8 +40,15 @@
 			targetDt = dateArr[0].trim();
 			if (parseInt(dateArr[1]) < 10) {
 				targetDt += '0' + dateArr[1].trim();
+			} else {
+				targetDt += dateArr[1].trim();
 			}
-			targetDt += dateArr[2].trim();
+			if (parseInt(dateArr[2]) < 10) {
+				targetDt += '0' + dateArr[2].trim();
+			} else {
+				targetDt += dateArr[2].trim();
+			}
+			
 		}
 
 		console.log('변환된 값 : ' + targetDt);
@@ -41,8 +57,8 @@
 
 
 
-	function getMovieApi() {
-		
+	function getMovieApi(targetDt) {
+		let baseUrl = "https://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=8344c161e851343f33ceb78f3de3fc62&targetDt=" + targetDt;
 		$.ajax({
 			url : baseUrl,             // 데이터가 송수신될 서버의 주소
 			type : 'GET',             // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
@@ -82,6 +98,10 @@
 
 			<h5 class="title"></h5>
 			<h6 class="outputDate"></h6>
+
+			<div style="margin-top: 15px; margin-bottom: 15px;">
+				<input type="date" class="form-control" id="selecDate">
+			</div>
 
 			<div class="boxOffice">
 				
