@@ -41,4 +41,9 @@ public class HomeController {
 		
 	}
 	
+	@RequestMapping("/movie")
+	public void goMoviePage() {
+		
+	}
+	
 }

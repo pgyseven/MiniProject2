@@ -31,6 +31,9 @@
 						
 					<li class="nav-item"><a class="nav-link"
 						href="/weather">오늘의 날씨(연습)</a></li>
+						
+					<li class="nav-item"><a class="nav-link"
+						href="/movie">영화 api(연습)</a></li>
 				</ul>
 				<form class="d-flex">
 					<input class="form-control me-2" type="text" placeholder="Search">
