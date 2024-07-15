@@ -46,4 +46,9 @@ public class HomeController {
 		
 	}
 	
+	@RequestMapping("/news")
+	public void goNewsPage() {
+		
+	}
+	
 }
