@@ -154,4 +154,15 @@ COMMENT = '게시판에 업로드 되는 업로드 파일을 기록하는 테이
 ALTER TABLE `webshjin`.`boardimg` 
 ADD COLUMN `thumbFileName` VARCHAR(60) NULL AFTER `originFileName`;
 
+-- 첨부파일 테이블 명 변경
+ALTER TABLE `webshjin`.`boardimg` 
+RENAME TO  `webshjin`.`boardupfiles` ;
+
+-- 컬럼 크기 수정
+ALTER TABLE `webshjin`.`boardupfiles` 
+CHANGE COLUMN `ext` `ext` VARCHAR(20) NULL DEFAULT NULL ;
+
+-- 컬럼명 변경
+ALTER TABLE `webshjin`.`boardupfiles` 
+CHANGE COLUMN `boardImgNo` `boardUpFileNo` INT NOT NULL AUTO_INCREMENT ;
 
