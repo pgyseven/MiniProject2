@@ -40,8 +40,7 @@
 					// 해당 파일 업로드
 					fileUpload(file)
 					
-					// 미리 보기
-					showPreview(file);
+					
 				}
 				
 			}
@@ -58,14 +57,30 @@
 		$.ajax({
 	         url : '/hboard/upfiles',             // 데이터가 송수신될 서버의 주소
 	         type : 'post',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
-	         dataType : 'json',					// 수신 받을 데이터의 타입 (text, xml, json)
+	         dataType : 'text',					// 수신 받을 데이터의 타입 (text, xml, json)
 			 data : fd,					// 보낼 데이터
 	         // processData :  false  -> 데이터를 쿼리스트링 형태로 보내지 안겠다는 설정
 	         // contentType 의 디폴트 값이 "application/x-www-form-urlencoded"인데, 파일을 전송하는 방식이기에 "multipart/form-data"로 되어야 하므로..
 	         processData: false,
 	         contentType : false,
+	         async : false,      // 비동기 통신 : false
 	         success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
 	            console.log(data);
+	         	if (data == 'success') {
+	         		showPreview(file);
+	         	}
+	         
+	         }, error : function (data) {
+	        	 console.log(data);
+	        	 if (data == 'fail') {
+	        		 alert ('파일을 업로드 하지 못했습니다');
+	        		 
+	        		 for(let i = 0; i < upfiles.length; i++) {
+	        			 if (upfile[i].name == file.name) {
+	        				 upfiles.splice(i, 1);  // 배열에서 삭제
+	        			 }
+	        		 }
+	        	 }
 	         }
 	      });
 	}
@@ -91,7 +106,7 @@
 		
 		for(let i = 0; i < upfiles.length; i++) {
 			if (upfiles[i].name == removedFileName) {
-				// 파일 삭제
+				// 파일 삭제 (백엔드단에도 삭제 해야 함)
 				upfiles.splice(i, 1);  // 배열에서 삭제
 				console.log(upfiles);
 				$(obj).parent().parent().remove();  // 태그 삭제
@@ -138,7 +153,7 @@
 
     <h2>게시글 작성</h2>
     <!--  multipart/form-data : 데이터를 여러 조각으로 나누어서 전송하는 방식. 수신되는 곳에서는 재조립이 필요하다. -->
-    <form action="saveBoard" method="multipart/form-data">
+    <form action="saveBoard" method="post">
         <div class="mb-3">
             <label for="title" class="form-label">글제목</label>
             <input type="text" class="form-control" id="title" name="title" placeholder="글제목을 입력하세요" >
