@@ -23,23 +23,53 @@
 			evt.preventDefault();  // 기본 이벤트 캔슬
 		});
 		
-		$('.fileUploadArea').on("drop", function(evt){
+		// 유저가 fileUploadArea에 파일을 드래그&드랍 하면...
+		$('.fileUploadArea').on("drop", function(evt){   
 			evt.preventDefault();
 			
 			//console.log(evt.originalEvent.dataTransfer.files);  // 업로드 되는 파일 객체의 정보
 			
-			for (let file of evt.originalEvent.dataTransfer.files) {
-				upfiles.push(file); // 배열에 담기
-				console.log(upfiles);
-				
-				// 미리 보기
-				showPreview(file);
-				
+			for (let file of evt.originalEvent.dataTransfer.files) {				
+				// 파일 사이즈 검사 하여 10MB가 넘게되면 파일 업로드가 안되도록...
+				if (file.size > 10485760) {
+					alert("파일 용량이 너무 큽니다.. 업로드한 파일을 확인해 주세요..!");
+				} else {
+					upfiles.push(file); // 배열에 담기
+					console.log(upfiles);
+					
+					// 해당 파일 업로드
+					fileUpload(file)
+					
+					// 미리 보기
+					showPreview(file);
+				}
 				
 			}
 			
 		});
 	});
+	
+	// 실제로 유저가 업로드한 파일을 컨트롤러단에 전송하여 저장되도록 하는 함수
+	function fileUpload(file) {
+		let result = false;
+		let fd = new FormData();  // FormData 객체 생성 : form태그와 같은 역할의 객체
+		fd.append("file", file);
+		
+		$.ajax({
+	         url : '/hboard/upfiles',             // 데이터가 송수신될 서버의 주소
+	         type : 'post',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
+	         dataType : 'json',					// 수신 받을 데이터의 타입 (text, xml, json)
+			 data : fd,					// 보낼 데이터
+	         // processData :  false  -> 데이터를 쿼리스트링 형태로 보내지 안겠다는 설정
+	         // contentType 의 디폴트 값이 "application/x-www-form-urlencoded"인데, 파일을 전송하는 방식이기에 "multipart/form-data"로 되어야 하므로..
+	         processData: false,
+	         contentType : false,
+	         success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
+	            console.log(data);
+	         }
+	      });
+	}
+	
 	
 	// 넘겨진 file이 이미지 파일이라면 미리보기 하여 출력한다.
 	function showPreview(file) {
