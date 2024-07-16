@@ -1,20 +1,31 @@
 package com.miniproj.controller.hboard;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.service.hboard.HBoardService;
+import com.miniproj.util.FileProcess;
 
 
 // Controller 단에서 해야 할 일
@@ -33,6 +44,11 @@ public class HBoardController {
 
 	@Autowired
 	private HBoardService service;
+	
+	@Autowired
+	private FileProcess fileProcess;
+	
+	private List<BoardUpFilesVODTO> uploadFileList = new ArrayList<BoardUpFilesVODTO>();
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
@@ -77,6 +93,52 @@ public class HBoardController {
 		}
 		
 		return returnPage;  // 게시글 전체 목록 페이지로 돌아감
+	}
+	
+	@RequestMapping(value="/upfiles", method = RequestMethod.POST, produces = "text/plain; charset=UTF-8;")
+	public ResponseEntity<String> saveBoardFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+		System.out.println("파일 전송됨... 이제 저장해야 함......");
+		
+		ResponseEntity<String> result = null;
+		
+		String contentType = file.getContentType();
+		String originalFileName = file.getOriginalFilename();
+		long fileSize = file.getSize();
+		byte[] upfile = null;
+		try {
+			upfile = file.getBytes();
+			
+			System.out.println("서버의 실제 물리적 경로 : " + request.getSession().getServletContext().getRealPath("/resources/boardUpFiles"));
+			String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
+			
+			BoardUpFilesVODTO fileInfo = fileProcess.saveFileToRealPath(upfile, realPath, contentType, originalFileName, fileSize);
+			
+//			System.out.println("저장된 파일의 정보 : " + fileInfo.toString());
+			
+			this.uploadFileList.add(fileInfo);
+			
+			
+			// 7월 17일 가장 먼저 해야 할 코드 : front에서 업로드한 파일을 지웠을때 백엔드에서도 지워야 한다.
+			System.out.println("=================================================================");
+			System.out.println("현재 파일리스트에 있는 파일들");
+			for (BoardUpFilesVODTO f :this.uploadFileList ) {
+				System.out.println(f.toString());
+			}
+			System.out.println("=================================================================");
+			
+			
+			
+			result = new ResponseEntity<String>("success", HttpStatus.OK);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+			
+			result = new ResponseEntity<String>("fail", HttpStatus.NOT_ACCEPTABLE);
+			
+		}
+		
+		return result;
+		
 	}
 	
 	
