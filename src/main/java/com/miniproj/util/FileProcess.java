@@ -19,26 +19,29 @@ public class FileProcess{
 		
 		
 		// 파일이 실제 저장되는 경로 realPath + "/년/월/일" 경로 
-		makeCalendarPath(realPath);
+		String[] ymd = makeCalendarPath(realPath);
+		makeDirectory(realPath, ymd);
 		
 		return  result;
 	}
 
 	// 파일이 저장될 경로의 디렉토리 구조를 "/년/월/일" 형태로 만드는 메서드
-	private void makeCalendarPath(String realPath) {
+	private String[] makeCalendarPath(String realPath) {
 		Calendar now = Calendar.getInstance();  // 현재날짜시간 객체
 		String year = File.separator + now.get(Calendar.YEAR) + "";   // \2024
 		String month = year + File.separator + new DecimalFormat("00").format(now.get(Calendar.MONTH) + 1);   // \2024\07
 		String date = month + File.separator + new DecimalFormat("00").format(now.get(Calendar.DATE));   // \2024\07\16
 		System.out.println(year + ", " + month + ", " + date);
 		
-		makeDirectory(realPath, year, month, date);
+		String[] ymd = {year, month, date};
+		
+		return ymd;
 		
 	}
 
 	// 실제 directory를 만드는 메서드
 	// 가변인자 메서드 (전달된 year, month, date의 값이 ymd 하나의 배열로 처리)
-	private void makeDirectory(String realPath, String...ymd) {
+	private void makeDirectory(String realPath, String[] ymd) {
 		if (!new File(realPath + ymd[ymd.length - 1]).exists()) {
 			// 디렉토리 생성해야 함
 			for (String path : ymd) {
