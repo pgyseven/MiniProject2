@@ -1,5 +1,6 @@
 package com.miniproj.controller.hboard;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,6 +49,7 @@ public class HBoardController {
 	@Autowired
 	private FileProcess fileProcess;
 	
+	// 유저가 업로드한 파일을 임시 보관하는 객체 (컬렉션)
 	private List<BoardUpFilesVODTO> uploadFileList = new ArrayList<BoardUpFilesVODTO>();
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
@@ -100,13 +102,14 @@ public class HBoardController {
 		System.out.println("파일 전송됨... 이제 저장해야 함......");
 		
 		ResponseEntity<String> result = null;
-		
+		// 파일의 기본정보 가져옴
 		String contentType = file.getContentType();
 		String originalFileName = file.getOriginalFilename();
 		long fileSize = file.getSize();
+		
 		byte[] upfile = null;
 		try {
-			upfile = file.getBytes();
+			upfile = file.getBytes();  // 파일의 실제 데이터를 읽어옴
 			
 			System.out.println("서버의 실제 물리적 경로 : " + request.getSession().getServletContext().getRealPath("/resources/boardUpFiles"));
 			String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
@@ -127,8 +130,9 @@ public class HBoardController {
 			System.out.println("=================================================================");
 			
 			
+			String tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
 			
-			result = new ResponseEntity<String>("success", HttpStatus.OK);
+			result = new ResponseEntity<String>("success_" + tmp, HttpStatus.OK);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -138,6 +142,22 @@ public class HBoardController {
 		}
 		
 		return result;
+		
+	}
+	
+	
+	@RequestMapping(value="/removefile", method=RequestMethod.POST)
+	public void removeUpFile(@RequestParam("removedFileName") String removeFileName) {
+		System.out.println("업로드된 파일을 삭제 하자~ : " + removeFileName);
+		
+		// 넘겨져온 removeFileName이 uploadFileList배열의 originalFileName과 같은것이 있는지 체크하여 있다면 삭제처리 해야 함
+		for (int i = 0; i < this.uploadFileList.size(); i++) {
+			if (removeFileName.equals(this.uploadFileList.get(i).getOriginalFileName())) {
+				// 하드디스크에서 파일 삭제
+				
+			}
+		}
+		
 		
 	}
 	
