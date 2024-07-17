@@ -97,11 +97,11 @@ public class HBoardController {
 		return returnPage;  // 게시글 전체 목록 페이지로 돌아감
 	}
 	
-	@RequestMapping(value="/upfiles", method = RequestMethod.POST, produces = "text/plain; charset=UTF-8;")
-	public ResponseEntity<String> saveBoardFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	@RequestMapping(value="/upfiles", method = RequestMethod.POST, produces = "application/json; charset=UTF-8;")
+	public ResponseEntity<BoardUpFilesVODTO> saveBoardFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		System.out.println("파일 전송됨... 이제 저장해야 함......");
 		
-		ResponseEntity<String> result = null;
+		ResponseEntity<BoardUpFilesVODTO> result = null;
 		// 파일의 기본정보 가져옴
 		String contentType = file.getContentType();
 		String originalFileName = file.getOriginalFilename();
@@ -133,12 +133,12 @@ public class HBoardController {
 			String tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
 			
 			// 저장된 새로운 파일이름을 json으로 return 시키도록 하자...
-			result = new ResponseEntity<String>("success_" + tmp, HttpStatus.OK);
+			result = new ResponseEntity<BoardUpFilesVODTO>(fileInfo, HttpStatus.OK);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
 			
-			result = new ResponseEntity<String>("fail", HttpStatus.NOT_ACCEPTABLE);
+			result = new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
 			
 		}
 		
