@@ -41,10 +41,11 @@ public class FileProcess{
 				File saveFile = new File(saveFilePath + File.separator + newFileName);
 				FileUtils.writeByteArrayToFile(saveFile, upfile); // 실제 파일 저장
 				
+				
 				result = BoardUpFilesVODTO.builder()
 						.ext(contentType)
-						.newFileName(newFileName)
-						.originalFileName(originalFileName)
+						.newFileName(ymd[2] + File.separator + newFileName)
+						.originalFileName(ymd[2] + File.separator + originalFileName)
 						.size(fileSize)
 						.build();
 						
@@ -77,13 +78,19 @@ public class FileProcess{
 		
 		boolean isFind = false;
 		
-		for (String name : tmp.list()) {
-			if (name.equals(originalFileName)) {
-				System.out.println("이름이 같은게 있다");
-				isFind = true;
-				break;
+		String[] dirs = tmp.list();
+		if (dirs != null) {
+			for (String name : tmp.list()) {
+				if (name.equals(originalFileName)) {
+					System.out.println("이름이 같은게 있다");
+					isFind = true;
+					break;
+				}
 			}
+		} else {  // 경로에 기존 업로드된 파일이나 폴더가 없을 때....
+			return isFind; 
 		}
+		
 		
 		if (!isFind) {
 			System.out.println("이름이 같은 파일이 없는 상태");
