@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -7,7 +7,8 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
 	rel="stylesheet">
@@ -67,7 +68,7 @@
 	         success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
 	            console.log(data);
 	         	if (data == 'success') {
-	         		showPreview(file);
+	         		showPreview(file);  // 파일 미리보기
 	         	}
 	         
 	         }, error : function (data) {
@@ -101,12 +102,28 @@
 		}
 	}
 	
+	// 업로드한 파일을 지운다. (화면, front배열, 백엔드)
 	function remFile(obj) {
 		let removedFileName = $(obj).parent().prev().html();
 		
 		for(let i = 0; i < upfiles.length; i++) {
 			if (upfiles[i].name == removedFileName) {
-				// 파일 삭제 (백엔드단에도 삭제 해야 함)
+				
+				// 파일 삭제 (백엔드단에서 삭제가 성공하면 front 단에서도 배열, 화면에서 삭제 해야 함)
+				$.ajax({
+	         		url : '/hboard/removefile',             // 데이터가 송수신될 서버의 주소
+	         		type : 'post',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
+	         		dataType : 'text',					// 수신 받을 데이터의 타입 (text, xml, json)
+					data : {							// 보낼 데이터
+						"removedFileName" : removedFileName
+					},
+	        		async : false,      // 비동기 통신 : false
+	         		success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
+	            		console.log(data);
+	         		         
+	         		}
+	      		});
+				
 				upfiles.splice(i, 1);  // 배열에서 삭제
 				console.log(upfiles);
 				$(obj).parent().parent().remove();  // 태그 삭제
@@ -137,48 +154,51 @@
     }
 </script>
 <style>
-	.fileUploadArea {
-		width: 100%;
-		height : 300px;
-		background-color: lightgray;
-		text-align: center;
-		line-height: 300px;
-		
-	}
+.fileUploadArea {
+	width: 100%;
+	height: 300px;
+	background-color: lightgray;
+	text-align: center;
+	line-height: 300px;
+}
 </style>
 </head>
 <body>
-<div class="container">
-	<c:import url="./../header.jsp" />
+	<div class="container">
+		<c:import url="./../header.jsp" />
 
-    <h2>게시글 작성</h2>
-    <!--  multipart/form-data : 데이터를 여러 조각으로 나누어서 전송하는 방식. 수신되는 곳에서는 재조립이 필요하다. -->
-    <form action="saveBoard" method="post">
-        <div class="mb-3">
-            <label for="title" class="form-label">글제목</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="글제목을 입력하세요" >
-        </div>
-        <div class="mb-3">
-            <label for="writer" class="form-label">작성자</label>
-            <input type="text" class="form-control" id="writer"  name="writer" placeholder="작성자를 입력하세요">
-        </div>
-        <div class="mb-3">
-            <label for="content" class="form-label">내용</label>
-            <textarea class="form-control" id="content" rows="5" name="content" placeholder="내용을 입력하세요"></textarea>
-        </div>
-        
-        <div class="fileUploadArea mb-3">
-        	<p>업로드할 파일을 요기에 드래그 드랍 하세요!</p>
-        </div>
-        
-        <div class="preview"></div>
-        
-        
-        <button type="submit" class="btn btn-primary" onclick="return validBoard();">저장</button>
-    </form>
-    
-    
-    <c:import url="./../footer.jsp" />
-</div>
+		<h2>게시글 작성</h2>
+		<!--  multipart/form-data : 데이터를 여러 조각으로 나누어서 전송하는 방식. 수신되는 곳에서는 재조립이 필요하다. -->
+		<form action="saveBoard" method="post">
+			<div class="mb-3">
+				<label for="title" class="form-label">글제목</label> <input type="text"
+					class="form-control" id="title" name="title"
+					placeholder="글제목을 입력하세요">
+			</div>
+			<div class="mb-3">
+				<label for="writer" class="form-label">작성자</label> <input
+					type="text" class="form-control" id="writer" name="writer"
+					placeholder="작성자를 입력하세요">
+			</div>
+			<div class="mb-3">
+				<label for="content" class="form-label">내용</label>
+				<textarea class="form-control" id="content" rows="5" name="content"
+					placeholder="내용을 입력하세요"></textarea>
+			</div>
+
+			<div class="fileUploadArea mb-3">
+				<p>업로드할 파일을 요기에 드래그 드랍 하세요!</p>
+			</div>
+
+			<div class="preview"></div>
+
+
+			<button type="submit" class="btn btn-primary"
+				onclick="return validBoard();">저장</button>
+		</form>
+
+
+		<c:import url="./../footer.jsp" />
+	</div>
 </body>
 </html>
