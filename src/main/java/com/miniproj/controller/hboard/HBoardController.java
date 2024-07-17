@@ -132,6 +132,7 @@ public class HBoardController {
 			
 			String tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
 			
+			// 저장된 새로운 파일이름을 json으로 return 시키도록 하자...
 			result = new ResponseEntity<String>("success_" + tmp, HttpStatus.OK);
 			
 		} catch (IOException e) {
