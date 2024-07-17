@@ -1,12 +1,17 @@
 package com.miniproj.util;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 // import java.lang.*;  // 생략  (java.lang 패키지는 기본 패키지이다)
 
+import javax.imageio.ImageIO;
+
 import org.apache.commons.io.FileUtils;
+import org.imgscalr.Scalr;
+import org.imgscalr.Scalr.Mode;
 import org.springframework.stereotype.Component;
 
 import com.miniproj.model.BoardUpFilesVODTO;
@@ -34,14 +39,25 @@ public class FileProcess{
 				newFileName = originalFileName;
 			}
 			
+			File saveFile = new File(saveFilePath + File.separator + newFileName);
+			FileUtils.writeByteArrayToFile(saveFile, upfile); // 실제 파일 저장
+			
 			if (ImageMimeType.isImage(ext)) {
 				// 이미지 파일임 -> 썸네일 이미지, base64문자열을 만들고  이미지와 함께 저장해야 한다.
+				String thumbImgName = makeThumbNailImage(saveFilePath, newFileName);
+				
+				// base64문자열로 encoding 작업도 해야 함... 언제 ? 내일 
+				
+				result = BoardUpFilesVODTO.builder()
+						.ext(contentType)
+						.newFileName(ymd[2] + File.separator + newFileName)
+						.originalFileName(ymd[2] + File.separator + originalFileName)
+						.size(fileSize)
+						.thumbFileName(ymd[2] + File.separator + thumbImgName)
+						.build();
+				
 			} else {
-				// 이미지 파일이 아니다.  그냥 현재 파일만 하드디스크에 저장하면 된다.
-				File saveFile = new File(saveFilePath + File.separator + newFileName);
-				FileUtils.writeByteArrayToFile(saveFile, upfile); // 실제 파일 저장
-				
-				
+				// 이미지 파일이 아니다.  그냥 현재 파일만 하드디스크에 저장하면 된다.		
 				result = BoardUpFilesVODTO.builder()
 						.ext(contentType)
 						.newFileName(ymd[2] + File.separator + newFileName)
@@ -53,6 +69,39 @@ public class FileProcess{
 		}
 		
 		return  result;   // 저장된 파일의 정보를 담은 객체
+	}
+	
+	private String makeThumbNailImage(String saveFilePath, String newFileName) throws IOException {
+		// 원본 이미지 파일을 읽음
+		BufferedImage originalImage = ImageIO.read(new File(saveFilePath + File.separator + newFileName));
+		// 원본 이미지 파일을 읽어 세로 크기를 50px로 맞춰 resizing 하도록...
+		BufferedImage thumbNailImage = Scalr.resize(originalImage, Mode.FIT_TO_HEIGHT, 50);  
+		
+		String thumbImgName = "thumb_" + newFileName;
+		
+		File saveThumbImg = new File(saveFilePath + File.separator + thumbImgName);
+		String ext = thumbImgName.substring(thumbImgName.lastIndexOf(".") + 1);
+		
+		if(ImageIO.write(thumbNailImage, ext,  saveThumbImg)) {
+			return thumbImgName;
+		} else {
+			return null;
+		}
+	}
+	
+	
+	// 업로드 되었던 파일을 하드디스크에서 삭제하는 메서드
+	// removeFileName : realPath + 년월일경로 + 파일 이름.확장자
+	public boolean removeFile(String removeFileName) {
+		boolean result = false;
+		
+		File tmpFile = new File(removeFileName);
+		
+		if (tmpFile.exists()) {
+			result = tmpFile.delete();
+		}
+		
+		return result;
 	}
 	
 	

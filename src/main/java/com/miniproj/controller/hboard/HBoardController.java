@@ -25,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
+import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.hboard.HBoardService;
 import com.miniproj.util.FileProcess;
 
@@ -98,10 +99,10 @@ public class HBoardController {
 	}
 	
 	@RequestMapping(value="/upfiles", method = RequestMethod.POST, produces = "application/json; charset=UTF-8;")
-	public ResponseEntity<BoardUpFilesVODTO> saveBoardFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+	public ResponseEntity<MyResponseWithoutData> saveBoardFile(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 		System.out.println("파일 전송됨... 이제 저장해야 함......");
 		
-		ResponseEntity<BoardUpFilesVODTO> result = null;
+		ResponseEntity<MyResponseWithoutData> result = null;
 		// 파일의 기본정보 가져옴
 		String contentType = file.getContentType();
 		String originalFileName = file.getOriginalFilename();
@@ -129,11 +130,22 @@ public class HBoardController {
 			}
 			System.out.println("=================================================================");
 			
+			String tmp = null;
+			if (fileInfo.getThumbFileName() != null) {
+				// 이미지
+				tmp = fileInfo.getNewFileName();
+			} else {
+				tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
+			}
 			
-			String tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
+			
+			MyResponseWithoutData mrw =  MyResponseWithoutData.builder()
+				.code(200)
+				.msg("success")
+				.newFileName(tmp).build();
 			
 			// 저장된 새로운 파일이름을 json으로 return 시키도록 하자...
-			result = new ResponseEntity<BoardUpFilesVODTO>(fileInfo, HttpStatus.OK);
+			result = new ResponseEntity<MyResponseWithoutData>(mrw, HttpStatus.OK);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -148,18 +160,49 @@ public class HBoardController {
 	
 	
 	@RequestMapping(value="/removefile", method=RequestMethod.POST)
-	public void removeUpFile(@RequestParam("removedFileName") String removeFileName) {
+	public ResponseEntity<MyResponseWithoutData> removeUpFile(@RequestParam("removedFileName") String removeFileName, HttpServletRequest request) {
 		System.out.println("업로드된 파일을 삭제 하자~ : " + removeFileName);
+		
+		boolean removeResult = false;
+		
+		ResponseEntity<MyResponseWithoutData> result = null;
+		
+		int removeIndex = -1;
 		
 		// 넘겨져온 removeFileName이 uploadFileList배열의 originalFileName과 같은것이 있는지 체크하여 있다면 삭제처리 해야 함
 		for (int i = 0; i < this.uploadFileList.size(); i++) {
-			if (removeFileName.equals(this.uploadFileList.get(i).getOriginalFileName())) {
-				// 하드디스크에서 파일 삭제
+			if (uploadFileList.get(i).getNewFileName().contains(removeFileName)) {
+				System.out.println(i + "번째에서 해당 파일 찾았음! : " + uploadFileList.get(i).getNewFileName());
+				String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
+				
+				if(fileProcess.removeFile(realPath + uploadFileList.get(i).getNewFileName())) {
+					removeIndex = i;
+					removeResult = true;
+					break;
+				}
 				
 			}
 		}
 		
+		if (removeResult) {
+			uploadFileList.remove(removeIndex);
+			System.out.println("=================================================================");
+			System.out.println("현재 파일리스트에 있는 파일들");
+			for (BoardUpFilesVODTO f :this.uploadFileList ) {
+				System.out.println(f.toString());
+			}
+			System.out.println("=================================================================");
+			
+			result = new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(200, "", "success"), HttpStatus.OK);
+			
+			
+			
+		} else {
+			result = new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(400, "", "fail"), HttpStatus.CONFLICT);
+		}
 		
+		return result;
+	
 	}
 	
 	

@@ -58,7 +58,7 @@
 		$.ajax({
 	         url : '/hboard/upfiles',             // 데이터가 송수신될 서버의 주소
 	         type : 'post',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
-	         dataType : 'text',					// 수신 받을 데이터의 타입 (text, xml, json)
+	         dataType : 'json',					// 수신 받을 데이터의 타입 (text, xml, json)
 			 data : fd,					// 보낼 데이터
 	         // processData :  false  -> 데이터를 쿼리스트링 형태로 보내지 안겠다는 설정
 	         // contentType 의 디폴트 값이 "application/x-www-form-urlencoded"인데, 파일을 전송하는 방식이기에 "multipart/form-data"로 되어야 하므로..
@@ -67,8 +67,8 @@
 	         async : false,      // 비동기 통신 : false
 	         success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
 	            console.log(data);
-	         	if (data != null) {
-	         		showPreview(file);  // 파일 미리보기
+	         	if (data.msg == 'success') {
+	         		showPreview(file, data.newFileName);  // 파일 미리보기
 	         	}
 	         
 	         }, error : function (data) {
@@ -87,27 +87,35 @@
 	}
 	
 	
+	
 	// 넘겨진 file이 이미지 파일이라면 미리보기 하여 출력한다.
-	function showPreview(file) {
+	function showPreview(file, newFileName) {
 		let imageType = ["image/jpeg", "image/png", "image/gif"];
 		console.log(file);
 		let fileType = file.type.toLowerCase();
 		if (imageType.indexOf(fileType) != -1) {
 			// 이미지 파일이라면...
-			alert("이미지 파일이다");
+			
+			// 업로드 했던 이미지를 reader객체로 읽어와 출력 합시다. 내일~~~~~~~~~~~~
+			
+			
+			let output = `<div><img src='/resources/boardUpFile\${imageFileName}' /><span>\${file.name}</span>`;
+			output += `<span><img src='/resources/images/remove.png' width='20px' onclick="remFile(this);" id="\${newFileName}" /></span></div>`;
+			$('.preview').append(output); 
 		} else {
 			let output = `<div><img src='/resources/images/noimage.png' /><span>\${file.name}</span>`;
-			output += `<span><img src='/resources/images/remove.png' width='20px' onclick="remFile(this);" /></span></div>`;
+			output += `<span><img src='/resources/images/remove.png' width='20px' onclick="remFile(this);" id="\${newFileName}" /></span></div>`;
 			$('.preview').append(output);
 		}
 	}
 	
 	// 업로드한 파일을 지운다. (화면, front배열, 백엔드)
 	function remFile(obj) {
-		let removedFileName = $(obj).parent().prev().html();
+		let removedFileName = $(obj).attr('id');
+		console.log('지워야 할 파일 이름 : ' + removedFileName);
 		
 		for(let i = 0; i < upfiles.length; i++) {
-			if (upfiles[i].name == removedFileName) {
+			if (upfiles[i].name == $(obj).parent().prev().html()) {
 				
 				// 파일 삭제 (백엔드단에서 삭제가 성공하면 front 단에서도 배열, 화면에서 삭제 해야 함)
 				$.ajax({
@@ -120,13 +128,15 @@
 	        		async : false,      // 비동기 통신 : false
 	         		success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
 	            		console.log(data);
+	         			if (data.msg == 'success') {
+	         				upfiles.splice(i, 1);  // 배열에서 삭제
+	        				console.log(upfiles);
+	        				$(obj).parent().parent().remove();  // 태그 삭제
+	         			}
 	         		         
 	         		}
 	      		});
-				
-				upfiles.splice(i, 1);  // 배열에서 삭제
-				console.log(upfiles);
-				$(obj).parent().parent().remove();  // 태그 삭제
+
 			}
 		}
 		
