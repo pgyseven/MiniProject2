@@ -67,7 +67,7 @@
 	         async : false,      // 비동기 통신 : false
 	         success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
 	            console.log(data);
-	         	if (data == 'success') {
+	         	if (data != null) {
 	         		showPreview(file);  // 파일 미리보기
 	         	}
 	         
@@ -113,7 +113,7 @@
 				$.ajax({
 	         		url : '/hboard/removefile',             // 데이터가 송수신될 서버의 주소
 	         		type : 'post',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
-	         		dataType : 'text',					// 수신 받을 데이터의 타입 (text, xml, json)
+	         		dataType : 'json',					// 수신 받을 데이터의 타입 (text, xml, json)
 					data : {							// 보낼 데이터
 						"removedFileName" : removedFileName
 					},
