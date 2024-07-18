@@ -81,7 +81,10 @@ public class HBoardController {
 	// 게시글 저장 버튼을 눌렀을때 해당 게시글을 db에 저장하는 메서드
 	@RequestMapping(value="/saveBoard", method = RequestMethod.POST)
 	public String saveBoard(HBoardDTO boardDTO, RedirectAttributes redirectAttributes) {
+		boardDTO.setFileList(this.uploadFileList);  // 첨부파일리스트를 boardDTO에 주입
+		
 		System.out.println("let's save this board... : " + boardDTO.toString());
+	
 		
 		String returnPage = "redirect:/hboard/listAll";
 		
