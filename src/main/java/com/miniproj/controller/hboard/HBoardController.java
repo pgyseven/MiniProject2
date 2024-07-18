@@ -159,7 +159,7 @@ public class HBoardController {
 	}
 	
 	
-	@RequestMapping(value="/removefile", method=RequestMethod.POST)
+	@RequestMapping(value="/removefile", method=RequestMethod.POST, produces = "application/json; charset=UTF-8;")
 	public ResponseEntity<MyResponseWithoutData> removeUpFile(@RequestParam("removedFileName") String removeFileName, HttpServletRequest request) {
 		System.out.println("업로드된 파일을 삭제 하자~ : " + removeFileName);
 		
@@ -203,6 +203,28 @@ public class HBoardController {
 		
 		return result;
 	
+	}
+	
+	
+	@RequestMapping(value="/cancelBoard", method=RequestMethod.GET, produces = "application/json; charset=UTF-8;")
+	public ResponseEntity<MyResponseWithoutData> cancelBoard(HttpServletRequest request) {
+		System.out.println("유저가 업로드 한 모든 파일을 삭제하자!");
+		String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
+		if (this.uploadFileList.size() > 0) {
+			for (int i = 0; i < uploadFileList.size(); i++) {
+				fileProcess.removeFile(realPath + uploadFileList.get(i).getNewFileName()); 
+				
+				// 이미지 파일이면 썸네일 파일또한 삭제 해야 함
+				if (uploadFileList.get(i).getThumbFileName() != null || uploadFileList.get(i).getThumbFileName() != "") {
+					fileProcess.removeFile(realPath + uploadFileList.get(i).getThumbFileName()); 
+				}
+			}
+			
+			this.uploadFileList.clear();  // 리스트에 있는 모든 데이터 삭제
+		}
+		
+		return new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(200, "", "success"), HttpStatus.OK);
+		
 	}
 	
 	

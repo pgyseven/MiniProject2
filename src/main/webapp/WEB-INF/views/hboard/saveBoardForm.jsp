@@ -162,6 +162,22 @@
         // 데이터가 백엔드 단으로 넘어갈지 말지를 결정해줘야 한다!!!!!
         return result;
     }
+    
+    // 유저가 취소버튼을 클릭하면... 서버에 저장한 모든 업로드한 파일을 지우고, 게시판 전체조회 페이지로 돌아가야 한다.
+    function cancelBoard() {
+    	$.ajax({
+     		url : '/hboard/cancelBoard',             // 데이터가 송수신될 서버의 주소
+     		type : 'get',                                     // 통신 방식 : GET, POST, PUT, DELETE, PATCH   
+     		dataType : 'json',					// 수신 받을 데이터의 타입 (text, xml, json)
+    		async : false,      // 비동기 통신 : false
+     		success : function (data) {                       // 비동기 통신에 성공하면 자동으로 호출될 callback function
+        		console.log(data); 
+     			if (data.msg == 'success') {
+     				location.href='/hboard/listAll';
+     			}
+     		}
+  		});
+    }
 </script>
 <style>
 .fileUploadArea {
@@ -205,6 +221,7 @@
 
 			<button type="submit" class="btn btn-primary"
 				onclick="return validBoard();">저장</button>
+			<button type="button" class="btn btn-warning" onclick="cancelBoard();">취소</button>
 		</form>
 
 
