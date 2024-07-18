@@ -52,11 +52,13 @@ public class FileProcess{
 				// 이진수 데이터를 ASCII(아스키코드) 영역의 문자로만 이루어진 문자열로 바꾸는 인코딩 방식이다.
 				// 특징 : 파일을 별도로 저장할 공간이 필요하지 않다. (하지만, 문자열을 저장해야 한다면 파일을 저장하는 것보다 크기가 더 크다 )
 				// 특징 : 인코딩 디코딩에 따른 부하가 걸린다.
+				// 용량이 큰 이미지는 문자열로 만들지 못한다 -> 썸네일 이미지만 base64로 처리할것!
 				
-				String base64Str = makeBase64String(upfile);
-				System.out.println("===========================================================");
-				System.out.println(base64Str);
-				System.out.println("===========================================================");
+				String base64Str = makeBase64String(saveFilePath + File.separator + thumbImgName);
+				
+//				System.out.println("===========================================================");
+//				System.out.println(base64Str);
+//				System.out.println("===========================================================");
 				
 				result = BoardUpFilesVODTO.builder()
 						.ext(contentType)
@@ -66,6 +68,8 @@ public class FileProcess{
 						.base64Img(base64Str)
 						.thumbFileName(ymd[2] + File.separator + thumbImgName)
 						.build();
+				
+				System.out.println(result.toString());
 				
 			} else {
 				// 이미지 파일이 아니다.  그냥 현재 파일만 하드디스크에 저장하면 된다.		
@@ -82,9 +86,16 @@ public class FileProcess{
 		return  result;   // 저장된 파일의 정보를 담은 객체
 	}
 	
-	private String makeBase64String(byte[] upfile) {
+	private String makeBase64String(String thumbNailFileName) throws IOException {
 		String result = null;
 		
+		// 썸네일 파일의 경로로 File객체 생성
+		File thumb = new File(thumbNailFileName);
+		
+		// File객체가 가리키는 파일을 읽어와 byte[] 
+		byte[] upfile = FileUtils.readFileToByteArray(thumb);
+		
+		// 인코딩
 		result = Base64.getEncoder().encodeToString(upfile);
 		
 		
