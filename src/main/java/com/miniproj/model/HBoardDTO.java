@@ -1,5 +1,7 @@
 package com.miniproj.model;
 
+import java.util.List;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,4 +20,6 @@ public class HBoardDTO {
 	private String title;
 	private String content;
 	private String writer;
+	
+	private List<BoardUpFilesVODTO> fileList;
 }

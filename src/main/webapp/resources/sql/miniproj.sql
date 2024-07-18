@@ -166,3 +166,7 @@ CHANGE COLUMN `ext` `ext` VARCHAR(20) NULL DEFAULT NULL ;
 ALTER TABLE `webshjin`.`boardupfiles` 
 CHANGE COLUMN `boardImgNo` `boardUpFileNo` INT NOT NULL AUTO_INCREMENT ;
 
+-- 방금 insert된 글의 글번호를 가져오는 쿼리문
+select max(boardNo) from hboard;
+
+-- 유저가 게시글을 저장할때 파일업로드 하는 쿼리문
