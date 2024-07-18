@@ -99,7 +99,7 @@
 			// 업로드 했던 이미지를 reader객체로 읽어와 출력 합시다. 내일~~~~~~~~~~~~
 			
 			
-			let output = `<div><img src='/resources/boardUpFile\${imageFileName}' /><span>\${file.name}</span>`;
+			let output = `<div><img src='/resources/boardUpFiles\${newFileName}' /><span>\${file.name}</span>`;
 			output += `<span><img src='/resources/images/remove.png' width='20px' onclick="remFile(this);" id="\${newFileName}" /></span></div>`;
 			$('.preview').append(output); 
 		} else {
