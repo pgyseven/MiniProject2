@@ -133,7 +133,7 @@ public class HBoardController {
 			String tmp = null;
 			if (fileInfo.getThumbFileName() != null) {
 				// 이미지
-				tmp = fileInfo.getNewFileName();
+				tmp = fileInfo.getThumbFileName();
 			} else {
 				tmp = fileInfo.getNewFileName().substring(fileInfo.getNewFileName().lastIndexOf(File.separator) + 1);
 			}
