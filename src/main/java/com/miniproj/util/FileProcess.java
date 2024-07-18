@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.Base64;
 import java.util.Calendar;
 // import java.lang.*;  // 생략  (java.lang 패키지는 기본 패키지이다)
 
@@ -46,13 +47,23 @@ public class FileProcess{
 				// 이미지 파일임 -> 썸네일 이미지, base64문자열을 만들고  이미지와 함께 저장해야 한다.
 				String thumbImgName = makeThumbNailImage(saveFilePath, newFileName);
 				
-				// base64문자열로 encoding 작업도 해야 함... 언제 ? 내일 
+				// base64문자열로 encoding
+				// base64인코딩 : 이진수(binary) 데이터를 Text로 바꾸는 인코딩의 하나로써 
+				// 이진수 데이터를 ASCII(아스키코드) 영역의 문자로만 이루어진 문자열로 바꾸는 인코딩 방식이다.
+				// 특징 : 파일을 별도로 저장할 공간이 필요하지 않다. (하지만, 문자열을 저장해야 한다면 파일을 저장하는 것보다 크기가 더 크다 )
+				// 특징 : 인코딩 디코딩에 따른 부하가 걸린다.
+				
+				String base64Str = makeBase64String(upfile);
+				System.out.println("===========================================================");
+				System.out.println(base64Str);
+				System.out.println("===========================================================");
 				
 				result = BoardUpFilesVODTO.builder()
 						.ext(contentType)
 						.newFileName(ymd[2] + File.separator + newFileName)
 						.originalFileName(ymd[2] + File.separator + originalFileName)
 						.size(fileSize)
+						.base64Img(base64Str)
 						.thumbFileName(ymd[2] + File.separator + thumbImgName)
 						.build();
 				
@@ -71,6 +82,15 @@ public class FileProcess{
 		return  result;   // 저장된 파일의 정보를 담은 객체
 	}
 	
+	private String makeBase64String(byte[] upfile) {
+		String result = null;
+		
+		result = Base64.getEncoder().encodeToString(upfile);
+		
+		
+		return result;
+	}
+
 	private String makeThumbNailImage(String saveFilePath, String newFileName) throws IOException {
 		// 원본 이미지 파일을 읽음
 		BufferedImage originalImage = ImageIO.read(new File(saveFilePath + File.separator + newFileName));
