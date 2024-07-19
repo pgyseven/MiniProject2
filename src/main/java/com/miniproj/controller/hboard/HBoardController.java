@@ -230,5 +230,18 @@ public class HBoardController {
 		
 	}
 	
+	@RequestMapping(value="/viewBoard")
+	public void viewBoard(@RequestParam("boardNo") int boardNo) {
+		System.out.println(boardNo + "번 글을 조회하자!");
+		
+		try {
+			service.read(boardNo);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	
 	
 }

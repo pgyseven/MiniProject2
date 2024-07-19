@@ -18,5 +18,7 @@ public interface HBoardDAO {
 	int getMaxBoardNo() throws Exception;
 	
 	// 업로드된 첨부파일을 저장하는 쿼리문
-	int insertBoardUpFile(BoardUpFilesVODTO upFile) throws Exception; 
+	int insertBoardUpFile(BoardUpFilesVODTO upFile) throws Exception;
+
+	
 }

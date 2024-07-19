@@ -47,6 +47,8 @@ public class HBoardDAOImpl implements HBoardDAO {
 	@Override
 	public int insertBoardUpFile(BoardUpFilesVODTO upFile) throws Exception {
 		
+	
+		
 		return ses.insert(NS + ".saveUpFile", upFile);
 	}
 	

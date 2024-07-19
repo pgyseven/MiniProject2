@@ -167,6 +167,26 @@ ALTER TABLE `webshjin`.`boardupfiles`
 CHANGE COLUMN `boardImgNo` `boardUpFileNo` INT NOT NULL AUTO_INCREMENT ;
 
 -- 방금 insert된 글의 글번호를 가져오는 쿼리문
-select max(boardNo) from hboard;
+select max(boardNo) from  hboard;
 
 -- 유저가 게시글을 저장할때 파일업로드 하는 쿼리문
+insert into boardupfiles(newFileName, originFileName, thumbFileName, ext, size, boardNo, base64Img)
+values(?, ?, ?, ?, ?, ?, ?);
+
+use webshjin;
+
+-- 게시판 상세 페이지를 출력하는 쿼리문
+select * from hboard where boardNo = ?;
+SELECT * FROM BOARDUPFILES WHERE BOARDnO= 16;
+
+-- 게시글과 첨부파일, 작성자 정보까지 함께 출력해보자(조인 테이블 3 개 3 -1 개의 조인 조건이 나와야 한다)
+select h.boardNo, h.title, h.content, h.writer, h.postdate, h.readcount
+, f.*, m.username, m.email
+from hboard h  left outer join boardupfiles f
+on h.boardNo = f.boardNo
+inner join member m
+on h.writer = m.userId
+where h.boardNo=16;
+
+
+
