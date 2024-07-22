@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
@@ -231,11 +232,14 @@ public class HBoardController {
 	}
 	
 	@RequestMapping(value="/viewBoard")
-	public void viewBoard(@RequestParam("boardNo") int boardNo) {
+	public void viewBoard(@RequestParam("boardNo") int boardNo, Model model) {
 		System.out.println(boardNo + "번 글을 조회하자!");
 		
 		try {
-			service.read(boardNo);
+			List<BoardDetailInfo> boardDetailInfo = service.read(boardNo);
+			
+			model.addAttribute("boardDetailInfo", boardDetailInfo);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

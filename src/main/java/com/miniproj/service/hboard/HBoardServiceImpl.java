@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.miniproj.model.BoardUpFilesMemberJoinVO;
+import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
@@ -74,6 +74,18 @@ public class HBoardServiceImpl implements HBoardService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	public List<BoardDetailInfo> read(int boardNo) throws Exception {
+		List<BoardDetailInfo> boardInfo =  bDao.selectBoardByBoardNo(boardNo);
+		
+		
+//		for (int i = 0; i < boardInfo.size(); i++) {
+//			System.out.println(i + "번째  : " + boardInfo.get(i).toString());
+//		}
+		
+		return boardInfo;
 	}
 
 	
