@@ -29,6 +29,7 @@ import com.miniproj.model.HBoardVO;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.hboard.HBoardService;
 import com.miniproj.util.FileProcess;
+import com.miniproj.util.GetClientIPAddr;
 
 
 // Controller 단에서 해야 할 일
@@ -155,7 +156,7 @@ public class HBoardController {
 			e.printStackTrace();
 			
 			result = new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-			
+			// ㄴㅏㄷㅗ
 		}
 		
 		return result;
@@ -232,11 +233,16 @@ public class HBoardController {
 	}
 	
 	@RequestMapping(value="/viewBoard")
-	public void viewBoard(@RequestParam("boardNo") int boardNo, Model model) {
-		System.out.println(boardNo + "번 글을 조회하자!");
+	public void viewBoard(@RequestParam("boardNo") int boardNo, Model model, HttpServletRequest request) {
+		
+		String ipAddr = GetClientIPAddr.getClientIp(request);
+		
+		System.out.println(ipAddr + "가 " + boardNo + "번 글을 조회한다!");
+		
+		// 유저가 
 		
 		try {
-			List<BoardDetailInfo> boardDetailInfo = service.read(boardNo);
+			List<BoardDetailInfo> boardDetailInfo = service.read(boardNo, ipAddr);
 			
 			model.addAttribute("boardDetailInfo", boardDetailInfo);
 			
