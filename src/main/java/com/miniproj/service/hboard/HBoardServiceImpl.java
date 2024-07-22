@@ -77,15 +77,36 @@ public class HBoardServiceImpl implements HBoardService {
 	}
 
 	@Override
-	public List<BoardDetailInfo> read(int boardNo) throws Exception {
-		List<BoardDetailInfo> boardInfo =  bDao.selectBoardByBoardNo(boardNo);
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public List<BoardDetailInfo> read(int boardNo, String ipAddr) throws Exception {
+		List<BoardDetailInfo> boardInfo =  bDao.selectBoardByBoardNo(boardNo); // select
 		
+		// 조회수 증가
+		if (boardInfo != null) {
+			
+			int dateDiff = bDao.selectDateDiff(boardNo, ipAddr); // select 
+			
+			if(dateDiff == -1) {
+				// ipAddr유저가 boardNo글을 조회한적이 없다.// 조회 내역 저장 -> 조회수 증가
+				if (bDao.saveBoardReadLog(boardNo, ipAddr) == 1) {  // insert
+					updateReadCount(boardNo, boardInfo);  // update
+				} 
+			} else if (dateDiff >= 1) {
+				updateReadCount(boardNo, boardInfo); // update
+				bDao.updateReadWhen(boardNo, ipAddr);  // 조회수 증가 한 날로 날짜 upddate
+			}
+		}
 		
-//		for (int i = 0; i < boardInfo.size(); i++) {
-//			System.out.println(i + "번째  : " + boardInfo.get(i).toString());
-//		}
 		
 		return boardInfo;
+	}
+
+	private void updateReadCount(int boardNo, List<BoardDetailInfo> boardInfo) throws Exception {
+		if (bDao.updateReadCount(boardNo) == 1) {
+			for (BoardDetailInfo b : boardInfo) {
+				b.setReadCount(b.getReadCount() + 1);
+			}
+		}
 	}
 
 	
