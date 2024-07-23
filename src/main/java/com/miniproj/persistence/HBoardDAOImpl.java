@@ -12,6 +12,7 @@ import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
+import com.miniproj.model.HReplyBoardDTO;
 
 @Repository  // 아래의 클래스가 DAO객체임을 명시
 public class HBoardDAOImpl implements HBoardDAO {
@@ -104,6 +105,21 @@ public class HBoardDAOImpl implements HBoardDAO {
 	public int updateBoardRef(int newBoardNo) throws Exception {
 		
 		return ses.update(NS + ".updateBoardRef", newBoardNo);
+	}
+
+	@Override
+	public int insertReplyBoard(HReplyBoardDTO replyBoard) throws Exception {
+		
+		return ses.insert(NS + ".insertReplyBoard", replyBoard);
+	}
+
+	@Override
+	public void updateRefOrder(int ref, int refOrder) throws Exception {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("ref", ref);
+		params.put("refOrder" , refOrder);
+		
+		ses.update(NS + ".updateBoardRefOrder", params);
 	}
 	
 	

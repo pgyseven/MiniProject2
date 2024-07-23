@@ -26,6 +26,7 @@ import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
+import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.hboard.HBoardService;
 import com.miniproj.util.FileProcess;
@@ -156,7 +157,7 @@ public class HBoardController {
 			e.printStackTrace();
 			
 			result = new ResponseEntity<>(HttpStatus.NOT_ACCEPTABLE);
-			// ㄴㅏㄷㅗ
+		
 		}
 		
 		return result;
@@ -250,6 +251,32 @@ public class HBoardController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+	}
+	
+	@RequestMapping("/showReplyForm")
+	public String showReplyForm() {
+		return "/hboard/replyForm";
+	}
+	
+	@RequestMapping(value="/saveReply", method=RequestMethod.POST)
+	public String saveReplyBoard(HReplyBoardDTO replyBoard, RedirectAttributes redirectAttributes) {
+		System.out.println(replyBoard + "를 답글로 저장하자~");
+		
+		String returnPage = "redirect:/hboard/listAll";
+		
+		try {
+			if(service.saveReply(replyBoard)) {
+				redirectAttributes.addAttribute("status", "success");
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			
+			redirectAttributes.addAttribute("status", "fail");
+		}
+		
+		return returnPage;
 		
 	}
 	

@@ -5,6 +5,7 @@ import java.util.List;
 import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
+import com.miniproj.model.HReplyBoardDTO;
 
 
 public interface HBoardService {
@@ -17,6 +18,9 @@ public interface HBoardService {
 
 	// 게시판 상세 보기
 	public List<BoardDetailInfo> read(int boardNo, String ipAddr) throws Exception;
+
+	// 게시글 답글 달기
+	public boolean saveReply(HReplyBoardDTO replyBoard) throws Exception;
 	
 	
 	// 게시판 글 수정
