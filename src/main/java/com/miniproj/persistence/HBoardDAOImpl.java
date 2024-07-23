@@ -99,6 +99,12 @@ public class HBoardDAOImpl implements HBoardDAO {
 		
 		return ses.update(NS + ".updateBoardReadLog", params);
 	}
+
+	@Override
+	public int updateBoardRef(int newBoardNo) throws Exception {
+		
+		return ses.update(NS + ".updateBoardRef", newBoardNo);
+	}
 	
 	
 

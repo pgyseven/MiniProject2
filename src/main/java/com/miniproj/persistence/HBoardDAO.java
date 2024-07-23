@@ -35,6 +35,19 @@ public interface HBoardDAO {
 
 	// 조회수 증가한 날자로 update 
 	int updateReadWhen(int boardNo, String ipAddr) throws Exception;
+	
+	// 글 번호를 ref 컬럼에 update
+	int updateBoardRef(int newBoardNo) throws Exception;
+	
+	
+	
+	
+	// default 메서드(이미 구현 완료된 메서드, 반드시 반환값이 있어야 한다)도 인터페이스 내부에 있을 수 있다
+	default String abc(int a) {
+		return null;
+	}
+
+	
 
 
 	

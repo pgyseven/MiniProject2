@@ -86,6 +86,11 @@
 		where readWho=#{readwho} and boardNo=#{boardNo};
 	</update>
 	
+	<!--  ref값을 boardNo로 update -->
+	<update id="updateBoardRef">
+		update hboard set ref = #{boardNo} 
+		where boardNo = #{boardNo}
+	</update>
 	
 	
 	
