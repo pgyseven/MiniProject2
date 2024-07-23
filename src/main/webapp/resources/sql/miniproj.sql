@@ -63,7 +63,7 @@ CREATE TABLE `webshjin`.`hboard` (
   `writer` VARCHAR(8) NULL,
   `postDate` DATETIME NULL DEFAULT now(),
   `readCount` INT NULL DEFAULT 0,
-  `ref` INT NULL DEFAULT 0,
+  `ref` INT NULL DEFAULT 0,  -- 부모글의 글번호
   `step` INT NULL DEFAULT 0,
   `refOrder` INT NULL DEFAULT 0,
   PRIMARY KEY (`boardNo`),
@@ -178,9 +178,11 @@ use webshjin;
 -- 게시판 상세 페이지를 출력하는 쿼리문
 select * from hboard where boardNo = ?;
 SELECT * FROM BOARDUPFILES WHERE BOARDnO= 16;
+SELECT * FROM MEMBER 
+WHERE USERid=(select writer from hboard where boardNo=16);
 
 -- 게시글과 첨부파일, 작성자 정보까지 함께 출력해보자(조인 테이블 3 개 3 -1 개의 조인 조건이 나와야 한다)
-select h.boardNo, h.title, h.content, h.writer, h.postdate, h.readcount
+select h.boardNo, h.title, h.content, h.writer, h.postDate, h.readCount
 , f.*, m.username, m.email
 from hboard h  left outer join boardupfiles f
 on h.boardNo = f.boardNo
@@ -189,4 +191,46 @@ on h.writer = m.userId
 where h.boardNo=16;
 
 
+-- 게시글의 조회수 증가 쿼리문
+update hboard set readCount = readCount + 1 
+where boardNo = ?;
 
+-- 게시판 조회수 증가를 위한 테이블 생성
+CREATE TABLE `webshjin`.`boardreadlog` (
+  `boardReadLogNo` INT NOT NULL AUTO_INCREMENT,
+  `readWho` VARCHAR(130) NOT NULL,
+  `readWhen` DATETIME NULL DEFAULT now(),
+  `boardNo` INT NOT NULL,
+  PRIMARY KEY (`boardReadLogNo`))
+COMMENT = '게시글을 조회한 내역';
+
+
+-- 조회수 증가 알고리즘 ---------------------------------------------------------------------
+-- 1) readwho가 '0:0:0:0:0:0:0:1'이고,  boardNo가 17번인 데이터가 있는지 조회
+select readWhen from boardreadlog
+where readwho='0:0:0:0:0:0:0:1' and boardNo=17;
+
+-- 2) 1)번에서 나온 결과가 null이면, insert
+insert into boardreadlog(readwho, boardNo) values(?, ?);
+
+-- 3) 1)번에서 나온 결과가 null이 아니면.. 현재날짜시간과 이전에 읽은 날짜시간의 날짜 차이를 구해야 한다.
+-- 1)번 + 3)의 내용 subquery와 함수를 이용하면 아래의 한 문장으로 해결할 수 있다.
+select ifnull(datediff(now(), (select readWhen from boardreadlog
+where readwho= ? and boardNo= ?)), -1) as datediff;
+
+
+---------------------------------------- 계층형 게시판으로 만들기 ----------------------------------------------------
+-- 1) 기존 게시글의 ref 컬럼 값을 boardNo값으로 update(기존의 글들은 모두 부모글이기 때문)
+
+-- 2) 앞으로 저장될 게시글에도 ref 컬럼 값을 boardNo값으로 update
+update hboard set ref = ? 
+where boardNo = ?;
+
+
+-- 2-1) 부모글에 대한 다른 답글이 있는 상태에서, 부모글의 답글이 추가되는경우, (자리확보를 위해) 기존의 답글의 refOrder값을 수정해야 한다.
+update hboard set refOrder = refOrder + 1
+where ref = ? and refOrder > ?;
+
+-- 3) 답글을 입력 받아 답글을 저장하고, 부모글의 boardNo를 ref에, 부모글의 step +1 값을 step에, 부모글의 refOrder + 1  값을 refOrder에 저장한다
+insert into hboard(title, content, writer, ref, step, refOrder)
+values(?, ?, ?, ?, ?, ?);
