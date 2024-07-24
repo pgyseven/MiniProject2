@@ -39,6 +39,7 @@ public class HBoardServiceImpl implements HBoardService {
 	
 	
 	@Override
+	@Transactional(readOnly=true)
 	public List<HBoardVO> getAllBoard() throws Exception {
 		
 		System.out.println("HBoardServiceImpl.....");
@@ -116,11 +117,12 @@ public class HBoardServiceImpl implements HBoardService {
 
 	
 	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
 	public boolean saveReply(HReplyBoardDTO replyBoard) throws Exception {
 		boolean result = false;
 		
 		// 부모글에 대한 다른 답글이 있는 상태에서, 부모글의 답글이 추가되는경우, (자리확보를 위해) 기존의 답글의 refOrder값을 수정해야 한다.
-		bDao.updateRefOrder(replyBoard.getRef(), replyBoard.getRefOrder());
+		bDao.updateRefOrder(replyBoard.getRef(), replyBoard.getRefOrder()); // <- update
 		
 		// 부모글의 boardNo를 ref에, 부모글의 step +1 값을 step에, 부모글의 refOrder + 1  값을 refOrder에 저장한다. 답글 데이터와 함께...
 		replyBoard.setStep(replyBoard.getStep() + 1);
@@ -131,6 +133,25 @@ public class HBoardServiceImpl implements HBoardService {
 		}
 		
 		return result;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public List<BoardUpFilesVODTO> removeBoard(int boardNo) throws Exception {
+		
+		// 1) 실제 파일을 하드디스크에서도 삭제해야 하므로, 삭제하기 전에 해당글의 첨부파일 정보를 불러와야 한다.
+		List<BoardUpFilesVODTO> fileList = bDao.selectBoardUpFiles(boardNo); // select
+		
+		// 2) boardNo번 글의 첨부파일이 있다면 첨부파일을 삭제해야 한다. 
+		bDao.deleteBoardUpFiles(boardNo); // delete
+		
+		// 3) boardNo번 글을 삭제 처리
+		if(bDao.deleteBoardByBoardNo(boardNo) == 1) { // update
+			return fileList;
+		} else {
+			return null;
+		}
+		
 	}
 
 	

@@ -6,7 +6,7 @@
 	
 	<!--  게시판의 모든 게시글을 번호 내림차순 정렬하여 가져오는 쿼리문 -->
 	<select id="getAllHBoard" resultType="com.miniproj.model.HBoardVO">
-		select * from hboard order by ref desc, refOrder asc; 
+		select * from hboard order by ref desc, refOrder asc
 	</select>
 	
 	<!-- 새로운 게시글을 저장하는 쿼리문 -->
@@ -27,6 +27,7 @@
 		values(#{newFileName}, #{originalFileName}, #{thumbFileName}, #{ext}, #{size}, #{boardNo}, #{base64Img})
 	</insert>
 	
+	
 	<!-- 게시글의 상세정보를 담기 위한 resultmap 설정 -->
 	<resultMap type="com.miniproj.model.BoardDetailInfo" id="boardDetailInfoMap">
 		<result column="boardNo" property="boardNo" javaType="int" />
@@ -38,6 +39,7 @@
 		<result column="ref" property="ref" javaType="int" />
 		<result column="step" property="step" javaType="int" />
 		<result column="refOrder" property="refOrder" javaType="int" />
+		<result column="isDelete" property="isDelete" javaType="String" />
 		
 		<result column="userName" property="userName" javaType="String" />
 		<result column="email" property="email" javaType="String" />
@@ -56,7 +58,7 @@
 	
 	<!--  게시글의 상세정보를 담는 조인 문 -->
 	<select id="selectBoardDetailInfoByBoardNo" resultMap="boardDetailInfoMap">
-		select h.boardNo, h.title, h.content, h.writer, h.postDate, h.readCount, h.ref, h.step, h.refOrder, f.*, m.userName, m.email
+		select h.boardNo, h.title, h.content, h.writer, h.postDate, h.readCount, h.ref, h.step, h.refOrder, h.isDelete, f.*, m.userName, m.email
 		from hboard h  left outer join boardupfiles f
 		on h.boardNo = f.boardNo
 		inner join member m
@@ -74,13 +76,13 @@
 	<!--  ipAddr의 유저가 boardNo글을 언제 조회했는지 날짜 차이를 얻어온다(조회한 적이 없다면 -1 반환) -->
 	<select id="selectBoardDateDiff"  resultType="int">
 		select ifnull(datediff(now(), (select readWhen from boardreadlog
-		where readwho = #{readwho} and boardNo = #{boardNo})), -1) as datediff
+		where readWho = #{readwho} and boardNo = #{boardNo})), -1) as datediff
 	</select>
 	
 	
 	<!-- BoardReadLog에 조회한 내역 저장  -->
 	<insert id="saveBoardReadLog">
-		insert into boardreadlog(readwho, boardNo) values(#{readwho}, #{boardNo})
+		insert into boardreadlog(readWho, boardNo) values(#{readwho}, #{boardNo})
 	</insert>
 	
 	<!--  조회수 증가한 날짜로 조회 내역 update -->
@@ -102,13 +104,26 @@
 		values(#{title}, #{content}, #{writer}, #{ref}, #{step}, #{refOrder})
 	</insert>
 	
+	<!-- boardNo 번 글의 첨부파일 정보를 가져오는 쿼리문 -->
+   <select id="selectBoardUpFiles"
+      resultType="com.miniproj.model.BoardUpFilesVODTO">
+      SELECT * FROM boardupfiles where boardNo = ${boardNo}
+   </select>
+	
 	<update id="updateBoardRefOrder">
 		update hboard set refOrder = refOrder + 1
 		where ref = #{ref} and refOrder > #{refOrder}
 	</update>
 	
 	
+	<!-- boardNo번 글의 첨부파일을 삭제하는 쿼리문 -->
+	<delete id="deleteBoardFiles">
+		DELETE FROM boardupfiles WHERE boardNo=#{boardNo}
+	</delete>
 	
 	
-	
+	<!--  boardNo번 글을 삭제처리하는 쿼리문 -->
+	<update id="deleteBoardByBoardNo">
+		UPDATE hboard SET isDelete = 'Y', title='', content='' WHERE boardNo=#{boardNo}
+	</update>
 </mapper> 

@@ -67,7 +67,9 @@ public class HBoardController {
 			list = service.getAllBoard();
 			model.addAttribute("boardList", list);  // 데이터 바인딩
 		} catch (Exception e) {
+			e.printStackTrace();
 			model.addAttribute("exception", "error");
+			
 		}
 
 		
@@ -217,20 +219,53 @@ public class HBoardController {
 		System.out.println("유저가 업로드 한 모든 파일을 삭제하자!");
 		String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
 		if (this.uploadFileList.size() > 0) {
-			for (int i = 0; i < uploadFileList.size(); i++) {
-				fileProcess.removeFile(realPath + uploadFileList.get(i).getNewFileName()); 
-				
-				// 이미지 파일이면 썸네일 파일또한 삭제 해야 함
-				if (uploadFileList.get(i).getThumbFileName() != null || uploadFileList.get(i).getThumbFileName() != "") {
-					fileProcess.removeFile(realPath + uploadFileList.get(i).getThumbFileName()); 
-				}
-			}
+			
+			allUploadFileDelete(realPath, this.uploadFileList);
 			
 			this.uploadFileList.clear();  // 리스트에 있는 모든 데이터 삭제
 		}
 		
 		return new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(200, "", "success"), HttpStatus.OK);
 		
+	}
+
+
+	private void allUploadFileDelete(String realPath, List<BoardUpFilesVODTO> fileList) {
+		for (int i = 0; i < fileList.size(); i++) {
+			fileProcess.removeFile(realPath + fileList.get(i).getNewFileName()); 
+			
+			// 이미지 파일이면 썸네일 파일 또한 삭제 해야 함
+			if (fileList.get(i).getThumbFileName() != null || fileList.get(i).getThumbFileName() != "") {
+				fileProcess.removeFile(realPath + fileList.get(i).getThumbFileName()); 
+			}
+		}
+	}
+	
+	@RequestMapping("/removeBoard")
+	public String removeBoard(@RequestParam("boardNo") int boardNo, RedirectAttributes redirectAttributes, HttpServletRequest request) {
+		System.out.println(boardNo + "번 글을 삭제하자");
+		
+		// Dao단에서 해당 boardNo번 글을 삭제처리한 후 
+		try {
+			System.out.println("removeBoard에 옵니다");
+			List<BoardUpFilesVODTO> fileList = service.removeBoard(boardNo);
+			
+			String realPath = request.getSession().getServletContext().getRealPath("/resources/boardUpFiles");
+			
+			// 첨부파일이 있다면 첨부파일의 정보를 가져와 하드디스크에서도 첨부파일을 삭제해야한다.
+			if(fileList.size() > 0) {
+				allUploadFileDelete(realPath, fileList);
+			}
+			
+			redirectAttributes.addAttribute("status", "success");
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			redirectAttributes.addAttribute("status", "fail");
+		}
+		
+		return "redirect:/hboard/listAll";
+	
 	}
 	
 	@RequestMapping(value="/viewBoard")
@@ -279,6 +314,8 @@ public class HBoardController {
 		return returnPage;
 		
 	}
+	
+	
 	
 	
 }
