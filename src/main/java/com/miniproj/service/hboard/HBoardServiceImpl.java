@@ -106,6 +106,13 @@ public class HBoardServiceImpl implements HBoardService {
 		
 		return boardInfo;
 	}
+	
+	@Override
+	@Transactional(readOnly = true, rollbackFor = Exception.class)
+	public List<BoardDetailInfo> read(int boardNo) throws Exception{
+		List<BoardDetailInfo> boardInfo =  bDao.selectBoardByBoardNo(boardNo); // select
+		return boardInfo;
+	}
 
 	private void updateReadCount(int boardNo, List<BoardDetailInfo> boardInfo) throws Exception {
 		if (bDao.updateReadCount(boardNo) == 1) {
@@ -153,6 +160,8 @@ public class HBoardServiceImpl implements HBoardService {
 		}
 		
 	}
+
+	
 
 	
 

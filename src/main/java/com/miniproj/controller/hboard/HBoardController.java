@@ -268,27 +268,41 @@ public class HBoardController {
 	
 	}
 	
-	@RequestMapping(value="/viewBoard")
-	public void viewBoard(@RequestParam("boardNo") int boardNo, Model model, HttpServletRequest request) {
+	// 아래의 viewBoard()는 /viewBoard(게시글 상세보기), /modifyBoard(게시글을 수정하기 위해 게시글을 불러오는)
+	// 일 때 2번 호출된다.
+	@RequestMapping(value={"/viewBoard", "/modifyBoard"})
+	public String viewBoard(@RequestParam("boardNo") int boardNo, Model model, HttpServletRequest request) {
 		
 		String ipAddr = GetClientIPAddr.getClientIp(request);
-		
 		System.out.println(ipAddr + "가 " + boardNo + "번 글을 조회한다!");
 		
-		// 유저가 
+		String returnViewPage = "";
+		
+		List<BoardDetailInfo> boardDetailInfo = null;
 		
 		try {
-			List<BoardDetailInfo> boardDetailInfo = service.read(boardNo, ipAddr);
-			
-			model.addAttribute("boardDetailInfo", boardDetailInfo);
-			
+			if(request.getRequestURI().equals("/hboard/viewBoard")) {
+				System.out.println("게시판 상세보기 호출");
+				
+				returnViewPage="/hboard/viewBoard";
+				
+				boardDetailInfo = service.read(boardNo, ipAddr);
+				
+			} else if(request.getRequestURI().equals("/hboard/modifyBoard")) {
+				System.out.println("게시판 수정 호출");
+				returnViewPage="/hboard/modifyBoard";
+				boardDetailInfo = service.read(boardNo);
+			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			returnViewPage = "redirect:/hboard/listAll?status=fail";
 		}
 		
+		model.addAttribute("boardDetailInfo", boardDetailInfo);
+		
+		return returnViewPage;
 	}
-	
+
 	@RequestMapping("/showReplyForm")
 	public String showReplyForm() {
 		return "/hboard/replyForm";
@@ -305,7 +319,6 @@ public class HBoardController {
 				redirectAttributes.addAttribute("status", "success");
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			
 			redirectAttributes.addAttribute("status", "fail");
@@ -315,7 +328,10 @@ public class HBoardController {
 		
 	}
 	
-	
+//	@RequestMapping("/modifyBoard")
+//	public void modifyBoard(@RequestParam("boardNo") int boardNo, HttpServletRequest request) {
+//		
+//	}
 	
 	
 }
