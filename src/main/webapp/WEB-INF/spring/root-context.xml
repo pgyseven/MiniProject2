@@ -27,7 +27,7 @@
 			value="com.mysql.cj.jdbc.Driver">
 		</property>
 		<property name="url"
-			value="jdbc:mysql://127.0.0.1:3306/webshjin?useSSL=false">
+			value="jdbc:mysql://127.0.0.1:3306/webkgy?useSSL=false">
 		</property>
 		<property name="username" value="root"></property>
 		<property name="password" value="1234"></property>
