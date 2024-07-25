@@ -55,6 +55,9 @@ public class HBoardController {
 	
 	// 유저가 업로드한 파일을 임시 보관하는 객체 (컬렉션)
 	private List<BoardUpFilesVODTO> uploadFileList = new ArrayList<BoardUpFilesVODTO>();
+	
+	
+	private List<BoardUpFilesVODTO> modifyFileList;
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
@@ -279,33 +282,45 @@ public class HBoardController {
 		
 		List<BoardDetailInfo> boardDetailInfo = null;
 		
-		try {
-			if(request.getRequestURI().equals("/hboard/viewBoard")) {
-				System.out.println("게시판 상세보기 호출");
-				
-				returnViewPage="/hboard/viewBoard";
-				
-				boardDetailInfo = service.read(boardNo, ipAddr);
-				
-			} else if(request.getRequestURI().equals("/hboard/modifyBoard")) {
-				System.out.println("게시판 수정 호출");
-				returnViewPage="/hboard/modifyBoard";
-				boardDetailInfo = service.read(boardNo);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			returnViewPage = "redirect:/hboard/listAll?status=fail";
-		}
-		
-		int fileCount = -1;
-		for(BoardDetailInfo b : boardDetailInfo) {
-			fileCount = b.getFileList().size();
-		}
-		model.addAttribute("fileCount", fileCount);
-		model.addAttribute("boardDetailInfo", boardDetailInfo);
-		
-		return returnViewPage;
-	}
+	      try {
+	          if (request.getRequestURI().equals("/hboard/viewBoard")) {
+	             System.out.println("상세보기 호출...");
+	             returnViewPage = "/hboard/viewBoard";
+	              boardDetailInfo = service.read(boardNo, ipAddr);
+	          }else if (request.getRequestURI().equals("/hboard/modifyBoard")) {
+	             System.out.println("수정하기 호출...");
+	             returnViewPage = "/hboard/modifyBoard";
+	             boardDetailInfo = service.read(boardNo);
+	             
+	             
+	             int fileCount = -1;
+	             for (BoardDetailInfo b : boardDetailInfo) {
+	                fileCount = b.getFileList().size();
+	                this.modifyFileList = b.getFileList(); // db 에서 가져온 업로드된 파일리스트를 멤버변수에 할당
+	             }
+	             model.addAttribute("fileCount", fileCount);
+	             
+	                System.out.println("====================================================================================");
+	                System.out.println("수정하기 호출 리스트에 있는 파일들");
+	             for (BoardUpFilesVODTO file: this.modifyFileList) {
+
+	                      System.out.println(file.toString());
+	                   }
+	             
+	                   System.out.println("=====================================================================================");
+	             }
+	          
+	             
+	       } catch (Exception e1) {
+	    
+	          e1.printStackTrace();
+	          returnViewPage = "redirect:/hboard/listAll?status=fail";
+	       }
+
+	       model.addAttribute("boardDetailInfo", boardDetailInfo);
+
+	       return returnViewPage;
+	    }
 
 	@RequestMapping("/showReplyForm")
 	public String showReplyForm() { 
