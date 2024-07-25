@@ -11,7 +11,7 @@
 
 <script>
 		
-
+	
 	let removeFilesArr = [];	
 	function removeFile() {
 		$('.fileCheck').each(function(i, item){
@@ -23,7 +23,7 @@
 		console.log("삭제될 파일 : " + removeFilesArr); // removeFilesArr에 저장된 id값을 console.log로 출력
 
 		$.each(removeFilesArr, function(i, item) {
-			$.ajax({
+         $.ajax({
             url : '/hboard/modifyRemoveFileCheck',            
             type : 'post',            
             dataType : 'json',           
@@ -31,12 +31,38 @@
             async : false, 
             success : function (data) {     
                console.log(data);
-            
+             if(data.msg =='success') {
+               $('#' + item).parent().parent().css('opacity', 0.2);
+            }
             }, error : function (data){
             }
                
          });
          });
+   }
+
+   function cancelRemFiles() {
+      $.ajax({
+         url : '/hboard/cancelRemFiles',
+         type : 'post',
+         dataType : 'json',
+
+         async : false,
+         success : function(data) {
+            console.log(data);
+            if (data.msg == 'success') {
+               $('.fileCheck').each(function(i, item) {
+                  $(item).prop('checked', false);
+                  $('#' + $(item).attr('id')).parent().parent().css('opacity',1);
+               });
+               
+               $('.removeUpFileBtn').attr('disabled', true);
+               $('.removeUpFileBtn').val("선택된 파일이 없습니다.");
+            }
+         }, error : function(data) {
+
+         }
+      });
    }
 
 	function removeFileCheck(fileId) {
@@ -48,9 +74,7 @@
             $('.removeUpFileBtn').attr('disabled', true);
             console.log($('.removeUpFileBtn').val());
             $('.removeUpFileBtn').val("선택된 파일이 없습니다");
-        }
-        
-        
+        }       
     }
     function isCheckBoxChecked() {
         let result = 0;
@@ -62,7 +86,48 @@
         console.log(result);
         return result;
     }
+
+	function addRows(obj) {
+		let rowCnt = $('.fileListTable tr').length;
+		console.log('tr 갯수 : ' + rowCnt);
+		let row = $(obj).parent().parent();
+        let inputFileTag = `<tr><td colspan='2'><input class='form-control' type='file' id='newFile_\${rowCnt}' onchange='showPreview(this);' /></td>
+							<td><input type="button" class="btn btn-info cancelRemove" value="cancel" onclick="cancelAddFile(this);"/></td></tr>`;
+        $(inputFileTag).insertBefore(row); // inputFileTag를 row 위로 추가
+	}
+
+	function showPreview(obj) {
+		// 이미지 파일이라면 ~
+		console.log(obj.files[0]);
+        let reader = new FileReader(); // FileReader 객체 생성
+        reader.onload = function(e) { 
+            // reader객체에 의해 파일을 읽기 완료하면 실행되는 콜백함수
+			let imgTag = `<div style='padding:10px;'><img src='\${e.target.result}' width='40px' /></div>`;
+			$(imgTag).insertAfter(obj);
+        }
+        reader.readAsDataURL(obj.files[0]); // 업로드된 파일을 읽어온다.
+
+		// 이미지 파일이 아니라면!!
+    }
+	
+
+	function cancelAddFile(obj) {
+        let fileTag = $(obj).parent().prev().children().eq(0);
+		$(fileTag).val(''); // input file tag의 value를 초기화
+		$(obj).parent().parent().remove(); 
+    }
 </script>
+<style>
+	.fileBtns{
+		display: flex;
+		justify-content: flex-end;
+	}
+	.fileBtns input{
+		margin-left: 5px;
+	}
+
+	
+</style>
 </head>
 <body>
 
@@ -116,7 +181,7 @@
 
 
 				<div class="fileList" style="padding: 15px">
-					<table class="table table-hover">
+					<table class="table table-hover fileListTable">
 						<thead>
 							<tr>
 								<th>#</th>
@@ -152,11 +217,17 @@
 									</tr>
 								</c:if>
 							</c:forEach>
+							<tr>
+								<td colspan="3" style="text-align : center;">
+									<img src="/resources/images/add.png" onclick="addRows(this);"/>
+								</td>
+							</tr>
 						</tbody>
 					</table>
 
 					<div class="fileBtns">
 						<input type="button" class="btn btn-danger removeUpFileBtn" disabled value="선택한 파일 삭제" onclick="removeFile();"/>						
+						<input type="button" class="btn btn-info cancelRemove" value="파일 삭제 취소" onclick="cancelRemFiles();"/>						
 					</div>
 				</div>
 
