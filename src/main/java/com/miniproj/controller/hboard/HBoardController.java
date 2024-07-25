@@ -102,6 +102,7 @@ public class HBoardController {
 			
 			redirectAttributes.addAttribute("status", "fail");
 		}
+		this.uploadFileList.clear();
 		
 		return returnPage;  // 게시글 전체 목록 페이지로 돌아감
 	}
@@ -202,9 +203,7 @@ public class HBoardController {
 			System.out.println("=================================================================");
 			
 			result = new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(200, "", "success"), HttpStatus.OK);
-			
-			
-			
+
 		} else {
 			result = new ResponseEntity<MyResponseWithoutData>(new MyResponseWithoutData(400, "", "fail"), HttpStatus.CONFLICT);
 		}
@@ -325,7 +324,6 @@ public class HBoardController {
 		}
 		
 		return returnPage;
-		
 	}
 	
 //	@RequestMapping("/modifyBoard")
