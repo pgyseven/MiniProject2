@@ -23,4 +23,7 @@ public class BoardUpFilesVODTO {
 	private long size;
 	private int boardNo;
 	private String base64Img;
+	
+	// 게시물 수정시 첨부파일의 상태를 기록하는 변수(ex : "INSERT" -> 새로 저장된 파일, "DELETE" -> 삭제될 파일
+	private BoardUpFileStatus fileStatus; 
 }
