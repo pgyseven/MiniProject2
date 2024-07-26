@@ -188,4 +188,11 @@ public class HBoardServiceImpl implements HBoardService {
 		return result;
 	}
 
+	@Override
+	@Transactional(readOnly=true)
+	public List<HBoardVO> getPopularBoards() throws Exception {
+		
+		return bDao.selectPopularBoards();
+	}
+
 }

@@ -33,6 +33,9 @@ public interface HBoardService {
 	// 게시판 글 수정
 	public boolean modifyBoard(HBoardDTO modifyBoard) throws Exception;
 
+	// 인기글 5개 가져오기
+	public List<HBoardVO> getPopularBoards() throws Exception;
+
 	
 	// 게시판 페이징
 	
