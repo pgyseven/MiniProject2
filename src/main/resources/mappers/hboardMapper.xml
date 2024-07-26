@@ -136,4 +136,10 @@
 	<delete id="deleteBoardUpFileByPK">
 		DELETE FROM boardupfiles WHERE boardUpFileNo = #{boardUpFileNo}
 	</delete>
+	
+	<!-- 인기글 5개 가져오기 -->
+	<select id="selectPopBoards" resultType="com.miniproj.model.HBoardVO">
+		SELECT boardNo, title, postDate FROM hboard WHERE isDelete='N' ORDER BY readCount DESC, boardNo DESC limit 5
+	</select>
+	
 </mapper> 
