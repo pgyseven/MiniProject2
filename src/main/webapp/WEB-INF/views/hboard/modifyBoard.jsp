@@ -97,17 +97,28 @@
 	}
 
 	function showPreview(obj) {
-		// 이미지 파일이라면 ~
+		
 		console.log(obj.files[0]);
-        let reader = new FileReader(); // FileReader 객체 생성
-        reader.onload = function(e) { 
+		let imageType = ["image/jpeg", "image/png", "image/gif"];
+		
+		// 파일 타입 확인
+		let fileType = obj.files[0].type;
+		
+		let fileName = obj.files[0].name;
+		if (imageType.indexOf(fileType) != -1) { // 이미지 파일이다.
+			let reader = new FileReader(); // FileReader 객체 생성
+        	reader.onload = function(e) { 
             // reader객체에 의해 파일을 읽기 완료하면 실행되는 콜백함수
-			let imgTag = `<div style='padding:10px;'><img src='\${e.target.result}' width='40px' /></div>`;
+			let imgTag = `<div style='padding:6px;'><img src='\${e.target.result}' width='40px' /><span>\${fileName}</span></div>`;
 			$(imgTag).insertAfter(obj);
-        }
-        reader.readAsDataURL(obj.files[0]); // 업로드된 파일을 읽어온다.
+        	}
+        	reader.readAsDataURL(obj.files[0]); // 업로드된 파일을 읽어온다.
+		} else { // 파일이 이미지가 아니라면
+			let imgTag = `<div style='padding:6px;'><img src='/resources/images/noimage.png' width='40px' /><span>\${fileName}</span></div>`;
+			$(imgTag).insertAfter(obj);
+		}
 
-		// 이미지 파일이 아니라면!!
+
     }
 	
 
