@@ -97,7 +97,11 @@
 	}
 
 	function showPreview(obj) {
-		
+		if(obj.files[0].size > 1024 * 1024 * 10) { //
+			alert("10MB 이하의 파일만 업로드할 수 있습니다.");
+            obj.value = ""; // 선택한 파일 초기화
+			return; // 10MB 이하의 파일만 업로드할 수 있도록 return
+		}
 		console.log(obj.files[0]);
 		let imageType = ["image/jpeg", "image/png", "image/gif"];
 		
