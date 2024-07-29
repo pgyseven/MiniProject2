@@ -6,7 +6,7 @@
 	
 	<!--  게시판의 모든 게시글을 번호 내림차순 정렬하여 가져오는 쿼리문 -->
 	<select id="getAllHBoard" resultType="com.miniproj.model.HBoardVO">
-		select * from hboard order by ref desc, refOrder asc
+		select * from hboard order by ref desc, refOrder asc limit #{startRowIndex}, #{viewPostCntPerPage}
 	</select>
 	
 	<!-- 새로운 게시글을 저장하는 쿼리문 -->
@@ -140,6 +140,11 @@
 	<!-- 인기글 5개 가져오기 -->
 	<select id="selectPopBoards" resultType="com.miniproj.model.HBoardVO">
 		SELECT boardNo, title, postDate FROM hboard WHERE isDelete='N' ORDER BY readCount DESC, boardNo DESC limit 5
+	</select>
+	
+	<!-- 전체 데이터 갯수 가져오기 -->
+	<select id="selectTotalCount" resultType="int">
+		SELECT COUNT(*) FROM hboard
 	</select>
 	
 </mapper> 

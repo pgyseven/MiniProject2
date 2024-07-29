@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -29,6 +30,8 @@ import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.MyResponseWithoutData;
+import com.miniproj.model.PagingInfo;
+import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.service.hboard.HBoardService;
 import com.miniproj.util.FileProcess;
 import com.miniproj.util.GetClientIPAddr;
@@ -60,14 +63,27 @@ public class HBoardController {
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
-	public void listAll(Model model) {
-		logger.info("HboardController.listAll()..............");
+	public void listAll(Model model, @RequestParam(value="pageNo", defaultValue = "1") int pageNo, @RequestParam(value="pagingSize", defaultValue = "10") int pagingSize) {
+    // defaultValue : pageNo 쿼리스트링 값이 생략되어 호출된다면 그 값이 1로 초기값이 부여되도록 한다.(400에러 방지)
+		logger.info(pageNo + "번 페이지를 출력하자 & (페이징 사이즈 : " + pagingSize + ")");
 
+		PagingInfoDTO dto = PagingInfoDTO.builder()
+			.pageNo(pageNo)
+			.pagingSize(pagingSize)
+			.build();
+		
 		// 서비스 단 호출
 		List<HBoardVO> list = null;
+		Map<String, Object> result = null;
 		try {
-			list = service.getAllBoard();
+			result = service.getAllBoard(dto);
+			
+			PagingInfo pi = (PagingInfo)result.get("pagingInfo");
+			list =(List<HBoardVO>)result.get("boardList");
+			
 			model.addAttribute("boardList", list); // 데이터 바인딩
+			model.addAttribute("PagingInfo", pi);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("exception", "error");

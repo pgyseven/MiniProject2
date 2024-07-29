@@ -1,7 +1,8 @@
 package com.miniproj.service.hboard;
 
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import com.miniproj.model.BoardUpFilesVODTO;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
+import com.miniproj.model.PagingInfo;
+import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.PointLogDTO;
 import com.miniproj.persistence.HBoardDAO;
 import com.miniproj.persistence.MemberDAO;
@@ -41,14 +44,39 @@ public class HBoardServiceImpl implements HBoardService {
 	
 	@Override
 	@Transactional(readOnly=true)
-	public List<HBoardVO> getAllBoard() throws Exception {
+	public Map<String, Object> getAllBoard(PagingInfoDTO dto) throws Exception {
+		
+		Map<String, Object> resultMap = new HashMap<String, Object>();
 		
 		System.out.println("HBoardServiceImpl.....");
 		
-		// DAO 단 호출
-		List<HBoardVO> lst = bDao.selectAllBoard();
+		PagingInfo pi = makePagingInfo(dto);
 		
-		return lst;
+		// DAO 단 호출
+		List<HBoardVO> list = bDao.selectAllBoard(pi);
+		
+		resultMap.put("pagingInfo", pi);
+		resultMap.put("boardList", list);
+		
+		return resultMap;
+	}
+
+	private PagingInfo makePagingInfo(PagingInfoDTO dto) throws Exception {
+		PagingInfo pi = new PagingInfo(dto);
+		
+		pi.setTotalPostCnt(bDao.getTotalPostCnt()); // 전체 데이터 수 세팅
+		pi.setTotalPageCnt(); // 전체 페이지 수 세팅
+		pi.setStartRowIndex(); // 현재 페이지에서 보여주기 시작할 rowIndex 세팅
+		
+		
+		// 페이징 블록 만들기
+		pi.setPageBlockNoCurPage();
+		pi.setStartPageNoCurBlock();
+		pi.setEndPageNoCurBlock();
+		
+		System.out.println(pi.toString());
+		return pi;
+		
 	}
 
 	@Override

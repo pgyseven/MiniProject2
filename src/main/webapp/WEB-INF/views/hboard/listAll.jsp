@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -7,21 +7,58 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script
-   src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
 
    $(function(){
 
+	  // 현재 페이지 번호를 가져와 해당 페이지번호 pagination li 태그에 active라는 클래스를 부여 
+	  /* let pageNo = '${param.pageNo}';
+	  if(pageNo == '') {
+		  pageNo = 1;
+	  } else {
+		  pageNo = parseInt('${param.pageNo}');
+	  }
+	  
+	  $(`#\${pageNo}`).addClass('active'); */
+	   
+	   
       showModalAccordingToStatus();
 
       timediifPostDate();  // 함수 호출
+      
+      let pagingSize = '${param.pagingSize}'
+      if(pagingSize == '') {
+   	  	pagingSize=10;
+   	  } else {
+   		pagingSize = parseInt(pagingSize);
+   	  }
+      $('#pagingSize').val(pagingSize);
       
       // 클래스가 modalCloseBtn인 태그를 클릭하면 실행되는 함수
       $('.modalCloseBtn').click(function(){
          $("#myModal").hide(); // 태그를 화면에서 감춤
       });
+      
+      
+   // 유저가 페이징 사이즈를 선택하면
+      $('.pagingSize').change(function(){
+   	   console.log($(this).val());
+   	   
+   	   let pageNo = '${param.pageNo}';
+   		  if(pageNo == '') {
+   			  pageNo = 1;
+   		  } else {
+   			  pageNo = parseInt('${param.pageNo}');
+   		  }
+   	   
+   	   location.href='/hboard/listAll?pagingSize=' + $(this).val() + '&pageNo=' + pageNo;
+      });
 
    });  // 웹 문서가 로딩 완료되면 현재의 함수를 실행하도록 한다
+   
+   
+   
 
 
    // 데이터 로딩 상태에 따라 모달창을 띄우는 함수
@@ -76,95 +113,134 @@
 </script>
 </head>
 <body>
-   <div class="container">
-      <c:import url="./../header.jsp" />
+	<div class="container">
+		<c:import url="./../header.jsp" />
 
-      <div class="content">
-         <h1>계층형 게시판 전체 리스트 페이지</h1>
-         <c:choose>
-            <c:when test="${boardList != null }">
-               <table class="table table-hover">
-                  <thead>
-                     <tr>
-                        <th>#</th>
-                        <th>title</th>
-                        <th>writer</th>
-                        <th>postDate</th>
-                        <th>readCount</th>
-                        <th>isDelete</th>
-                     </tr>
-                  </thead>
-                  <tbody>
-                     <c:forEach var="board" items="${boardList }">
-                        <c:choose>
-                           <c:when test="${board.isDelete == 'N'}">
-                              <tr
-                                 onclick="location.href='/hboard/viewBoard?boardNo=${board.boardNo}';">
-                                 <td>${board.boardNo }</td>
-                                 <td><c:forEach var="i" begin="1" end="${board.step }">
-                                       <img src="/resources/images/reply.png" />
-                                    </c:forEach> ${board.title }</td>
-                                 <td>${board.writer }</td>
-                                 <td class="postDate">${board.postDate }</td>
-                                 <td>${board.readCount }</td>
-                                 <td>${board.isDelete }</td>
-                              </tr>
-                           </c:when>
-                           
-                           <c:when test="${board.isDelete == 'Y' }">
-                              <tr>
-                                 <td>${board.boardNo }</td>
-                                 <td>삭제된 글입니다...</td>
-                                 <td></td>
-                                 <td class="postDate"></td>
-                                 <td></td>
-                                 <td>${board.isDelete }</td>
-                              </tr>
-                           </c:when>
-                           
-                        </c:choose>
+		<div class="content">
+			<h1>계층형 게시판 전체 리스트 페이지</h1>
 
-                     </c:forEach>
-                  </tbody>
-               </table>
-            </c:when>
-         </c:choose>
+			<div class="boardControl">
+				<select class="form-select pagingSize" id="pagingSize">
+					<option value="10">10개씩 보기</option>
+					<option value="20">20개씩 보기</option>
+					<option value="40">40개씩 보기</option>
+					<option value="80">80개씩 보기</option>
+				</select>
+			</div>
+
+			<c:choose>
+				<c:when test="${boardList != null }">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>title</th>
+								<th>writer</th>
+								<th>postDate</th>
+								<th>readCount</th>
+								<th>isDelete</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="board" items="${boardList}">
+								<c:choose>
+									<c:when test="${board.isDelete == 'N'}">
+										<tr
+											onclick="location.href='/hboard/viewBoard?boardNo=${board.boardNo}';">
+											<td>${board.boardNo }</td>
+											<td><c:forEach var="i" begin="1" end="${board.step}">
+													<img src="/resources/images/reply.png" />
+												</c:forEach> ${board.title }</td>
+											<td>${board.writer }</td>
+											<td class="postDate">${board.postDate }</td>
+											<td>${board.readCount }</td>
+											<td>${board.isDelete }</td>
+										</tr>
+									</c:when>
+
+									<c:when test="${board.isDelete == 'Y' }">
+										<tr>
+											<td>${board.boardNo }</td>
+											<td>삭제된 글입니다...</td>
+											<td></td>
+											<td class="postDate"></td>
+											<td></td>
+											<td>${board.isDelete }</td>
+										</tr>
+									</c:when>
+
+								</c:choose>
+
+							</c:forEach>
+						</tbody>
+					</table>
+				</c:when>
+			</c:choose>
 
 
 
-      </div>
+		</div>
 
-      <div>
-         <button type="button" class="btn btn-primary"
-            onclick="location.href='/hboard/saveBoard';">글 저장</button>
-      </div>
+		<div>
+			<button type="button" class="btn btn-primary"
+				onclick="location.href='/hboard/saveBoard';">글 쓰기</button>
+		</div>
 
-      <!-- The Modal -->
-      <div class="modal" id="myModal" style="display: none;">
-         <div class="modal-dialog">
-            <div class="modal-content">
+		<div class="pagination justify-content-center" style="margin: 20px 0">
+			<ul class="pagination">
+				<c:if test="${param.pageNo > 1}">
+					<li class="page-item"><a class="page-link"
+						href="/hboard/listAll?pageNo=${param.pageNo - 1}">prev</a></li>
+				</c:if>
 
-               <!-- Modal Header -->
-               <div class="modal-header">
-                  <h4 class="modal-title">MiniProject</h4>
-                  <button type="button" class="btn-close modalCloseBtn"
-                     data-bs-dismiss="modal"></button>
-               </div>
+				<c:forEach var="i" begin="${PagingInfo.startPageNoCurBlock}"
+					end="${PagingInfo.endPageNoCurBlock}">
+					<c:choose>
+						<c:when test="${param.pageNo == i}">
+							<li class="page-item active" id="${i}"><a class="page-link"
+								href="/hboard/listAll?pageNo=${i}">${i}</a></li>
+						</c:when>
+						<c:otherwise>
+							<li class="page-item" id="${i}"><a class="page-link"
+								href="/hboard/listAll?pageNo=${i}">${i}</a></li>
+						</c:otherwise>
+					</c:choose>
 
-               <!-- Modal body -->
-               <div class="modal-body"></div>
+				</c:forEach>
 
-               <!-- Modal footer -->
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-danger modalCloseBtn"
-                     data-bs-dismiss="modal">Close</button>
-               </div>
+				<c:if test="${param.pageNo < PagingInfo.totalPageCnt}">
+					<li class="page-item"><a class="page-link"
+						href="/hboard/listAll?pageNo=${param.pageNo + 1}">next</a></li>
+				</c:if>
+			</ul>
+		</div>
 
-            </div>
-         </div>
-      </div>
+		<!-- The Modal -->
+		<div class="modal" id="myModal" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
 
-      <c:import url="./../footer.jsp" />
-   </div>
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title">MiniProject</h4>
+						<button type="button" class="btn-close modalCloseBtn"
+							data-bs-dismiss="modal"></button>
+					</div>
+
+					<!-- Modal body -->
+					<div class="modal-body"></div>
+
+					<!-- Modal footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-danger modalCloseBtn"
+							data-bs-dismiss="modal">Close</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<c:import url="./../footer.jsp" />
+	</div>
 </body>
 </html>
