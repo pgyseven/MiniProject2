@@ -27,7 +27,7 @@
 					<li class="nav-item"><a class="nav-link"
 						href="javascript:void(0)">댓글형게시판</a></li>
 					<li class="nav-item"><a class="nav-link"
-						href="javascript:void(0)">회원가입</a></li>
+						href="/member/register">회원가입</a></li>
 						
 					<li class="nav-item"><a class="nav-link"
 						href="/weather">오늘의 날씨(연습)</a></li>
