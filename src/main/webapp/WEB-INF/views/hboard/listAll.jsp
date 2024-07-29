@@ -190,7 +190,8 @@
 			<ul class="pagination">
 				<c:if test="${param.pageNo > 1}">
 					<li class="page-item"><a class="page-link"
-						href="/hboard/listAll?pageNo=${param.pageNo - 1}">prev</a></li>
+						href="/hboard/listAll?pageNo=${param.pageNo - 1}">◀</a></li>
+
 				</c:if>
 
 				<c:forEach var="i" begin="${PagingInfo.startPageNoCurBlock}"
@@ -210,7 +211,7 @@
 
 				<c:if test="${param.pageNo < PagingInfo.totalPageCnt}">
 					<li class="page-item"><a class="page-link"
-						href="/hboard/listAll?pageNo=${param.pageNo + 1}">next</a></li>
+						href="/hboard/listAll?pageNo=${param.pageNo + 1}">▶</a></li>
 				</c:if>
 			</ul>
 		</div>
