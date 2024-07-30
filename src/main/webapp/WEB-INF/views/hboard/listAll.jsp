@@ -109,6 +109,22 @@
 
       });
    }
+   
+   // 검색 버튼을 눌렀을 때 searchType == -1 이거나, searchWord에 빈 문자열이라면 검색어가 제대로 입력되지 않았으므로
+   // 백엔드 단으로 데이터를 넘기면 안된다.
+   function isValid() {
+	   let result = false;
+	   	
+	   if($('#searchType').val() == -1 || $('#searchWord').val() == '') {
+		   alert('검색조건과 검색어를 지정해주세요');
+		   $('#searchType').focus();
+		   return result;
+	   } else {
+		   result = true;
+	   }
+	   
+	   return result;
+   }
 
 </script>
 </head>
@@ -181,10 +197,30 @@
 
 		</div>
 
-		<div>
-			<button type="button" class="btn btn-primary"
+		<div style="float : right; margin-right:5px;">
+			<button type="button" class="btn btn-secondary"
 				onclick="location.href='/hboard/saveBoard';">글 쓰기</button>
 		</div>
+
+		<form class="searchBar" style="clear:right; display:flex; flex-direction: row; align-items:center; justify-content:center;"
+			action="/hboard/listAll" method="post">
+			
+				<div class="input-group mt-3 mb-3" style="width:40%;">
+					<select class="form-select" name="searchType" id="searchType">
+						<option value="-1">--검색조건--</option>
+						<option value="title">제목</option>
+						<option value="writer">작성자</option>
+						<option value="">내용</option>
+					</select>
+					<input type="text" class="form-control" name="searchWord" id="searchWord" placeholder="검색어를 입력하세요">
+					<input type="hidden" name="pageNo" value="${param.pageNo}" />
+					<input type="hidden" name="pagingSize" value="${param.pagingSize}" />
+				</div>
+			<div>
+				<button type="submit" class="btn btn-primary" onclick="return isValid();">검색</button>
+ 		    </div>
+
+		</form>
 
 		<div class="pagination justify-content-center" style="margin: 20px 0">
 			<ul class="pagination">
