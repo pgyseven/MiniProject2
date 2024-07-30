@@ -52,7 +52,7 @@
    			  pageNo = parseInt('${param.pageNo}');
    		  }
    	   
-   	   location.href='/hboard/listAll?pagingSize=' + $(this).val() + '&pageNo=' + pageNo;
+   	   location.href='/hboard/listAll?pagingSize=' + $(this).val() + '&pageNo=' + pageNo + '&searchType=${param.searchType}&searchWord=${param.searchWord}';
       });
 
    });  // 웹 문서가 로딩 완료되면 현재의 함수를 실행하도록 한다
@@ -210,7 +210,7 @@
 						<option value="-1">--검색조건--</option>
 						<option value="title">제목</option>
 						<option value="writer">작성자</option>
-						<option value="">내용</option>
+						<option value="content">내용</option>
 					</select>
 					<input type="text" class="form-control" name="searchWord" id="searchWord" placeholder="검색어를 입력하세요">
 					<input type="hidden" name="pageNo" value="${param.pageNo}" />
@@ -226,7 +226,7 @@
 			<ul class="pagination">
 				<c:if test="${param.pageNo > 1}">
 					<li class="page-item"><a class="page-link"
-						href="/hboard/listAll?pageNo=${param.pageNo - 1}">◀</a></li>
+						href="/hboard/listAll?pageNo=${param.pageNo - 1}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">◀</a></li>
 
 				</c:if>
 
@@ -235,11 +235,11 @@
 					<c:choose>
 						<c:when test="${param.pageNo == i}">
 							<li class="page-item active" id="${i}"><a class="page-link"
-								href="/hboard/listAll?pageNo=${i}">${i}</a></li>
+								href="/hboard/listAll?pageNo=${i}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">${i}</a></li>
 						</c:when>
 						<c:otherwise>
 							<li class="page-item" id="${i}"><a class="page-link"
-								href="/hboard/listAll?pageNo=${i}">${i}</a></li>
+								href="/hboard/listAll?pageNo=${i}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">${i}</a></li>
 						</c:otherwise>
 					</c:choose>
 
@@ -247,7 +247,7 @@
 
 				<c:if test="${param.pageNo < PagingInfo.totalPageCnt}">
 					<li class="page-item"><a class="page-link"
-						href="/hboard/listAll?pageNo=${param.pageNo + 1}">▶</a></li>
+						href="/hboard/listAll?pageNo=${param.pageNo + 1}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">▶</a></li>
 				</c:if>
 			</ul>
 		</div>

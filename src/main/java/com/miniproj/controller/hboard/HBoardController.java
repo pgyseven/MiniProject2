@@ -32,6 +32,7 @@ import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
+import com.miniproj.model.SearchCriteriaDTO;
 import com.miniproj.service.hboard.HBoardService;
 import com.miniproj.util.FileProcess;
 import com.miniproj.util.GetClientIPAddr;
@@ -63,9 +64,10 @@ public class HBoardController {
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
-	public void listAll(Model model, @RequestParam(value="pageNo", defaultValue = "1") int pageNo, @RequestParam(value="pagingSize", defaultValue = "10") int pagingSize) {
+	public void listAll(Model model, @RequestParam(value="pageNo", defaultValue = "1") int pageNo,
+			@RequestParam(value="pagingSize", defaultValue = "10") int pagingSize, SearchCriteriaDTO searchCriteria) {
     // defaultValue : pageNo 쿼리스트링 값이 생략되어 호출된다면 그 값이 1로 초기값이 부여되도록 한다.(400에러 방지)
-		logger.info(pageNo + "번 페이지를 출력하자 & (페이징 사이즈 : " + pagingSize + ")");
+		logger.info(pageNo + "번 페이지를 출력하자 & 페이징 사이즈 : " + pagingSize + " (검색조건 : " + searchCriteria.toString() + ")");
 
 		PagingInfoDTO dto = PagingInfoDTO.builder()
 			.pageNo(pageNo)
@@ -76,13 +78,14 @@ public class HBoardController {
 		List<HBoardVO> list = null;
 		Map<String, Object> result = null;
 		try {
-			result = service.getAllBoard(dto);
+			result = service.getAllBoard(dto, searchCriteria);
 			
 			PagingInfo pi = (PagingInfo)result.get("pagingInfo");
 			list =(List<HBoardVO>)result.get("boardList");
 			
 			model.addAttribute("boardList", list); // 데이터 바인딩
 			model.addAttribute("PagingInfo", pi);
+			model.addAttribute("search", searchCriteria);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

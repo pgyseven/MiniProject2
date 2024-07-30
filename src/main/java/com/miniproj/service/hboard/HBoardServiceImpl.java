@@ -19,9 +19,11 @@ import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.PointLogDTO;
+import com.miniproj.model.SearchCriteriaDTO;
 import com.miniproj.persistence.HBoardDAO;
 import com.miniproj.persistence.MemberDAO;
 import com.miniproj.persistence.PointLogDAO;
+import com.mysql.cj.util.StringUtils;
 
 // Service단에서 해야할 작업
 // 1) Controller에서 넘겨진 파라메터를 처리한 후(비즈니스 로직에 의해(트랜잭션 처리를 통해)) 
@@ -44,16 +46,22 @@ public class HBoardServiceImpl implements HBoardService {
 	
 	@Override
 	@Transactional(readOnly=true)
-	public Map<String, Object> getAllBoard(PagingInfoDTO dto) throws Exception {
+	public Map<String, Object> getAllBoard(PagingInfoDTO dto, SearchCriteriaDTO searchCriteria) throws Exception {
 		
 		Map<String, Object> resultMap = new HashMap<String, Object>();
 		
 		System.out.println("HBoardServiceImpl.....");
 		
-		PagingInfo pi = makePagingInfo(dto);
+		PagingInfo pi = makePagingInfo(dto, searchCriteria);
 		
 		// DAO 단 호출
-		List<HBoardVO> list = bDao.selectAllBoard(pi);
+		List<HBoardVO> list = null;
+		if(StringUtils.isNullOrEmpty(searchCriteria.getSearchType()) && StringUtils.isNullOrEmpty(searchCriteria.getSearchWord())) {
+			list = bDao.selectAllBoard(pi);
+		} else {
+			list = bDao.selectAllBoard(pi, searchCriteria);
+		}
+		
 		
 		resultMap.put("pagingInfo", pi);
 		resultMap.put("boardList", list);
@@ -61,10 +69,18 @@ public class HBoardServiceImpl implements HBoardService {
 		return resultMap;
 	}
 
-	private PagingInfo makePagingInfo(PagingInfoDTO dto) throws Exception {
+	private PagingInfo makePagingInfo(PagingInfoDTO dto, SearchCriteriaDTO sc) throws Exception {
 		PagingInfo pi = new PagingInfo(dto);
 		
-		pi.setTotalPostCnt(bDao.getTotalPostCnt()); // 전체 데이터 수 세팅
+		
+		// 검색어가 있을 때는 검색한 글의 데이터 수를 얻어오는 것부터 페이징 시작
+		if(StringUtils.isNullOrEmpty(sc.getSearchType()) && StringUtils.isNullOrEmpty(sc.getSearchWord())) { // 검색어가 없을 때는 전체 데이터 수를 얻어오는 것부터 페이징
+			pi.setTotalPostCnt(bDao.getTotalPostCnt()); // 전체 데이터 수 세팅
+		} else {
+			pi.setTotalPostCnt(bDao.getTotalPostCnt(sc)); // 검색 조건에 따라 검색된 데이터 수 세팅
+		}
+		
+		
 		pi.setTotalPageCnt(); // 전체 페이지 수 세팅
 		pi.setStartRowIndex(); // 현재 페이지에서 보여주기 시작할 rowIndex 세팅
 		

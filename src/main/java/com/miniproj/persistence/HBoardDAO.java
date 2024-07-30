@@ -8,6 +8,7 @@ import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfo;
+import com.miniproj.model.SearchCriteriaDTO;
 
 public interface HBoardDAO  {
    
@@ -70,8 +71,14 @@ public interface HBoardDAO  {
    // 인기글 5개 가져오기
    List<HBoardVO> selectPopularBoards() throws Exception;
 
-   // 게시판의 전체 글 수를 얻어오는 메소드
+   // (검색어가 없을 때) 게시판의 전체 글 수를 얻어오는 메소드
    int getTotalPostCnt() throws Exception;
+
+   // (검색어가 있을 때) 게시판의 전체 글 수를 얻어오는 메소드
+   int getTotalPostCnt(SearchCriteriaDTO sc) throws Exception;
+
+   // 검색어가 있는 경우 검색된 게시글들을 페이징하여 가져오는 메소드
+   List<HBoardVO> selectAllBoard(PagingInfo pi, SearchCriteriaDTO searchCriteria) throws Exception;
 
 
 }

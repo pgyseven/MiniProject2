@@ -9,12 +9,13 @@ import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfoDTO;
+import com.miniproj.model.SearchCriteriaDTO;
 
 
 public interface HBoardService {
 	
 	// 게시판 전제 리스트 조회
-	public Map<String, Object> getAllBoard(PagingInfoDTO dto) throws Exception;
+	public Map<String, Object> getAllBoard(PagingInfoDTO dto, SearchCriteriaDTO searchCriteria) throws Exception;
 	
 	// 게시판 글 작성
 	boolean saveBoard(HBoardDTO newBoard) throws Exception;
