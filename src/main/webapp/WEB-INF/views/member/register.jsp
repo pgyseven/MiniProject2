@@ -22,6 +22,38 @@
    }
 
    $(function(){
+	   
+	// 패스워드1을 입력하고 blur 되었을때
+		$('#userPwd1').blur(function (){
+			let tmpPwd = $('#userPwd1').val();
+			
+			if (tmpPwd.length < 4 || tmpPwd.length > 8) {
+				outputError('패스워드는 4~8자로 입력하세요.', $('#userPwd1'));
+				$('#userPwd1').val('');
+				$(this).val('');
+			}else {
+				setTimeout(()=> {
+					$('.error').remove();
+				}, 500);  // 0.5초 후에 에러메시지 사라짐
+				$('#userPwd1').css('border', '');  // css 원상태로
+			}
+		});
+	
+		// 패스워드 확인을 입력하고 blur 되었을때
+		$('#userPwd2').blur(function(){
+			let tmpPwd1 = $('#userPwd1').val();
+			if (tmpPwd1 != $(this).val()) {
+				outputError('패스워드 다릅니다.', $('#userPwd1'));
+				$('#userPwd1').val('');
+				$(this).val('');
+				$('#userPwd1').focus();	
+				$('#pwdValid').val('');
+			}else {
+				clearError($('#userPwd1'));
+				$('#pwdValid').val('checked');
+			}
+		});
+	   
       // 아이디에 키보드가 눌려졌을때 발생하는 이벤트
       $('#userId').keyup(function(evt){
          let tmpUserId = $('#userId').val();
@@ -69,7 +101,7 @@
       let pwdCheck = pwdValid();
       
 
-      if (idCheck) {
+      if (idCheck && pwdCheck) {
             return true;
         } else {
             return false;
@@ -81,6 +113,9 @@
       // 비밀번호 : 필수이고, 4~8자, 비밀번호확인과 동일해야 한다.
       let result = false;
 
+      if($('#pwdValid').val() == 'checked') {
+    	  result = true;
+      }
 
       return result;
    }
@@ -132,6 +167,7 @@
             <label for="userPwd1" class="form-label">패스워드 확인: </label> <input
                type="password" class="form-control" id="userPwd2"
                placeholder="비밀번호를 확인하세요..." />
+               <input type="hidden" id="pwdValid"  />
          </div>
 
          <div class="mb-3 mt-3">
