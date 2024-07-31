@@ -67,6 +67,7 @@
 				해지는시간
 				
 			</div>
+			<button type="button" class="btn btn-info" onclick="location.href='/hboard/listAll';">리스트페이지로 돌아가기</button>
 		</div>
 
 		<c:import url="./footer.jsp" />

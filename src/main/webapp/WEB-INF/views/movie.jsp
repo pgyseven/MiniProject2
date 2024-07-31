@@ -94,8 +94,9 @@
 		<c:import url="./header.jsp" />
 
 		<div class="content">
+		
 			<h1>movie.jsp</h1>
-
+	<button type="button" class="btn btn-info" onclick="location.href='/hboard/listAll';">리스트페이지로 돌아가기</button>
 			<h5 class="title"></h5>
 			<h6 class="outputDate"></h6>
 

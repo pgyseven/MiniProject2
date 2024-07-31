@@ -120,8 +120,7 @@ function showRemoveModal() {
          <button type="button" class="btn btn-primary"
             onclick="location.href='/hboard/modifyBoard?boardNo=${board.boardNo}';">글수정</button>
          <button type="button" class="btn btn-danger" onclick="showRemoveModal();">글삭제</button>
-         <button type="button" class="btn btn-info"
-            onclick="location.href='/hboard/listAll';">리스트페이지로</button>
+         <button type="button" class="btn btn-info" onclick="location.href='/hboard/listAll';">리스트페이지로 돌아가기</button>
       </div>
       </c:forEach>
       </div>
