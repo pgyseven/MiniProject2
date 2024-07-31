@@ -14,7 +14,14 @@ public class MemberDAOImpl implements MemberDAO {
 
 	@Override
 	public int updateUserPoint(String userId) throws Exception {
+		
 		return ses.insert(NS + ".updateUserPoint", userId);
+	}
+
+	@Override
+	public int selectDuplicateId(String tmpUserId) throws Exception {
+		
+		return ses.selectOne(NS + ".selectUserId", tmpUserId);
 	}
 
 }
