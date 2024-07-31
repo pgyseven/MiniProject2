@@ -58,7 +58,7 @@ public class MemberController {
       } catch (Exception e) {
          
          e.printStackTrace();
-         result = new ResponseEntity<>(json, HttpStatus.CONFLICT);
+         result = new ResponseEntity<MyResponseWithoutData>(HttpStatus.CONFLICT);
       }
       return result;
    }
