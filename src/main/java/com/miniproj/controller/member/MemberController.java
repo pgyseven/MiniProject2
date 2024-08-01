@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.miniproj.model.MemberVO;
 import com.miniproj.model.MyResponseWithoutData;
@@ -26,9 +27,9 @@ public class MemberController {
       
    }
    @RequestMapping(value="/register", method = RequestMethod.POST)
-   public void registerMember(MemberVO registMember) {
+   public void registerMember(MemberVO registMember, @RequestParam("userProfile") MultipartFile userProfile) {
       System.out.println("회원가입 진행~~~~~~~~~~~~~~~~" + registMember.toString());
-      
+      System.out.println(userProfile.getOriginalFilename());
    }
    
    
