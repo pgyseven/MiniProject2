@@ -22,38 +22,38 @@
    }
 
    $(function(){
-	   
-	// 패스워드1을 입력하고 blur 되었을때
-		$('#userPwd1').blur(function (){
-			let tmpPwd = $('#userPwd1').val();
-			
-			if (tmpPwd.length < 4 || tmpPwd.length > 8) {
-				outputError('패스워드는 4~8자로 입력하세요.', $('#userPwd1'));
-				$('#userPwd1').val('');
-				$(this).val('');
-			}else {
-				setTimeout(()=> {
-					$('.error').remove();
-				}, 500);  // 0.5초 후에 에러메시지 사라짐
-				$('#userPwd1').css('border', '');  // css 원상태로
-			}
-		});
-	
-		// 패스워드 확인을 입력하고 blur 되었을때
-		$('#userPwd2').blur(function(){
-			let tmpPwd1 = $('#userPwd1').val();
-			if (tmpPwd1 != $(this).val()) {
-				outputError('패스워드 다릅니다.', $('#userPwd1'));
-				$('#userPwd1').val('');
-				$(this).val('');
-				$('#userPwd1').focus();	
-				$('#pwdValid').val('');
-			}else {
-				clearError($('#userPwd1'));
-				$('#pwdValid').val('checked');
-			}
-		});
-	   
+      
+      // 패스워드1을 입력하고 blur 되었을때
+      $('#userPwd1').blur(function (){
+         let tmpPwd = $('#userPwd1').val();
+         
+         if (tmpPwd.length < 4 || tmpPwd.length > 8) {
+            outputError('패스워드는 4~8자로 입력하세요.', $('#userPwd1'));
+            $('#pwdValid').val('');
+            $(this).val('');
+         } else {
+            setTimeout(()=> {
+               $('.error').remove();
+            }, 500);  // 0.5초 후에 에러메시지 사라짐
+            $('#userPwd1').css('border', '');  // css 원상태로
+         }
+      });
+      
+      // 패스워드 확인을 입력하고 blur 되었을때
+      $('#userPwd2').blur(function(){
+         let tmpPwd1 = $('#userPwd1').val();
+         if (tmpPwd1 != $(this).val()) {
+            outputError('패스워드 다릅니다.', $('#userPwd1'));
+            $('#userPwd1').val('');
+            $(this).val('');
+            $('#pwdValid').val('');
+         } else {
+            clearError($('#userPwd1'));
+            $('#pwdValid').val('checked');
+         }
+      });
+      
+      
       // 아이디에 키보드가 눌려졌을때 발생하는 이벤트
       $('#userId').keyup(function(evt){
          let tmpUserId = $('#userId').val();
@@ -99,22 +99,44 @@
 
       let idCheck = idValid();
       let pwdCheck = pwdValid();
+      let genderCheck = genderValid();
       
 
-      if (idCheck && pwdCheck) {
+      if (idCheck && pwdCheck && genderCheck) {
             return true;
         } else {
             return false;
         }
 
    }
+   
+   function genderValid() {
+      // 성별을 남성, 여성 중 하나를 반드시 선택해야 한다.
+      let genders = document.getElementsByName("gender");
+      let result = false;
+      
+      for (let g of genders) { // = for(BoardVO b : list<BoardVO>) 자바스크립트에서는 콜론(:) 대신에 of가 붙는다.
+         if (g.checked) {
+            console.log("하나라도 체크 되었음");
+            result = true;
+         }
+      }
+      
+      if (!result) {
+         outputError('성별은 필수 입니다!', $('.genderDiv'));
+      } else {
+         clearError($('.genderDiv'));
+      }
+      
+      return result;
+   }
 
    function pwdValid() {
       // 비밀번호 : 필수이고, 4~8자, 비밀번호확인과 동일해야 한다.
       let result = false;
-
-      if($('#pwdValid').val() == 'checked') {
-    	  result = true;
+   
+      if ($('#pwdValid').val() == 'checked') {
+         result = true;
       }
 
       return result;
@@ -151,50 +173,60 @@
       <form method="post" action="/member/register" enctype="multipart/form-data">
       
          <div class="mb-3 mt-3">
-            <label for="userId" class="form-label">아이디: </label> <input
+            <label for="userId" class="form-label">아이디 : </label> <input
                type="text" class="form-control" id="userId"
                placeholder="아이디를 입력하세요..." name="userId" />
             <input type="hidden" id="idValid"  />
          </div>
 
          <div class="mb-3 mt-3">
-            <label for="userPwd1" class="form-label">패스워드: </label> <input
+            <label for="userPwd1" class="form-label">패스워드 : </label> <input
                type="password" class="form-control" id="userPwd1"
                placeholder="비밀번호를 입력하세요..." name="userPwd" />
          </div>
 
          <div class="mb-3 mt-3">
-            <label for="userPwd1" class="form-label">패스워드 확인: </label> <input
+            <label for="userPwd2" class="form-label">패스워드 확인 : </label> <input
                type="password" class="form-control" id="userPwd2"
                placeholder="비밀번호를 확인하세요..." />
                <input type="hidden" id="pwdValid"  />
          </div>
-
+         
+         
          <div class="mb-3 mt-3">
-            <label for="userEmail" class="form-label">이메일: </label> <input
+            <label for="userName" class="form-label">이름 : </label> <input
+               type="text" class="form-control" id="userName" name="userName"
+               placeholder="이름" />
+         </div>
+
+         <!-- 라디오 버튼 : 단일 선택 (input 태그의 name 속성값을 반드시 동일하게 해야한다) -->
+         <!-- 라벨 태그로 인풋태그를 감싸주면 여성 또는 남성 글자를 선택했을 때 라디오 버튼이 같이 눌린다. -->
+         <div class="form-check genderDiv">
+            <label
+               class="form-check-label" for="female">
+            <input type="radio" class="form-check-input" id="female"
+               name="gender" value="F">여성</label>
+         </div>
+         <div class="form-check">
+         <label
+               class="form-check-label" for="male">
+            <input type="radio" class="form-check-input" id="male"
+               name="gender" value="M">남성</label>
+         </div>
+   
+         <div class="mb-3 mt-3">
+            <label for="userEmail" class="form-label">이메일 : </label> <input
                type="text" class="form-control" id="userEmail" name="userEmail" />
          </div>
 
-         <div class="form-check">
-            <input type="radio" class="form-check-input" id="radio1"
-               name="optradio" value="option1" checked>여성 <label
-               class="form-check-label" for="radio1"></label>
-         </div>
-         <div class="form-check">
-            <input type="radio" class="form-check-input" id="radio2"
-               name="optradio" value="option2">남성 <label
-               class="form-check-label" for="radio2"></label>
-         </div>
-         
-
          <div class="mb-3 mt-3">
-            <label for="mobile" class="form-label">휴대전화: </label> <input
+            <label for="mobile" class="form-label">휴대전화 : </label> <input
                type="text" class="form-control" id="mobile"
                placeholder="전화번호를 입력하세요..." name="userMobile" />
          </div>
 
          <div class="mb-3 mt-3">
-            <label for="memberProfile" class="form-label">회원 프로필: </label> <input
+            <label for="memberProfile" class="form-label">회원 프로필 : </label> <input
                type="file" class="form-control" id="userProfile"
                name="memberProfile" />
 
