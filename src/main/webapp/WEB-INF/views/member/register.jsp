@@ -100,15 +100,48 @@
       let idCheck = idValid();
       let pwdCheck = pwdValid();
       let genderCheck = genderValid();
+      let emailCheck = emailValid();
+      let mobileCheck = mobileValid();
       
 
-      if (idCheck && pwdCheck && genderCheck) {
+      if (idCheck && pwdCheck && genderCheck && emailCheck && mobileCheck) {
             return true;
         } else {
             return false;
         }
 
    }
+   
+   function mobileValid() {
+      let result = false; 
+	   let tmpUserMobile = $('#mobile').val();
+	   let mobileRegExp = /^(01[016789]{1})-?[0-9]{3,4}-?[0-9]{4}$/;
+
+      if(!mobileRegExp.test(tmpUserMobile)) {
+         outputError('전화번호 형식이 아닙니다.', $('#mobile'));
+      } else {
+         clearError($('#mobile'));
+         result = true;
+      }
+      return result;
+   }
+   
+   function emailValid() {
+		// 1) 이메일 주소 형식이면..(정규 표현식을 이용한다)
+		// 2) 이메일 주소 형식이면..인증문자를 이메일로 보내고, 인증문자를 다시 입력받아 검증
+		let result = false;
+		
+		let tmpUserEmail = $('#userEmail').val();
+		let emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+		if (!emailRegExp.test(tmpUserEmail)) {
+			outputError('이메일 주소 형식이 아닙니다!', $('#userEmail'));
+		}else {
+			clearError($('#userEmail'));
+			result = true;
+		}
+		
+		return result;
+	}
    
    function genderValid() {
       // 성별을 남성, 여성 중 하나를 반드시 선택해야 한다.
@@ -216,27 +249,24 @@
    
          <div class="mb-3 mt-3">
             <label for="userEmail" class="form-label">이메일 : </label> <input
-               type="text" class="form-control" id="userEmail" name="userEmail" />
+               type="text" class="form-control" id="userEmail" name="email" />
          </div>
 
          <div class="mb-3 mt-3">
             <label for="mobile" class="form-label">휴대전화 : </label> <input
                type="text" class="form-control" id="mobile"
-               placeholder="전화번호를 입력하세요..." name="userMobile" />
+               placeholder="전화번호를 입력하세요..." name="mobile" />
          </div>
 
          <div class="mb-3 mt-3">
             <label for="memberProfile" class="form-label">회원 프로필 : </label> <input
-               type="file" class="form-control" id="userProfile"
-               name="memberProfile" />
-
+               type="file" class="form-control" id="userImg" name="userImg" />
          </div>
 
 
          <div class="form-check">
             <input class="form-check-input" type="checkbox" id="agree"
-               name="agree" value="Y" /> <label class="form-check-label">회원
-               가입 조항에 동의합니다</label>
+               name="agree" value="Y" /> <label class="form-check-label">회원가입 조항에 동의합니다</label>
          </div>
 
          <!-- form 태그는 항상 submit / reset 버튼과 함께 사용 -->
