@@ -23,6 +23,13 @@ prefix="c"%>
       }
 
       $(function () {
+        // userEmail이 focus 되었을 경우
+        $('#userEmail').focus(function () {
+          if($('#emailValid').val() == 'checked') {
+            return;
+          }
+        }); 
+
         // 이메일 주소 입력을 완료하고 blur 되었을 경우
         $('#userEmail').blur(function (){
           emailValid();
@@ -140,63 +147,97 @@ prefix="c"%>
       }
 
       function emailValid() {
-        // 1) 이메일 주소 형식이면..(정규 표현식을 이용한다)
-        // 2) 이메일 주소 형식이면..인증문자를 이메일로 보내고, 인증문자를 다시 입력받아 검증
-        let result = false;
+          // 1) 이메일 주소 형식이면..(정규 표현식을 이용한다)
+          // 2) 이메일 주소 형식이면..인증문자를 이메일로 보내고, 인증문자를 다시 입력받아 검증
+          let result = false;
 
-        let tmpUserEmail = $("#userEmail").val();
-        let emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
-        if (!emailRegExp.test(tmpUserEmail)) {
-          outputError("이메일 주소 형식이 아닙니다!", $("#userEmail"));
-        } else {
-          // 이메일 주소 형식이다...
-          // 유저가 입력한 이메일 주소로 인증 코드 발송(back end) - timer(3분)
-          // 인증코드를 유저에게 입력 받음
-          // 유저가 입력한 인증코드와 백엔드에서 만든 인증코드가 같은지 비교
-          // 같고, 인증시간 안에 인증 완료 통과...
+          let tmpUserEmail = $("#userEmail").val();
+          let emailRegExp = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+          if (!emailRegExp.test(tmpUserEmail)) {
+            outputError("이메일 주소 형식이 아닙니다!", $("#userEmail"));
+          } else {
+            // 이메일 주소 형식이다...
+            // 유저가 입력한 이메일 주소로 인증 코드 발송(back end) - timer(3분)
+            // 인증코드를 유저에게 입력 받음
+            // 유저가 입력한 인증코드와 백엔드에서 만든 인증코드가 같은지 비교
+            // 같고, 인증시간 안에 인증 완료 통과...
 
-          showAuthenticateDiv();  // 인증 코드를 입력하는 div창을 보여주기
-          callSendMail(); // 이메일을 발송하고
-          startTimer(); // 타이머 동작 시키기
-          
+            if($('#emailValid').val() == 'checked') {
+              result = true;
+            } else {
+              showAuthenticateDiv();  // 인증 코드를 입력하는 div창을 보여주기
+              callSendMail();// 이메일 발송 하고
+              startTimer(); // 타이머 동작 시키기..
+              clearError($("#userEmail"));
 
-          clearError($("#userEmail"));
-          result = true;
+              result = true;
+            }           
+            return result;
+          }
+          return result;
         }
 
-        return result;
-      }
+        function callSendMail() {
+          $.ajax({
+                url: "/member/callSendMail", // 데이터가 송수신될 서버의 주소
+                type: "post", // 통신 방식 : GET, POST, PUT, DELETE, PATCH
+                dataType: "text", // 수신 받을 데이터의 타입 (text, xml, json)
+                data: {
+                  "tmpUserEmail" : $("#userEmail").val()
+                },
+                success: function (data) {
+                  // 비동기 통신에 성공하면 자동으로 호출될 callback function
+                  console.log(data);
+                  if (data == 'success') {
+                    alert("이메일로 인증코드를 발송했습니다..");
+                    $('#userAuthCode').focus();
+                  }
+                },
+                error: function (data) {
+                  console.log(data);
+                },
+              });
+        }
 
-      function callSendMail() { // 이메일을 발송하고
-        $.ajax({
-              url: "/member/callSendMail", // 데이터가 송수신될 서버의 주소
+
+        function showAuthenticateDiv() {
+            alert("이메일로 인증코드를 발송했습니다!\n 인증코드를 입력해주세요~");
+            $('#userAuthCode').focus();
+            let authDiv = "<div id='authenticateDiv'>";
+            authDiv += `<input type="text" class="form-control" id="userAuthCode" placeholder="인증코드입력..." />`;
+            authDiv += `<span class='timer'>3:00</span>`;
+            authDiv += `<button type="button" id="authBtn" class="btn btn-primary" onclick="checkAuthCode()">인증</button>`;
+            authDiv += "</div>";
+
+            $(authDiv).insertAfter($("#userEmail"));
+          }
+
+          function checkAuthCode() {
+            let userAuthCode = $("#userAuthCode").val();
+            $.ajax({
+              url: "/member/checkAuthCode", // 데이터가 송수신될 서버의 주소
               type: "post", // 통신 방식 : GET, POST, PUT, DELETE, PATCH
-              dataType: "json", // 수신 받을 데이터의 타입 (text, xml, json)
+              dataType: "text", // 수신 받을 데이터의 타입 (text, xml, json)
               data: {
-                "tmpUserEmail" : $("#userEmail").val(), // 자바 스크립트에서는 ,를 써도 되고 안써도 된다. 얘 자체가 객체이기 때문임
-              },
+                    "tmpUserAuthCode" : userAuthCode
+              },    
               success: function (data) {
-                // 비동기 통신에 성공하면 자동으로 호출될 callback function
-                console.log(data);
-                
-              },
-              error: function (data) {
-                console.log(data);
-              },
+                    // 비동기 통신에 성공하면 자동으로 호출될 callback function
+                    console.log(data);
+                    if (data == 'success') {
+                      alert("인증 성공!");
+                      $('#userEmail').attr("readonly", true);
+
+                      $('#authenticateDiv').remove();
+
+                      $('#emailValid').val("checked");
+                    } else {
+                      alert("인증 실패!");
+                      $('#emailValid').val("");
+                    }
+              }
             });
-      }
-
-      function showAuthenticateDiv() {
-        alert("이메일로 인증코드를 발송하였습니다!\n 인증코드를 입력해주세요.");
-        $('#userAuthCode').focus();
-        let authDiv = "<div id='authenticateDiv'>";
-        authDiv += `<input type="text" class="form-control" id="userAuthCode" placeholder="인증코드입력..." />`;
-        authDiv += `<span class='timer'>3:00</span>`;
-        authDiv += `<button type="button" id="authBtn" class="btn btn-primary" onclick="checkAuthCode()">인증</button>`;
-        authDiv += "</div>";
-
-        $(authDiv).insertAfter($("#userEmail"));
-      }
+          }
 
       function genderValid() {
         // 성별을 남성, 여성 중 하나를 반드시 선택해야 한다.
@@ -290,6 +331,11 @@ prefix="c"%>
         flex-direction: row;
         justify-content: space-between;
      }
+     .timer {
+        color : orangered;
+        font-weight : bold;
+        font-size : 0.8em;
+    }
     </style>
   </head>
   <body>
@@ -375,6 +421,7 @@ prefix="c"%>
         <div class="mb-3 mt-3">
           <label for="userEmail" class="form-label">이메일: </label>
           <input type="text" class="form-control" id="userEmail" name="email" />
+          <input type="hidden" id="emailValid" />
         </div>
 
         <div class="mb-3 mt-3">
