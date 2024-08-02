@@ -156,15 +156,34 @@ prefix="c"%>
           // 같고, 인증시간 안에 인증 완료 통과...
 
           showAuthenticateDiv();  // 인증 코드를 입력하는 div창을 보여주기
-          // 이메일을 발송하고
-          // 타이머 동작 시키기
-          startTimer();
+          callSendMail(); // 이메일을 발송하고
+          startTimer(); // 타이머 동작 시키기
+          
 
           clearError($("#userEmail"));
           result = true;
         }
 
         return result;
+      }
+
+      function callSendMail() { // 이메일을 발송하고
+        $.ajax({
+              url: "/member/callSendMail", // 데이터가 송수신될 서버의 주소
+              type: "post", // 통신 방식 : GET, POST, PUT, DELETE, PATCH
+              dataType: "json", // 수신 받을 데이터의 타입 (text, xml, json)
+              data: {
+                "tmpUserEmail" : $("#userEmail").val(), // 자바 스크립트에서는 ,를 써도 되고 안써도 된다. 얘 자체가 객체이기 때문임
+              },
+              success: function (data) {
+                // 비동기 통신에 성공하면 자동으로 호출될 callback function
+                console.log(data);
+                
+              },
+              error: function (data) {
+                console.log(data);
+              },
+            });
       }
 
       function showAuthenticateDiv() {

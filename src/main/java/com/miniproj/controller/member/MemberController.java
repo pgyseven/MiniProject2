@@ -1,5 +1,7 @@
 package com.miniproj.controller.member;
 
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,8 +66,12 @@ public class MemberController {
       return result;
    }
    
-   
-   
+   @RequestMapping("/callSendMail")
+   public void sendMailAuthCode(@RequestParam("tmpUserEmail") String tmpUserEmail) {
+	   
+	   String authCode = UUID.randomUUID().toString(); // 랜덤한 UUID를 뽑아낼 수 있다.
+	   System.out.println(tmpUserEmail + "로 " + authCode + " 뽑기");
+   }
    
    
    
