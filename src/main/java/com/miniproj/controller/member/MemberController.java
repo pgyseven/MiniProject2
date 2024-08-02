@@ -80,13 +80,13 @@ public class MemberController {
       String result = "";
       
       try {
-         new SendMailService().sendMail(tmpUserEmail, authCode);
+         // new SendMailService().sendMail(tmpUserEmail, authCode); <- 실제 메일을 보내는 부분. 어차피 인증 코드는 콘솔창에 보이니까 그걸로 사용하자
          session.setAttribute("authCode", authCode); // 인증 코드를 세션 객체에 저장
          
          result = "success";
          
          
-      }  catch (MessagingException e) {
+      }  catch (Exception e) {
          
          e.printStackTrace();
          result = "fail";
