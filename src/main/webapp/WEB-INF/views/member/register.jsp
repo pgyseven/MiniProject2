@@ -115,7 +115,10 @@ prefix="c"%>
         let mobileCheck = mobileValid();
         let imgCheck = imgValid();
 
-        if (idCheck && pwdCheck && genderCheck && emailCheck && mobileCheck && imgCheck) {
+        // 가입자 동의
+        let agreeCheck = $('#agree').is(':checked'); // checkbox의 checked 여부
+
+        if (idCheck && pwdCheck && genderCheck && emailCheck && mobileCheck && imgCheck && agreeCheck) {
           return true;
         } else {
           return false;
@@ -189,7 +192,7 @@ prefix="c"%>
                   // 비동기 통신에 성공하면 자동으로 호출될 callback function
                   console.log(data);
                   if (data == 'success') {
-                    alert("이메일로 인증코드를 발송했습니다..");
+                    alert("이메일로 인증코드를 발송했습니다.");
                     $('#userAuthCode').focus();
                   }
                 },
