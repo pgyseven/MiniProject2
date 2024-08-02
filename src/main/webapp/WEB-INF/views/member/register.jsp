@@ -6,6 +6,8 @@ prefix="c"%>
   <head>
     <meta charset="UTF-8" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <script src="/resources/js/timer.js"></script>
     <title>회원 가입 페이지</title>
     <script>
       function outputError(msg, obj) {
@@ -21,6 +23,12 @@ prefix="c"%>
       }
 
       $(function () {
+        // 이메일 주소 입력을 완료하고 blur 되었을 경우
+        $('#userEmail').blur(function (){
+          emailValid();
+        });
+
+
         // 패스워드1을 입력하고 blur 되었을때
         $("#userPwd1").blur(function () {
           let tmpPwd = $("#userPwd1").val();
@@ -141,16 +149,34 @@ prefix="c"%>
         if (!emailRegExp.test(tmpUserEmail)) {
           outputError("이메일 주소 형식이 아닙니다!", $("#userEmail"));
         } else {
-          // 이메일 주소 형식이다.
-          // 유저가 입력한 이메일 주소로 인증 코드를 발송(backend) - timer(3분)
-          // 인증 코드를 유저에게 입력 받고 
+          // 이메일 주소 형식이다...
+          // 유저가 입력한 이메일 주소로 인증 코드 발송(back end) - timer(3분)
+          // 인증코드를 유저에게 입력 받음
           // 유저가 입력한 인증코드와 백엔드에서 만든 인증코드가 같은지 비교
-          // 같고 + 인증시간 내에 인증 완료시 통과
+          // 같고, 인증시간 안에 인증 완료 통과...
+
+          showAuthenticateDiv();  // 인증 코드를 입력하는 div창을 보여주기
+          // 이메일을 발송하고
+          // 타이머 동작 시키기
+          startTimer();
+
           clearError($("#userEmail"));
           result = true;
         }
 
         return result;
+      }
+
+      function showAuthenticateDiv() {
+        alert("이메일로 인증코드를 발송하였습니다!\n 인증코드를 입력해주세요.");
+        $('#userAuthCode').focus();
+        let authDiv = "<div id='authenticateDiv'>";
+        authDiv += `<input type="text" class="form-control" id="userAuthCode" placeholder="인증코드입력..." />`;
+        authDiv += `<span class='timer'>3:00</span>`;
+        authDiv += `<button type="button" id="authBtn" class="btn btn-primary" onclick="checkAuthCode()">인증</button>`;
+        authDiv += "</div>";
+
+        $(authDiv).insertAfter($("#userEmail"));
       }
 
       function genderValid() {
@@ -213,11 +239,11 @@ prefix="c"%>
       let fileName = obj.files[0].name;
       if (imageType.indexOf(fileType) != -1) {  // 이미지 파일이다.
          let reader = new FileReader();  // FileReader 객체 생성
-         reader.onload = function(e) { 
+           reader.onload = function(e) { 
                // reader객체에 의해 파일을 읽기 완료하면 실행되는 콜백함수
             let imgTag = `<div style='padding : 6px;'><img src='\${e.target.result}' width='40px' /><span>\${fileName}</span></div>`;
             $(imgTag).insertAfter(obj);
-         }
+           }
            reader.readAsDataURL(obj.files[0]);  // 업로드된 파일을 읽어온다.
            
            clearError(obj);
@@ -230,146 +256,158 @@ prefix="c"%>
          // $('#imgCheck').val('noImage');
       }
    }
-   </script>
-   <style>
+    </script>
+    <style>
       .error {
-         color: #990000;
-         font-size: 0.8em;
-         padding: 5px;
-         border: 1px solid #990000;
-         border-radius: 5px;
-         margin: 5px 0px;
+        color: #990000;
+        font-size: 0.8em;
+        padding: 5px;
+        border: 1px solid #990000;
+        border-radius: 5px;
+        margin: 5px 0px;
       }
+     .hobbies {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+     }
+    </style>
+  </head>
+  <body>
+    <c:import url="../header.jsp" />
 
-      .hobbies {
-         display : flex;
-         flex-direction : row;
-         justify-content : space-between;
-      }
-   </style>
-</head>
-<body>
-   <c:import url="../header.jsp" />
-
-   <div class="container">
+    <div class="container">
       <h1>회원가입페이지</h1>
 
       <form
-         method="post"
-         action="/member/register"
-         enctype="multipart/form-data"
+        method="post"
+        action="/member/register"
+        enctype="multipart/form-data"
       >
-      <div class="mb-3 mt-3">
-         <label for="userId" class="form-label">아이디: </label>
-         <input
+        <div class="mb-3 mt-3">
+          <label for="userId" class="form-label">아이디: </label>
+          <input
             type="text"
             class="form-control"
             id="userId"
             placeholder="아이디를 입력하세요..."
-            name="userId"/>
-         <input type="hidden" id="idValid" />
-      </div>
+            name="userId"
+          />
+          <input type="hidden" id="idValid" />
+        </div>
 
-      <div class="mb-3 mt-3">
-         <label for="userPwd1" class="form-label">패스워드: </label>
-            <input
+        <div class="mb-3 mt-3">
+          <label for="userPwd1" class="form-label">패스워드: </label>
+          <input
             type="password"
             class="form-control"
             id="userPwd1"
             placeholder="비밀번호를 입력하세요..."
-            name="userPwd"/>
-      </div>
+            name="userPwd"
+          />
+        </div>
 
-      <div class="mb-3 mt-3">
-         <label for="userPwd2" class="form-label">패스워드 확인: </label>
-         <input
+        <div class="mb-3 mt-3">
+          <label for="userPwd2" class="form-label">패스워드 확인: </label>
+          <input
             type="password"
             class="form-control"
             id="userPwd2"
-            placeholder="비밀번호를 확인하세요..."/>
-         <input type="hidden" id="pwdValid" />
-      </div>
+            placeholder="비밀번호를 확인하세요..."
+          />
+          <input type="hidden" id="pwdValid" />
+        </div>
 
-      <div class="mb-3 mt-3">
-         <label for="userName" class="form-label">이름: </label>
-         <input
+        <div class="mb-3 mt-3">
+          <label for="userName" class="form-label">이름: </label>
+          <input
             type="text"
             class="form-control"
             id="userName"
             name="userName"
-            placeholder="이름을 입력하세요..."/>
-      </div>
+            placeholder="이름을 입력하세요..."
+          />
+        </div>
 
-      <!--  라디오 버튼 : 단일 선택 (input 태그의 name 속성 값을 반드시 동일하게 해야 한다)-->
-      <div class="form-check genderDiv">
-         <label class="form-check-label" for="female">
+        <!--  라디오 버튼 : 단일 선택 (input 태그의 name 속성 값을 반드시 동일하게 해야 한다)-->
+        <div class="form-check genderDiv">
+          <label class="form-check-label" for="female">
             <input
-               type="radio"
-               class="form-check-input"
-               id="female"
-               name="gender"
-               value="F"
-            />여성</label>
-      </div>
-      <div class="form-check">
-         <label class="form-check-label" for="male">
+              type="radio"
+              class="form-check-input"
+              id="female"
+              name="gender"
+              value="F"
+            />여성</label
+          >
+        </div>
+        <div class="form-check">
+          <label class="form-check-label" for="male">
             <input
-               type="radio"
-               class="form-check-input"
-               id="male"
-               name="gender"
-               value="M"
-            />남성</label>
-      </div>
+              type="radio"
+              class="form-check-input"
+              id="male"
+              name="gender"
+              value="M"
+            />남성</label
+          >
+        </div>
 
-      <div class="mb-3 mt-3">
-         <label for="userEmail" class="form-label">이메일 : </label>
-         <input type="text" class="form-control" id="userEmail" name="email" />
-      </div>
+        <div class="mb-3 mt-3">
+          <label for="userEmail" class="form-label">이메일: </label>
+          <input type="text" class="form-control" id="userEmail" name="email" />
+        </div>
 
-      <div class="mb-3 mt-3">
-         <label for="mobile" class="form-label">휴대전화 : </label>
-         <input
+        <div class="mb-3 mt-3">
+          <label for="mobile" class="form-label">휴대전화: </label>
+          <input
             type="text"
             class="form-control"
             id="mobile"
             placeholder="전화번호를 입력하세요..."
             name="mobile"
-         />
-      </div>
+          />
+        </div>
 
       <div class="form-check">
-         <div>취미 : </div>
+         <div>취미 :</div>
          <div class="hobbies">
-         <span><input class="form-check-input" type="checkbox" id="check1" name="hobby" value="sleep" checked>낮잠</span>         
-         <span><input class="form-check-input" type="checkbox" id="check1" name="hobby" value="reading">독서</span>         
-         <span><input class="form-check-input" type="checkbox" id="check1" name="hobby" value="coding">코딩</span>
-         <span><input class="form-check-input" type="checkbox" id="check1" name="hobby" value="game">게임</span>
+            <span><input class="form-check-input" type="checkbox" name="hobby" value="sleep" checked>낮잠</span>
+            <span><input class="form-check-input" type="checkbox" name="hobby" value="reading">독서</span>
+            <span><input class="form-check-input" type="checkbox" name="hobby" value="coding">코딩</span>
+            <span><input class="form-check-input" type="checkbox" name="hobby" value="game">게임</span>
          </div>
       </div>
 
-      <div class="form-check">
-         <input
+      
+        <div class="mb-3 mt-3">
+          <label for="userImg" class="form-label">회원 프로필: </label>
+          <input type="file" class="form-control" id="userImg" name="userProfile" onchange="showPreview(this);" />
+          <input type="hidden" id="imgCheck" />
+         </div>
+
+        <div class="form-check">
+          <input
             class="form-check-input"
             type="checkbox"
             id="agree"
             name="agree"
             value="Y"
-         />
-         <label class="form-check-label">회원 가입 조항에 동의합니다</label>
-      </div>
+          />
+          <label class="form-check-label">회원 가입 조항에 동의합니다</label>
+        </div>
 
-      <!-- form 태그는 항상 submit / reset 버튼과 함께 사용 -->
-      <input
-         type="submit"
-         class="btn btn-success"
-         value="회원가입"
-         onclick="return isValid();"
-      />
-      <input type="reset" class="btn btn-danger" value="취소" />
+        <!-- form 태그는 항상 submit / reset 버튼과 함께 사용 -->
+        <input
+          type="submit"
+          class="btn btn-success"
+          value="회원가입"
+          onclick="return isValid();"
+        />
+        <input type="reset" class="btn btn-danger" value="취소" />
       </form>
-   </div>
+    </div>
 
-   <c:import url="../footer.jsp" />
-</body>
+    <c:import url="../footer.jsp" />
+  </body>
 </html>
