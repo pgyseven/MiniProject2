@@ -2,6 +2,10 @@ package com.miniproj.controller.member;
 
 import java.util.UUID;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,11 +13,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.miniproj.model.MemberVO;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.member.MemberService;
+import com.miniproj.util.SendMailService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -67,14 +73,52 @@ public class MemberController {
    }
    
    @RequestMapping("/callSendMail")
-   public void sendMailAuthCode(@RequestParam("tmpUserEmail") String tmpUserEmail) {
-	   
-	   String authCode = UUID.randomUUID().toString(); // 랜덤한 UUID를 뽑아낼 수 있다.
-	   System.out.println(tmpUserEmail + "로 " + authCode + " 뽑기");
+   public ResponseEntity<String> sendMailAuthCode(@RequestParam("tmpUserEmail") String tmpUserEmail, HttpSession session) {
+      String authCode = UUID.randomUUID().toString();
+      System.out.println(tmpUserEmail + "로 " + authCode + "를 보내자~");
+      
+      String result = "";
+      
+      try {
+         new SendMailService().sendMail(tmpUserEmail, authCode);
+         session.setAttribute("authCode", authCode); // 인증 코드를 세션 객체에 저장
+         
+         result = "success";
+         
+         
+      }  catch (MessagingException e) {
+         
+         e.printStackTrace();
+         result = "fail";
+      }
+   
+      return new ResponseEntity<String>(result, HttpStatus.OK);
+      
+   } 
+   
+   @RequestMapping("/checkAuthCode")
+   public ResponseEntity<String> checkAuthCode(@RequestParam("tmpUserAuthCode") String tmpUserAuthCode, HttpSession session) {
+      System.out.println(tmpUserAuthCode + "와 세션에 있는 인증코드가 같은지 비교");
+      
+      String result = "fail";
+      
+      if(session.getAttribute("authCode") != null) {
+    	  String sesAuthCode = (String)session.getAttribute("authCode");
+    	  
+    	  if(tmpUserAuthCode.equals(sesAuthCode)) {
+    		  result = "success";
+    	  }
+      }
+      
+      return new ResponseEntity<String>(result, HttpStatus.OK);
    }
    
-   
-   
-   
-   
+   @RequestMapping("/clearAuthCode")
+   public ResponseEntity<String> clearCode(HttpSession session) {
+	   if(session.getAttribute("authCode") != null) {
+		   session.removeAttribute("authCode"); // attribute 속성을 지운다.
+	   }
+	   
+	   return new ResponseEntity<String>("success", HttpStatus.OK);
+   }
 }
