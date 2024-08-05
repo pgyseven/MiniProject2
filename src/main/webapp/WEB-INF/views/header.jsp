@@ -28,6 +28,8 @@
 						href="javascript:void(0)">댓글형게시판</a></li>
 					<li class="nav-item"><a class="nav-link"
 						href="/member/register">회원가입</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="/member/login">로그인</a></li>
 						
 					<li class="nav-item"><a class="nav-link"
 						href="/weather">오늘의 날씨(연습)</a></li>
