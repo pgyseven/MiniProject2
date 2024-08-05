@@ -20,6 +20,7 @@ import com.miniproj.model.MemberVO;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.member.MemberService;
 import com.miniproj.util.SendMailService;
+import com.mysql.cj.util.StringUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,17 @@ public class MemberController {
    public void registerMember(MemberVO registMember, @RequestParam("userProfile") MultipartFile userProfile) {
       System.out.println("회원가입 진행~~~~~~~~~~~~~~~~" + registMember.toString());
       System.out.println(userProfile.getOriginalFilename());
+      
+      // (프로필 파일 이름 : 유저 아이디 + .유저가 올린 파일의 확장자) -> 유저가 프로필 파일을 업로드했을 때
+      String tmpUserProfileName = userProfile.getOriginalFilename();  
+      if (StringUtils.isNullOrEmpty(tmpUserProfileName)) {
+    	  String ext = tmpUserProfileName.substring(tmpUserProfileName.lastIndexOf(".") + 1);
+          registMember.setUserImg(registMember.getUserId() + "." + ext);
+      }
+      
+      
+      //mService.saveMember(registMember);
+      
    }
    
    
