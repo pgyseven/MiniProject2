@@ -4,7 +4,9 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.miniproj.model.LoginDTO;
 import com.miniproj.model.MemberVO;
+import com.miniproj.model.PointLogDTO;
 
 @Repository
 public class MemberDAOImpl implements MemberDAO {
@@ -15,9 +17,9 @@ public class MemberDAOImpl implements MemberDAO {
 	private static String NS = "com.miniproj.mappers.membermapper";
 
 	@Override
-	public int updateUserPoint(String userId) throws Exception {
+	public int updateUserPoint(PointLogDTO pointLogDTO) throws Exception {
 		
-		return ses.insert(NS + ".updateUserPoint", userId);
+		return ses.insert(NS + ".updateUserPoint", pointLogDTO);
 	}
 
 	@Override
@@ -30,6 +32,12 @@ public class MemberDAOImpl implements MemberDAO {
 	public int insertMember(MemberVO registMember) throws Exception {
 
 		return ses.insert(NS + ".insertMember", registMember);
+	}
+
+	@Override
+	public MemberVO login(LoginDTO loginDTO) throws Exception {
+		
+		return ses.selectOne(NS + ".loginWithDTO", loginDTO);
 	}
 
 }

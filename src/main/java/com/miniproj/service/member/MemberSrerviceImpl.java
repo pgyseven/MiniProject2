@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.miniproj.model.LoginDTO;
 import com.miniproj.model.MemberVO;
 import com.miniproj.model.PointLogDTO;
 import com.miniproj.persistence.MemberDAO;
@@ -55,10 +56,30 @@ public class MemberSrerviceImpl implements MemberService {
 		// 1) 회원 데이터를 DB에 저장(파일 이름 : 유저 아이디 + .유저가 올린 파일의 확장자 <- 컨트롤러단에서 했음)
 		if(mDao.insertMember(registMember) == 1) {
 			// 2) 가입한 회원에게 100 포인트 부여(포인트 로그 기록)
-			pDao.insertPointLog(new PointLogDTO(registMember.getUserId(), "회원가입", 100));
+			pDao.insertPointLog(new PointLogDTO(registMember.getUserId(), "회원가입"));
 			result = true;
 		}
 		
 		return result;
+	}
+
+	@Override
+	@Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
+	public MemberVO login(LoginDTO loginDTO) throws Exception {
+		
+		// 1) 로그인 시도 -> select
+		MemberVO loginMember = mDao.login(loginDTO);
+		if(loginMember != null) {
+			// 2) 1)번에서 로그인 성공시 pointlog 테이블에 insert
+			PointLogDTO pointLogDTO = new PointLogDTO(loginDTO.getUserId(), "로그인");
+			
+			if(pDao.insertPointLog(pointLogDTO) == 1) {
+				
+				// 3) member 테이블의 userPoint 1점 증가 update
+				mDao.updateUserPoint(pointLogDTO);
+			}	
+		}
+			
+		return loginMember;
 	}
 }
