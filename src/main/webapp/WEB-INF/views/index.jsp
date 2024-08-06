@@ -100,7 +100,7 @@
 </head>
 <body>
 	<div class="container">
-		<c:import url="./header.jsp" />
+		<jsp:include page="./header.jsp"></jsp:include>
 
 		<div class="content">
 			<h1>index.jsp</h1>
@@ -135,7 +135,7 @@
 			</div>
 		</div>
 
-		<c:import url="./footer.jsp" />
+		<jsp:include page="./footer.jsp"></jsp:include>
 	</div>
 </body>
 </html>
