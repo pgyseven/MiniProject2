@@ -116,9 +116,11 @@ public class HBoardServiceImpl implements HBoardService {
 			}
 			
 			// 2) 1번에서 insert가 성공했을 때 글작성자의 point를 부여한다.  - (select)  close - insert close			
-			if (pDao.insertPointLog(new PointLogDTO(newBoard.getWriter(), "글작성", 0)) == 1) {
+			PointLogDTO pointLogDTO = new PointLogDTO(newBoard.getWriter(), "글작성");
+			
+			if (pDao.insertPointLog(pointLogDTO) == 1) {
 				// 3) 작성자의 userpoint값 update  close
-				if (mDao.updateUserPoint(newBoard.getWriter()) == 1) {
+				if (mDao.updateUserPoint(pointLogDTO) == 1) {
 					result = true;
 				}	
 			}	
