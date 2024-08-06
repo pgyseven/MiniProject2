@@ -199,4 +199,22 @@ public class MemberController {
 		e.printStackTrace();
 	}
    }
+   
+   @RequestMapping("/logout")
+   public String logoutMember(HttpSession session) {
+	   
+	   System.out.println("로그아웃 이전의 세션값 : " + session.getId());
+	   
+	   // 세션에 저장했던 값들을 지우고,
+	   if (session.getAttribute("loginMember") != null) {
+		   session.removeAttribute("loginMember");
+		   
+		   // 세션 무효화를 시킨다.
+		   session.invalidate();
+	   }
+	   
+	   System.out.println("로그아웃 이후의 세션값 : " + session.getId());
+	   
+	   return "redirect:/";
+   }
 }
