@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -176,7 +177,26 @@ public class MemberController {
    }
    
    @RequestMapping(value="/login", method=RequestMethod.POST)
-   public void loginPOST(LoginDTO loginDTO) {
+   public void loginPOST(LoginDTO loginDTO, Model model) {
 	   System.out.println(loginDTO.toString() + "으로 로그인하자");
+	   
+	   try {
+		MemberVO loginMember = mService.login(loginDTO);
+		
+		if(loginMember != null) {
+			//System.out.println("MemberController - 로그인 성공");
+			
+			// 모델 객체에 loginMember를 바인딩 시킨다.
+			model.addAttribute("loginMember", loginMember);
+			
+			// 홈으로 이동
+			
+		} else {
+			//System.out.println("로그인 실패");
+		}
+	} catch (Exception e) {
+		
+		e.printStackTrace();
+	}
    }
 }
