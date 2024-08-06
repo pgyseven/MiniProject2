@@ -114,4 +114,13 @@ public class HomeController {
 	      return result;
 	   }
 	   
+	   
+	   @RequestMapping("/sampleInterceptor")
+	   public void sampleInterceptor() {
+		   // interceptor의 preHandle이 동작
+		   System.out.println("sampleInterceptor() 호출!!!!!!!!!!!!!!");
+		   
+		   // /sampleInterceptor.jsp를 찾아 response
+	   }
+	   
 	}
