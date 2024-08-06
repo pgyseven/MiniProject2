@@ -34,5 +34,16 @@
 		<beans:property name="maxUploadSize" value="10485760"></beans:property>
 	</beans:bean>
 	
+	<!-- 인터셉터(interceptor) 설정 : 필요한 인터셉터 객체를 만들고 관리하도록 한다. -->
+	<beans:bean id="sampleInterceptor" class="com.miniproj.interceptor.interceptorExam">	
+	</beans:bean>
+	
+	<!-- 인터셉터가 동작하는 매핑 설정 -->
+	<interceptors>
+		<interceptor> <!-- "/sampleInterceptor" uri로 매핑이 들어오면 "sampleInterceptor" 객체가 동작하도록 한다. -->
+			<mapping path="/sampleInterceptor" />
+			<beans:ref bean="sampleInterceptor" /> <!-- 객체를 참조해주는 것 -->
+		</interceptor>
+	</interceptors>
 	
 </beans:beans>
