@@ -248,7 +248,7 @@
 
 					<div calss="btns">
 						<button type="submit" class="btn btn-primary" onclick="">저장</button>
-						<button type="button" class="btn btn-secondary">취소</button>
+						<button type="button" class="btn btn-secondary" onclick="location.href='/hboard/viewBoard?boardNo=${board.boardNo}'">취소</button>
 					</div>
 				</form>
 			</c:forEach>
