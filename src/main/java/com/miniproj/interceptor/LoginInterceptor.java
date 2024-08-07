@@ -10,6 +10,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import com.miniproj.model.MemberVO;
+import com.mysql.cj.util.StringUtils;
 
 
 // 역할 : 직접 로그인을 하는 동작과정을 인터셉터로 구현한다.(유저가 로그인 페이지로 가서 로그인 할 때 사용)
@@ -46,8 +47,17 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 				HttpSession ses = request.getSession();
 				ses.setAttribute("loginMember", loginMember);
 
-				// 홈페이지로 이동
-				response.sendRedirect("/");
+//				if(ses.getAttribute("destPath") != null) {
+//					response.sendRedirect((String)ses.getAttribute("destPath"));
+//				} else {
+//					response.sendRedirect("/");
+//				}
+				
+				// 위의 if문을 3항 연산자로 바꿔서 사용했음
+				Object tmp = ses.getAttribute("destPath");
+				response.sendRedirect((tmp == null) ? "/" : (String)tmp);
+				
+				
 
 			} else {
 				System.out.println("[LoginInterceptor...postHandle() : 로그인 실패!]");
