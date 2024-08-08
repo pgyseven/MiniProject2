@@ -450,3 +450,11 @@ select * from member where userId = 'douner' and userPwd = sha1(md5('1234'));
 
 -- ?번글의 작성자 얻어오는 쿼리문
 select writer from hboard where boardNo = ?
+
+--------------------------  자동 로그인 기능 구현 ------------------------------
+-- 자동 로그인을 체크한 유저의 경우 아래의 두 컬럼에 자동  로그인을 체크했을 때의 세션값과 만료시간을 저장한다.
+-- 향후에 쿠키에 있는 자동 로그인 정보와 DB의 아래 컬럼에 있는 자동 로그인 정보와 비교하여 맞을 때만 자동 로그인을 시켜야 한다.
+ALTER TABLE `webkgy`.`member` 
+ADD COLUMN `sesid` VARCHAR(40) NULL AFTER `userPoint`,
+ADD COLUMN `allimit` DATETIME NULL AFTER `sesid`;
+
