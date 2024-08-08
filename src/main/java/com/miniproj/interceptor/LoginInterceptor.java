@@ -54,6 +54,8 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 //				}
 				
 				// 위의 if문을 3항 연산자로 바꿔서 사용했음
+				// 로그인하기 이전에 저장한 경로가 있다면 그 경로로 가고
+				// 없다면 "/"로 페이지 이동
 				Object tmp = ses.getAttribute("destPath");
 				response.sendRedirect((tmp == null) ? "/" : (String)tmp);
 				
