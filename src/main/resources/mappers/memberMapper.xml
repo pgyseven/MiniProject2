@@ -32,4 +32,9 @@
 	<select id="loginWithDTO" resultType="com.miniproj.model.MemberVO">
 		SELECT * FROM member WHERE userId = #{userId} AND userPwd = sha1(md5(#{userPwd}))
 	</select>
+	
+	<!-- 자동 로그인 정보를 저장하는 쿼리문 -->
+	<update id="updateAutoLoginInfo">
+		UPDATE member SET sesid = #{sesid}, allimit = #{allimit} WHERE userId = #{userId}
+	</update>
 </mapper>

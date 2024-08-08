@@ -458,3 +458,8 @@ ALTER TABLE `webkgy`.`member`
 ADD COLUMN `sesid` VARCHAR(40) NULL AFTER `userPoint`,
 ADD COLUMN `allimit` DATETIME NULL AFTER `sesid`;
 
+-- 자동 로그인 정보를 DB에 저장하는 쿼리문
+UPDATE member SET sesid = ?, allimit = ? WHERE userId = ?;
+
+-- 쿠키에 자동 로그인을 한다고 저장되어 있을 때 자동 로그인을 하는 쿼리문
+SELECT * FROM member WHERE sesid = '쿠키에 저장된 sesid' AND allimit > now();
