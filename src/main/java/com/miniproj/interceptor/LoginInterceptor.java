@@ -2,6 +2,7 @@ package com.miniproj.interceptor;
 
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -46,6 +47,11 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 				// 로그인한 유저의 세션에 해당 유저의 정보를 넣어준다.
 				HttpSession ses = request.getSession();
 				ses.setAttribute("loginMember", loginMember);
+				
+				// 만약 자동로그인(remember me)을 체크한 유저라면~
+				if (request.getParameter("remember") != null) {
+					saveAutoLoginInfo(request, response);
+				}
 
 //				if(ses.getAttribute("destPath") != null) {
 //					response.sendRedirect((String)ses.getAttribute("destPath"));
@@ -67,6 +73,14 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 				response.sendRedirect("/member/login?status=fail");
 			} 
 		}
+	}
+
+	private void saveAutoLoginInfo(HttpServletRequest request, HttpServletResponse response) {
+		// 자동로그인을 체크 했을 때의 세션을 쿠키에 넣어둔다.
+		Cookie autoLoginCookie = new Cookie("al", request.getSession().getId()); // al에 유저아이디가 아닌 세션 아이디를 넣어준다.
+		autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 일주일동안 쿠키 유지(자동 로그인 기간 : 일주일)
+		autoLoginCookie.setPath("/"); // 쿠키가 저장될 경로 설정(해당 경로일 때 쿠키 확인 가능)
+		response.addCookie(autoLoginCookie);
 	}
 
 }
