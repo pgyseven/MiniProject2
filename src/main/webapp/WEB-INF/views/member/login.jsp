@@ -6,6 +6,14 @@
 <head>
 <meta charset="UTF-8">
 <title>로그인</title>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+	$(function() { // = 이 페이지가 로딩이 완료되면
+		$('.rememberCheck').click(function() {
+			alert('자동로그인은 공공장소에서 사용하지 않을 것을 권고드립니다.');
+		});
+	});
+</script>
 </head>
 <body>
 	<div class="container">
@@ -27,7 +35,7 @@
 				</div>
 				<div class="form-check mb-3">
 					<label class="form-check-label"> <input
-						class="form-check-input" type="checkbox" name="remember">
+						class="form-check-input rememberCheck" type="checkbox" name="remember">
 						Remember me
 					</label>
 				</div>
