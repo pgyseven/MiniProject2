@@ -37,4 +37,10 @@
 	<update id="updateAutoLoginInfo">
 		UPDATE member SET sesid = #{sesid}, allimit = #{allimit} WHERE userId = #{userId}
 	</update>
+	
+	<!-- 자동 로그인 유저를 확인하는 쿼리문 -->
+	<select id="checkAutoLoginUser" resultType="com.miniproj.model.MemberVO">
+		SELECT * FROM member WHERE sesid = #{sesid} AND allimit > now()
+	</select>
+	
 </mapper>
