@@ -176,7 +176,7 @@ public class MemberController {
 	   
    }
    
-   @RequestMapping(value="/login", method=RequestMethod.POST)
+   @RequestMapping(value="/loginPOST", method=RequestMethod.POST)
    public void loginPOST(LoginDTO loginDTO, Model model) {
 	   System.out.println(loginDTO.toString() + "으로 로그인하자");
 	   
@@ -189,11 +189,9 @@ public class MemberController {
 			// 모델 객체에 loginMember를 바인딩 시킨다.
 			model.addAttribute("loginMember", loginMember);
 			
-			// 홈으로 이동
-			
-		} else {
-			//System.out.println("로그인 실패");
 		}
+		return; // loginPOST.jsp로 가지 않고, LoginInterceptor의 postHandle()이 수행되도록...
+		
 	} catch (Exception e) {
 		
 		e.printStackTrace();
