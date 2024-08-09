@@ -19,6 +19,6 @@ import lombok.ToString;
 @ToString
 public class AutoLoginInfo {
 	private String userId;
-	private String sesId;
+	private String sesid;
 	private Timestamp allimit;
 }
