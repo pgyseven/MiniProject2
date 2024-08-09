@@ -58,6 +58,12 @@
 			<mapping path="/sampleInterceptor" />
 			<beans:ref bean="sampleInterceptor" /> <!-- 객체를 참조해주는 것 -->
 		</interceptor>
+		
+		<interceptor>
+			<mapping path="/member/login" />
+			<mapping path="/member/loginPOST" />
+			<beans:ref bean="loginInterceptor" />
+		</interceptor>
 
 		<!-- 로그인 인증이 필요한 페이지 : 글작성, 글수정, 글삭제, 댓글작성/수정/삭제, 관리자 페이지의 모든 기능 -->
 		<interceptor>
