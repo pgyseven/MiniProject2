@@ -4,20 +4,21 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.miniproj.mappers.hboardmapper">
 
-	<!--  게시판의 모든 게시글을 번호 내림차순 정렬하여 가져오는 쿼리문 -->
-	<select id="getAllHBoard" resultType="com.miniproj.model.HBoardVO">
-		select * from hboard order by ref desc, refOrder asc limit #{startRowIndex}, #{viewPostCntPerPage}
-	</select>
+	<!-- 게시판의 모든 게시글을 번호 내림차순 정렬하여 가져오는 쿼리문(최신글부터 보여지도록 내림차순한다.) -->
+   <select id="getAllHBoard" resultType="com.miniproj.model.HBoardVO">
+      SELECT * FROM hboard where boardType = 'hboard' ORDER BY ref desc, refOrder asc limit #{startRowIndex}, #{viewPostCntPerPage}
+   </select>
+
 	
-	<!-- 새로운 게시글을 저장하는 쿼리문 -->
+	<!-- 새로운 게시글(계층형 게시판)을 저장하는 쿼리문 -->
 	<insert id="saveNewBoard">
-		insert into hboard(title, content, writer) values(#{title}, #{content}, #{writer})
+		insert into hboard(title, content, writer, boardType) values(#{title}, #{content}, #{writer}, 'hboard')
 	</insert>
 	
 	
 	<!-- 저장된 글번호를 가져오는 쿼리문   -->
 	<select id="getMaxNo" resultType="int">
-		select max(boardNo) from  hboard
+		select max(boardNo) from  hboard WHERE boardType = 'hbaord'
 	</select>
 	
 	
@@ -63,7 +64,7 @@
 		on h.boardNo = f.boardNo
 		inner join member m
 		on h.writer = m.userId
-		where h.boardNo = #{boardNo}
+		where h.boardNo = #{boardNo} and boardType = 'hboard'
 	</select>
 	
 	<!-- 게시글의 조회수를 증가하는 쿼리문 -->
@@ -82,7 +83,7 @@
 	
 	<!-- BoardReadLog에 조회한 내역 저장  -->
 	<insert id="saveBoardReadLog">
-		insert into boardreadlog(readWho, boardNo) values(#{readwho}, #{boardNo})
+		insert into boardreadlog(readWho, boardNo, boardType) values(#{readwho}, #{boardNo}, 'hboard')
 	</insert>
 	
 	<!--  조회수 증가한 날짜로 조회 내역 update -->
@@ -100,8 +101,8 @@
 	
 	<!--  답글 데이터와 함께 ref, step, refOrder 값 저장 -->
 	<insert id="insertReplyBoard">
-		insert into hboard(title, content, writer, ref, step, refOrder)
-		values(#{title}, #{content}, #{writer}, #{ref}, #{step}, #{refOrder})
+		insert into hboard(title, content, writer, ref, step, refOrder, boardType)
+		values(#{title}, #{content}, #{writer}, #{ref}, #{step}, #{refOrder}, 'hboard')
 	</insert>
 	
 	<!-- boardNo 번 글의 첨부파일 정보를 가져오는 쿼리문 -->
@@ -139,12 +140,12 @@
 	
 	<!-- 인기글 5개 가져오기 -->
 	<select id="selectPopBoards" resultType="com.miniproj.model.HBoardVO">
-		SELECT boardNo, title, postDate FROM hboard WHERE isDelete='N' ORDER BY readCount DESC, boardNo DESC limit 5
+		SELECT boardNo, title, postDate FROM hboard WHERE isDelete='N' AND boardType = 'hboard' ORDER BY readCount DESC, boardNo DESC limit 5
 	</select>
 	
 	<!-- 전체 데이터 갯수 가져오기 -->
 	<select id="selectTotalCount" resultType="int">
-		SELECT COUNT(*) FROM hboard
+		SELECT COUNT(*) FROM hboard WHERE boardType = 'hboard'
 	</select>
 	
 	<!-- 검색어가 있을 경우의 데이터 갯수 가져오기 -->
@@ -161,6 +162,7 @@
 				WHERE content LIKE #{searchWord}
 			</when>
 		</choose>
+		AND boardType = 'hboard'
 	</select>
 	
 	<!-- 검색어가 있을 경우의 페이징 처리 후 데이터 가져오기 -->
@@ -177,6 +179,8 @@
 				WHERE content LIKE #{searchWord}
 			</when>
 		</choose>
+			AND boardType = 'hboard'
+			
 			ORDER BY ref DESC, refOrder ASC LIMIT #{startRowIndex}, #{viewPostCntPerPage}
 	</select>
 	
