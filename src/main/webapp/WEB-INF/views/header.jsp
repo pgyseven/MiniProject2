@@ -40,7 +40,7 @@
 			<div class="collapse navbar-collapse" id="mynavbar">
 				<ul class="navbar-nav me-auto">
 					<li class="nav-item"><a class="nav-link" href="/hboard/listAll">계층형게시판</a></li>
-					<li class="nav-item"><a class="nav-link" href="javascript:void(0)">댓글형게시판</a></li>
+					<li class="nav-item"><a class="nav-link" href="/rboard/listAll">댓글형게시판</a></li>
 					<li class="nav-item"><a class="nav-link" href="/member/register">회원가입</a></li>
 						
 					<c:choose>
