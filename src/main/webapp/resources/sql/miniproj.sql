@@ -480,5 +480,6 @@ UPDATE `webkgy`.`hboard` SET `boardType` = 'rboard' WHERE (`boardNo` = '678');
 ALTER TABLE `webkgy`.`boardreadlog` 
 ADD COLUMN `boardType` VARCHAR(10) NULL AFTER `boardNo`;
 
-
-
+-- content 사이즈를 키워주기 위해서 데이터 타입을 LONGTEXT로 변경함
+ALTER TABLE `webkgy`.`hboard` 
+CHANGE COLUMN `content` `content` LONGTEXT NULL DEFAULT NULL ;
