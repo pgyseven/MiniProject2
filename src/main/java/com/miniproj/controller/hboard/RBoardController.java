@@ -3,6 +3,8 @@ package com.miniproj.controller.hboard;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -12,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.miniproj.model.BoardDetailInfo;
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.SearchCriteriaDTO;
 import com.miniproj.service.hboard.RBoardService;
+import com.miniproj.util.GetClientIPAddr;
 
 import lombok.RequiredArgsConstructor;
 
@@ -83,5 +87,46 @@ public class RBoardController {
 			redirectAttributes.addAttribute("status", "fail");
 		}
 		return returnPage; // 게시글 전체 목록보기 페이지로 돌아간다.
+	}
+	
+	@RequestMapping(value = { "/viewBoard", "/modifyBoard" })
+	public String viewBoard(@RequestParam("boardNo") int boardNo, Model model, HttpServletRequest request) {
+
+		String ipAddr = GetClientIPAddr.getClientIp(request);
+		System.out.println(ipAddr + "가 " + boardNo + "번 글을 조회한다!");
+
+		String returnViewPage = "";
+
+		BoardDetailInfo boardDetailInfo = null;
+
+		try {
+			if (request.getRequestURI().equals("/rboard/viewBoard")) {
+				System.out.println("상세보기 호출...");
+				returnViewPage = "/rboard/viewBoard";
+				boardDetailInfo = service.read(boardNo, ipAddr);
+			} else if (request.getRequestURI().equals("/rboard/modifyBoard")) {
+//				System.out.println("수정하기 호출...");
+//				returnViewPage = "/rboard/modifyBoard";
+//				boardDetailInfo = service.read(boardNo);
+
+//				int fileCount = -1;
+//				for (BoardDetailInfo b : boardDetailInfo) {
+//					fileCount = b.getFileList().size();
+//					this.modifyFileList = b.getFileList(); // db 에서 가져온 업로드된 파일리스트를 멤버변수에 할당
+//				}
+//				model.addAttribute("fileCount", fileCount);
+//
+//				outputCurModifyFileList();
+			}
+
+		} catch (Exception e1) {
+
+			e1.printStackTrace();
+			returnViewPage = "redirect:/rboard/listAll?status=fail";
+		}
+
+		model.addAttribute("board", boardDetailInfo);
+
+		return returnViewPage;
 	}
 }

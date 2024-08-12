@@ -162,7 +162,7 @@
 								<c:choose>
 									<c:when test="${board.isDelete == 'N'}">
 										<tr
-											onclick="location.href='/hboard/viewBoard?boardNo=${board.boardNo}';">
+											onclick="location.href='/rboard/viewBoard?boardNo=${board.boardNo}';">
 											<td>${board.boardNo }</td>
 											<td><c:forEach var="i" begin="1" end="${board.step}">
 													<img src="/resources/images/reply.png" />
