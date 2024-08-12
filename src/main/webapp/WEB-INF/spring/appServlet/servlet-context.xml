@@ -71,6 +71,8 @@
 			<mapping path="/hboard/modifyBoard" /> <!-- 글&댓글 수정 -->
 			<mapping path="/hboard/removeBoard" /> <!-- 글&댓글 삭제 -->
 			<mapping path="/hboard/showReplyForm" /> <!-- 댓글작성 -->
+			
+			<mapping path="/rboard/showSaveBoardForm" /> <!-- 댓글 게시판의 글 작성 페이지 -->
 
 			<beans:ref bean="authInterceptor" />
 		</interceptor>
