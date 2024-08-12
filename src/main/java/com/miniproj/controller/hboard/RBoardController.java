@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.miniproj.model.HBoardDTO;
 import com.miniproj.model.HBoardVO;
@@ -65,7 +66,22 @@ public class RBoardController {
 	}
 	
 	@RequestMapping(value="/saveBoard", method=RequestMethod.POST)
-	public void saveBoard(HBoardDTO newBoard) {
+	public String saveBoard(HBoardDTO newBoard, RedirectAttributes redirectAttributes) {
 		System.out.println(newBoard + "글을 저장하자");
+		
+	    System.out.println("let'save this board : " + newBoard.toString());
+		
+		String returnPage = "redirect:/rboard/listAll";
+		
+		try {
+			if(service.saveBoard(newBoard)) {
+				redirectAttributes.addAttribute("status", "success");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+			redirectAttributes.addAttribute("status", "fail");
+		}
+		return returnPage; // 게시글 전체 목록보기 페이지로 돌아간다.
 	}
 }

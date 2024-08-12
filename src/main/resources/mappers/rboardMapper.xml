@@ -10,9 +10,9 @@
    </select>
 
 	
-	<!-- 새로운 게시글(계층형 게시판)을 저장하는 쿼리문 -->
+	<!-- 새로운 게시글(댓글형 게시판)을 저장하는 쿼리문 -->
 	<insert id="saveNewBoard">
-		insert into hboard(title, content, writer, boardType) values(#{title}, #{content}, #{writer}, 'hboard')
+		insert into hboard(title, content, writer, boardType) values(#{title}, #{content}, #{writer}, 'rboard')
 	</insert>
 	
 	
