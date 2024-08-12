@@ -25,7 +25,7 @@
 			<div class="mb-3">
 				<label for="title" class="form-label">글제목</label> <input type="text"
 					class="form-control" id="title" name="title"
-					placeholder="글제목을 입력하세요">
+					value = "${sessionScope.loginMember.userId}">
 			</div>
 			<div class="mb-3">
 				<label for="writer" class="form-label">작성자</label> <input
