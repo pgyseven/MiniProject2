@@ -32,7 +32,7 @@ public interface RBoardService{
 	 * @returType : List<BoardDetailInfo> - 글과 첨부파일, 글의 작성자 정보를 함께 불러온다.
 	 * @throwsException : dao단 다녀오는거라 예외 생길 수 있음
 	 */
-	public List<BoardDetailInfo> read(int boardNo) throws Exception;
+	public BoardDetailInfo read(int boardNo) throws Exception;
 	
 	// 게시글 답글 달기
 	public boolean saveReply(HReplyBoardDTO replyBoard) throws Exception;
