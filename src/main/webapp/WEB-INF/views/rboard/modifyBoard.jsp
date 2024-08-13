@@ -8,6 +8,12 @@
 <title>상세보기</title>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!-- include summernote css/js -->
+<link
+	href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css"
+	rel="stylesheet">
+<script
+	src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
 <script>
 		
@@ -186,14 +192,8 @@
 						</div>
 						<!-- readonly는 수정 불가 -->
 
-
-						<div class="mb-3">
-							<label for="content" class="form-label">내용</label>
-							<textarea class="form-control" id="content" rows="5" name="content">
-                  ${board.content}
-                  	</textarea>
-						</div>
 					</div>
+					<textarea id="summernote" name="content"></textarea>
 
 
 					<div class="fileList" style="padding: 15px">
@@ -206,30 +206,6 @@
 								</tr>
 							</thead>
 							<tbody>
-								<c:forEach var="file" items="${board.fileList}">
-									<c:if test="${file.boardUpFileNo != '0'}">
-										<tr>
-											<td><input class="form-check-input fileCheck"
-												type="checkbox" id="${file.boardUpFileNo}"
-												onclick="removeFileCheck(this.id);" /></td>
-											<td><c:choose>
-													<c:when test="${file.thumbFileName != null}">
-														<!-- 이미지파일이라면 -->
-														<img src="/resources/boardUpFiles/${file.newFileName}"
-															width="40px;" />
-													</c:when>
-													<c:when test="${file.thumbFileName == null}">
-														<!-- 이미지파일이 아니라면 -->
-														<a href="/resources/boardUpFiles/${file.newFileName}">
-															<img src="/resources/images/noimage.png" />
-															${file.newFileName}
-														</a>
-													</c:when>
-												</c:choose></td>
-											<td>${file.newFileName}</td>
-										</tr>
-									</c:if>
-								</c:forEach>
 								<tr>
 									<td colspan="3" style="text-align: center;"><img
 										src="/resources/images/add.png" onclick="addRows(this);" /></td>
