@@ -19,6 +19,7 @@ import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.PointLogDTO;
 import com.miniproj.model.SearchCriteriaDTO;
+import com.miniproj.persistence.HBoardDAO;
 import com.miniproj.persistence.MemberDAO;
 import com.miniproj.persistence.PointLogDAO;
 import com.miniproj.persistence.RBoardDAO;
@@ -33,6 +34,7 @@ public class RBoardServiceImpl implements RBoardService {
    private final RBoardDAO rDao;
    private final PointLogDAO pDao;
    private final MemberDAO mDao;
+   private final HBoardDAO hDao;
 
    @Override
    @Transactional(readOnly = true)
@@ -105,29 +107,37 @@ public class RBoardServiceImpl implements RBoardService {
       return result;
    }
 
+   
    @Override
+   @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT, rollbackFor = Exception.class)
    public BoardDetailInfo read(int boardNo, String ipAddr) throws Exception {
+	  
       BoardDetailInfo boardInfo = rDao.selectBoardByBoardNo(boardNo);  //select
 
-
       // 조회수 증가
-//      if (boardInfo != null) {
-//
-//         int dateDiff = bDao.selectDateDiff(boardNo, ipAddr);  //select
-//         if (dateDiff == -1) {
-//            // ipAddr 유저가 boardNo글을 조회한적이 없다. 조회내역 증가 - > 조회수 증가
-//            if (bDao.saveBoardReadLog(boardNo, ipAddr) == 1) { // 조회 내역 저장 / insert
-//               updateReadCount(boardNo, boardInfo); //update     Propagation.REQUIRED 에 의해서 트랜잭션이 아래 호출하는 매서드 까지 확장
-//            }
-//
-//         } else if (dateDiff >= 1) {
-//            updateReadCount(boardNo, boardInfo); //update
-//            bDao.updateReadWhen(boardNo, ipAddr); // 조회수 증가 한 날로 날짜 update
-//         }
-//      }
+      if (boardInfo != null) {
+
+         int dateDiff = hDao.selectDateDiff(boardNo, ipAddr);  //select
+         if (dateDiff == -1) {
+            // ipAddr 유저가 boardNo글을 조회한적이 없다. 조회내역 증가 - > 조회수 증가
+            if (hDao.saveBoardReadLog(boardNo, ipAddr) == 1) { // 조회 내역 저장 / insert
+               updateReadCount(boardNo, boardInfo); //update     Propagation.REQUIRED 에 의해서 트랜잭션이 아래 호출하는 매서드 까지 확장
+            }
+
+         } else if (dateDiff >= 1) {
+            updateReadCount(boardNo, boardInfo); //update
+            hDao.updateReadWhen(boardNo, ipAddr); // 조회수 증가 한 날로 날짜 update
+         }
+      }
 
       return boardInfo;
    }
+   
+   private void updateReadCount(int boardNo, BoardDetailInfo boardInfo) throws Exception {
+		if (hDao.updateReadCount(boardNo) == 1) {
+			boardInfo.setReadCount(boardInfo.getReadCount() + 1);			
+		}
+	}
 
    @Override
    public List<BoardDetailInfo> read(int boardNo) throws Exception {

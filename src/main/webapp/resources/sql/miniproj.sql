@@ -483,3 +483,8 @@ ADD COLUMN `boardType` VARCHAR(10) NULL AFTER `boardNo`;
 -- content 사이즈를 키워주기 위해서 데이터 타입을 LONGTEXT로 변경함
 ALTER TABLE `webkgy`.`hboard` 
 CHANGE COLUMN `content` `content` LONGTEXT NULL DEFAULT NULL ;
+
+
+-- boardreadlog 테이블에 불필요한 컬럼 삭제
+ALTER TABLE `webkgy`.`boardreadlog`
+DROP COLUMN `boardType`;

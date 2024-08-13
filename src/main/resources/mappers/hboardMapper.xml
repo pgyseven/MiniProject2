@@ -83,7 +83,7 @@
 	
 	<!-- BoardReadLog에 조회한 내역 저장  -->
 	<insert id="saveBoardReadLog">
-		insert into boardreadlog(readWho, boardNo, boardType) values(#{readwho}, #{boardNo}, 'hboard')
+		insert into boardreadlog(readWho, boardNo) values(#{readwho}, #{boardNo})
 	</insert>
 	
 	<!--  조회수 증가한 날짜로 조회 내역 update -->
