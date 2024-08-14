@@ -488,3 +488,87 @@ CHANGE COLUMN `content` `content` LONGTEXT NULL DEFAULT NULL ;
 -- boardreadlog 테이블에 불필요한 컬럼 삭제
 ALTER TABLE `webkgy`.`boardreadlog`
 DROP COLUMN `boardType`;
+
+--------------------------  댓글 기능 구현 ------------------------------
+-- 댓글을 저장하는 테이블 생성
+CREATE TABLE `webkgy`.`replyboard` (
+  `replyNo` INT NOT NULL AUTO_INCREMENT,
+  `replyer` VARCHAR(8) NULL,
+  `content` VARCHAR(200) NULL,
+  `regDate` DATETIME NULL DEFAULT now(),
+  `boardNo` INT NOT NULL,
+  PRIMARY KEY (`replyNo`))
+COMMENT = '댓글을 저장하는 테이블';
+
+use webkgy;
+
+-- replyboard FK 설정
+alter table replyboard 
+add constraint replyer_member_fk foreign key(replyer) references member(userId)
+on delete cascade;
+
+-- replyboard FK 설정
+alter table replyboard
+add constraint boardNo_board_fk foreign key(boardNo) references hboard(boardNo);
+
+-- 댓글 등록
+INSERT INTO replyboard(replyer, content, boardNo) VALUES('dooly', '뉴진스 왤케 이쁨', 687);
+
+-- ?번 글에 대한 모든 댓글을 얻어오는 쿼리문
+SELECT * FROM replyboard WHERE boardNo=?;
+
+-- ?번 글에 대한 게시글과 함께 모든 댓글을 얻어오는 쿼리문
+SELECT h.*, r.*
+FROM hboard h INNER JOIN replyboard r 
+ON h.boardNo = r.boardNo
+WHERE h.boardNo = 688 AND boardType='rboard';
+
+-- 모든 게시글과 모든 댓글을 함께 얻어오는 쿼리문
+select h.*, r.*
+from hboard h left outer join replyboard r 
+on h.boardNo = r.boardNo
+where boardType='rboard'
+group by h.boardNo;
+
+-- ?번 글의 댓글 갯수 얻어오기
+SELECT COUNT(*) FROM replyboard WHERE boardNo=688;
+
+-- 댓글 게시판의 데이터와, 그 댓글 게시물에 달려있는 댓글의 갯수를 함께 얻어오는 쿼리문
+-- 셀렉트 문을 수행할 때 서브쿼리부터 실행한다.
+select h.boardNo, h.title, h.readCount, h.postDate, (select count(*) from replyboard where r.boardNo = h.boardNo)
+from hboard h left outer join replyboard r 
+on h.boardNo = r.boardNo
+where boardType='rboard'
+group by h.boardNo
+order by h.boardNo desc;
+-- 위의 쿼리문은 문제가 있으므로 아래의 쿼리문이 해결방법이다.
+select *
+from hboard
+where boardType='rboard';
+select count(*) from replyboard where boardNo = 688;
+
+-- group by 절 : 그룹화를 시킬 때 사용하는 절
+-- group by 그룹화를 시킬 컬럼명
+-- emp의 모든 사원에 대하여 직무별(job) 급여 총합과 급여 평균을 구해보자.
+SELECT job, SUM(sal), AVG(sal)
+FROM emp 
+GROUP BY job;
+
+-- having 절은 group화를 시킨 컬럼에 대해 조건을 부여할 때 사용한다.
+-- 직무별 급여 총합이 5000 이상인 직무만 검색하여 직무와 급여 총합을 구하자.
+SELECT job, SUM(sal)
+FROM emp
+GROUP BY job
+HAVING SUM(sal) >= 5000;
+-- having 대신 where을 쓰면 에러가 난다. 그룹함수(count, sum, avg)를 쓸 때는 having절을 써야 한다. 그룹함수의 특징은 결과(row)가 하나만 나오는 것이다.
+
+-- 부서별 인원수를 구하여 부서번호와 인원수를 출력하세요.
+SELECT deptNo, COUNT(*) -- 그룹화를 시켰기 때문에 count(*)를 했을 때 그룹별 인원수를 뽑아낼 수 있는 것이다.
+FROM emp
+GROUP BY deptNo;
+
+-- 부서별 인원수를 구하여 부서번호와 부서이름, 인원수를 출력하세요.
+SELECT e.deptNo, COUNT(*), d.d
+FROM emp e INNER JOIN dept d
+ON e.deptNo = d.deptNo
+GROUP BY e.deptNo, d.dname;
