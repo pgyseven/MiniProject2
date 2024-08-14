@@ -31,7 +31,7 @@
 	<!-- 아래의 패키지를 조사하여 필요한 컨트롤러 객체를 컨테이너에 적재 -->
 	<context:component-scan
 		base-package="com.miniproj.controller" />
-		<context:component-scan
+	<context:component-scan
 		base-package="com.miniproj.reply" />
 
 	<!-- 수신된 Multipart의 데이터를 순서대로 재조립, 파일 업로드 제한 : 10MB -->
@@ -51,7 +51,7 @@
 
 	<beans:bean id="authInterceptor"
 		class="com.miniproj.interceptor.AuthInterceptor">
-		
+
 	</beans:bean>
 
 	<!-- 인터셉터가 동작하는 매핑 설정 -->
@@ -60,7 +60,7 @@
 			<mapping path="/sampleInterceptor" />
 			<beans:ref bean="sampleInterceptor" /> <!-- 객체를 참조해주는 것 -->
 		</interceptor>
-		
+
 		<interceptor>
 			<mapping path="/member/login" />
 			<mapping path="/member/loginPOST" />
@@ -73,7 +73,7 @@
 			<mapping path="/hboard/modifyBoard" /> <!-- 글&댓글 수정 -->
 			<mapping path="/hboard/removeBoard" /> <!-- 글&댓글 삭제 -->
 			<mapping path="/hboard/showReplyForm" /> <!-- 댓글작성 -->
-			
+
 			<mapping path="/rboard/showSaveBoardForm" /> <!-- 댓글 게시판의 글 작성 페이지 -->
 			<mapping path="/rboard/modifyBoard" /> <!-- 댓글 게시판의 글 수정 페이지 -->
 
