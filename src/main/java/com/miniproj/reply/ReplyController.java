@@ -19,9 +19,11 @@ public class ReplyController {
 	
 	private final ReplyService rService;
 	
-	@GetMapping("/all/{boardNo}") // @PathVariable : 이 자리에 boardNo가 들어간다는 의미
+	@GetMapping("/all/{boardNo}") 
+	// 쿼리 스트링이 아니다. pathVariable이다.
+	// @PathVariable : 이 자리에 boardNo가 들어간다는 의미
 	public @ResponseBody List<ReplyVO> getAllReplyByBoardNo(@PathVariable("boardNo") int boardNo) {
-		// @ResponseBody : json 형태로 반환해준다.
+		// @ResponseBody : 뒤에있는(List<ReplyVO> 얘를) 반환값 타입을 json 형태로 반환해준다.
 		System.out.println(boardNo + "번의 모든 댓글을 얻어오자.");
 		
 		List<ReplyVO> result = null;
