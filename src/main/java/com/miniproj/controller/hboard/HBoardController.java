@@ -2,6 +2,7 @@ package com.miniproj.controller.hboard;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,29 +65,26 @@ public class HBoardController {
 
 	// 게시판 전체 목록 리스트를 출력하는 메서드
 	@RequestMapping("/listAll")
-	public void listAll(Model model, @RequestParam(value="pageNo", defaultValue = "1") int pageNo,
-			@RequestParam(value="pagingSize", defaultValue = "10") int pagingSize, SearchCriteriaDTO searchCriteria) {
-    // defaultValue : pageNo 쿼리스트링 값이 생략되어 호출된다면 그 값이 1로 초기값이 부여되도록 한다.(400에러 방지)
+	public void listAll(Model model, @RequestParam(value = "pageNo", defaultValue = "1") int pageNo,
+			@RequestParam(value = "pagingSize", defaultValue = "10") int pagingSize, SearchCriteriaDTO searchCriteria) {
+		// defaultValue : pageNo 쿼리스트링 값이 생략되어 호출된다면 그 값이 1로 초기값이 부여되도록 한다.(400에러 방지)
 		logger.info(pageNo + "번 페이지를 출력하자 & 페이징 사이즈 : " + pagingSize + " (검색조건 : " + searchCriteria.toString() + ")");
 
-		PagingInfoDTO dto = PagingInfoDTO.builder()
-			.pageNo(pageNo)
-			.pagingSize(pagingSize)
-			.build();
-		
+		PagingInfoDTO dto = PagingInfoDTO.builder().pageNo(pageNo).pagingSize(pagingSize).build();
+
 		// 서비스 단 호출
 		List<HBoardVO> list = null;
 		Map<String, Object> result = null;
 		try {
 			result = service.getAllBoard(dto, searchCriteria);
-			
-			PagingInfo pi = (PagingInfo)result.get("pagingInfo");
-			list =(List<HBoardVO>)result.get("boardList");
-			
+
+			PagingInfo pi = (PagingInfo) result.get("pagingInfo");
+			list = (List<HBoardVO>) result.get("boardList");
+
 			model.addAttribute("boardList", list); // 데이터 바인딩
 			model.addAttribute("PagingInfo", pi);
 			model.addAttribute("search", searchCriteria);
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			model.addAttribute("exception", "error");
@@ -293,44 +291,50 @@ public class HBoardController {
 	// 아래의 viewBoard()는 /viewBoard(게시글 상세보기), /modifyBoard(게시글을 수정하기 위해 게시글을 불러오는)
 	// 일 때 2번 호출된다.
 	@RequestMapping(value = { "/viewBoard", "/modifyBoard" })
-	public String viewBoard(@RequestParam("boardNo") int boardNo, Model model, HttpServletRequest request) {
-
-		String ipAddr = GetClientIPAddr.getClientIp(request);
-		System.out.println(ipAddr + "가 " + boardNo + "번 글을 조회한다!");
-
+	public String viewBoard(@RequestParam("boardNo") String boardNo, Model model, HttpServletRequest request) {
+		
 		String returnViewPage = "";
-
 		List<BoardDetailInfo> boardDetailInfo = null;
 
 		try {
+
+			String ipAddr = GetClientIPAddr.getClientIp(request);
+			System.out.println(ipAddr + "가 " + boardNo + "번 글을 조회한다!");
+
 			if (request.getRequestURI().equals("/hboard/viewBoard")) {
-				System.out.println("상세보기 호출...");
+				System.out.println("게시판 상세보기 호출..................");
 				returnViewPage = "/hboard/viewBoard";
-				boardDetailInfo = service.read(boardNo, ipAddr);
+				boardDetailInfo = service.read(Integer.parseInt(boardNo), ipAddr);
+
 			} else if (request.getRequestURI().equals("/hboard/modifyBoard")) {
-				System.out.println("수정하기 호출...");
+				System.out.println("게시판 수정 호출 .................");
 				returnViewPage = "/hboard/modifyBoard";
-				boardDetailInfo = service.read(boardNo);
+				boardDetailInfo = service.read(Integer.parseInt(boardNo));
 
 				int fileCount = -1;
 				for (BoardDetailInfo b : boardDetailInfo) {
 					fileCount = b.getFileList().size();
-					this.modifyFileList = b.getFileList(); // db 에서 가져온 업로드된 파일리스트를 멤버변수에 할당
+					this.modifyFileList = b.getFileList(); // db에서 가져온 업로드된 파일리스트를 멤버변수에 할당
 				}
 				model.addAttribute("fileCount", fileCount);
 
 				outputCurModifyFileList();
+
 			}
-
-		} catch (Exception e1) {
-
-			e1.printStackTrace();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			returnViewPage = "redirect:/hboard/listAll?status=fail";
+		} catch (Exception ex) {
+			System.out.println(boardNo + " 의 값");
+			System.out.println("요기~~~~~~~~~~~~~~~~~" + ex.getMessage());
 			returnViewPage = "redirect:/hboard/listAll?status=fail";
 		}
 
 		model.addAttribute("boardDetailInfo", boardDetailInfo);
 
 		return returnViewPage;
+
 	}
 
 	private void outputCurModifyFileList() {
@@ -399,34 +403,33 @@ public class HBoardController {
 				HttpStatus.OK);
 	}
 
-	   @RequestMapping(value = "/modifyBoardSave", method = RequestMethod.POST)
-	   public String modifyBoardSave(HBoardDTO modifyBoard, @RequestParam("modifyNewFile") MultipartFile[] modifyNewFile,
-	         HttpServletRequest request, RedirectAttributes redirectAttributes) {
-	      System.out.println(modifyBoard.toString() + "로 수정하자");
-	      
-	      try { // 서버나 파일 저장시에도 하나라도 안되면 예외 처리로 나오게 범위를 넓혔다 
-	         for (int i = 0; i < modifyNewFile.length; i++) {
-	            System.out.println("새로 업로드된 파일 :" + modifyNewFile[i].getOriginalFilename());
+	@RequestMapping(value = "/modifyBoardSave", method = RequestMethod.POST)
+	public String modifyBoardSave(HBoardDTO modifyBoard, @RequestParam("modifyNewFile") MultipartFile[] modifyNewFile,
+			HttpServletRequest request, RedirectAttributes redirectAttributes) {
+		System.out.println(modifyBoard.toString() + "로 수정하자");
 
-	            BoardUpFilesVODTO fileInfo = fileSave(modifyNewFile[i], request);
-	            fileInfo.setFileStatus(BoardUpFileStatus.INSERT); // insert 되어야 할 파일임을 기록
-	            this.modifyFileList.add(fileInfo);
-	         }
+		try { // 서버나 파일 저장시에도 하나라도 안되면 예외 처리로 나오게 범위를 넓혔다
+			for (int i = 0; i < modifyNewFile.length; i++) {
+				System.out.println("새로 업로드된 파일 :" + modifyNewFile[i].getOriginalFilename());
 
-	         outputCurModifyFileList();
-	         //DB에 저장(servixe 호출)
-	         modifyBoard.setFileList(modifyFileList);
-	         if(service.modifyBoard(modifyBoard)) {
-	            redirectAttributes.addAttribute("status", "success");
-	         }
-	      } catch (Exception e) { //DB의 익셉션 및 IO 익셉션을 모두 포함하기 위하여  익셉션으로 바꿈
-	         
-	         e.printStackTrace();
-	         redirectAttributes.addAttribute("status", "fail");
-	      }
-	      return "redirect:/hboard/viewBoard?boardNo=" + modifyBoard.getBoardNo();
+				BoardUpFilesVODTO fileInfo = fileSave(modifyNewFile[i], request);
+				fileInfo.setFileStatus(BoardUpFileStatus.INSERT); // insert 되어야 할 파일임을 기록
+				this.modifyFileList.add(fileInfo);
+			}
 
-	   }
-		
-	
+			outputCurModifyFileList();
+			// DB에 저장(servixe 호출)
+			modifyBoard.setFileList(modifyFileList);
+			if (service.modifyBoard(modifyBoard)) {
+				redirectAttributes.addAttribute("status", "success");
+			}
+		} catch (Exception e) { // DB의 익셉션 및 IO 익셉션을 모두 포함하기 위하여 익셉션으로 바꿈
+
+			e.printStackTrace();
+			redirectAttributes.addAttribute("status", "fail");
+		}
+		return "redirect:/hboard/viewBoard?boardNo=" + modifyBoard.getBoardNo();
+
+	}
+
 }
