@@ -4,9 +4,12 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.miniproj.mappers.replyMapper">
 
-    <!--  -->
 	<select id="getReplies" resultType="com.miniproj.model.ReplyVO">
-		select * from replyboard where boardNo=#{boardNo} order by replyNo desc
+		select * from replyboard where boardNo=#{boardNo} order by replyNo desc limit #{startRowIndex}, #{viewPostCntPerPage}
+	</select>
+	
+	<select id="getReplyCount" resultType="int">
+		select count(*) from replyboard where boardNo = #{boardNo}
 	</select>
 	
 </mapper>
