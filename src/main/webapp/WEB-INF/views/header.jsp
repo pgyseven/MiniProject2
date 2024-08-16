@@ -45,7 +45,7 @@
 						
 					<c:choose>
 						<c:when test="${sessionScope.loginMember != null}">
-							<li class="nav-item userArea">
+							<li class="nav-item userArea" onclick="location.href='/member/mypage'">
 								<img src="/resources/userImg/${sessionScope.loginMember.userImg}" class="userProfile" />
 								<span class="userName">
 									${sessionScope.loginMember.userName}
