@@ -15,7 +15,7 @@
    
    $(function() {
       //모달창 닫기 버튼을 클릭하면...
-      getAllReplies();
+      getAllReplies(pageNo);
       
       $('.modalCloseBtn').click(function() {
          $('#myModal').hide();
@@ -28,7 +28,7 @@
       $('#myModal').show(500); /* 밀리세컨드 단위고 0.5초 속도로 천천히 보여줌 */
    }
    
-   function getAllReplies() {
+   function getAllReplies(pageNo) {
       $.ajax({
          url : '/reply/all/${param.boardNo}/' + pageNo,
          type : 'get',
@@ -51,74 +51,115 @@
    function outputReplies(replies) {
       let output = `<div class="list-group">`;
       
-      $.each(replies.data.replyList, function(i, reply) {
-         output += `<a href="#" class="list-group-item list-group-item-action reply">`;      
-         output += `<div class='replyBody'>`;
-         
-         output += `<div class='replyerProfile'>`;
-         output += `<img src='/resources/userImg/\${reply.userImg}'/>`;
+      if(replies.data.replyList.length == 0) {
+         output += `<div class="empty">`;
+         output += `<img src ='/resources/images/empty.png'>`;
+         output += `<div>댓글이 없습니다.</div>`;
          output += `</div>`;
          
-         output += `<div class='replyBodyArea'>`;
-         output += `<div class='replyContent'>\${reply.content}</div>`;
-         
-         output += `<div class='replyInfo'>`;
-         let betweenTime = processPostDate(reply.regDate);
-         output += `<div class='regDate'>\${betweenTime}</div>`;
-         
-         output += `<div class='replyer' onmouseover='showReplyInfo(this);' onmouseout='hideReplyInfo(this);'>`;
-         output += `\${reply.replyer}</div>`;
-         output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`;
-         
-         output += `</div>`;
-         
-         output += `</div>`;
-         output += `</div>`;
-         output += `</a>`;
-      });
+      }else {
+         $.each(replies.data.replyList, function(i, reply) {
+                output += `<a href="#" class="list-group-item list-group-item-action reply">`;      
+                output += `<div class='replyBody'>`;
+                
+                output += `<div class='replyerProfile'>`;
+                output += `<img src='/resources/userImg/\${reply.userImg}'/>`;
+                output += `</div>`;
+                
+                output += `<div class='replyBodyArea'>`;
+                output += `<div class='replyContent'>\${reply.content}</div>`;
+                
+                output += `<div class='replyInfo'>`;
+                let betweenTime = processPostDate(reply.regDate);
+                output += `<div class='regDate'>\${betweenTime}</div>`;
+                
+                output += `<div class='replyer' onmouseover='showReplyInfo(this);' onmouseout='hideReplyInfo(this);'>`;
+                output += `\${reply.replyer}</div>`;
+                output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`;
+                
+                output += `</div>`;
+                
+                output += `</div>`;
+                output += `</div>`;
+                output += `</a>`;
+             });
+         outputPagination(replies);
+      }
+      
+     
       output += ``;
         
       output += `</div>`;
       
       $(".replyList").html(output);
+      
    }
+   // 댓글 페이징
+   function outputPagination(replies) {
+         let output = `<ul class="pagination justify-content-center" style="margin:20px 0">`;
+         
+         let pagingInfo = replies.data.pagingInfo;
+         if(pageNo > 1){
+            output += `<li class="page-item"><a class="page-link" onclick="getAllReplies(--pageNo);">◀</a></li>`;
+         }
+         
+         
+         for (let i  = pagingInfo.startPageNoCurBlock ; i <= pagingInfo.endPageNoCurBlock ; i++) {
+            
+            if(pageNo == i) {
+               output += `<li class="page-item active"><a class="page-link" onclick="pageNo = \${i}; getAllReplies(\${i});">\${i}</a></li>`;
+            } else {
+               output += `<li class="page-item"><a class="page-link" onclick="pageNo = \${i}; getAllReplies(\${i});">\${i}</a></li>`;
+            }
+         }
+         if (pageNo < pagingInfo.totalPageCnt){
+            output += `<li class="page-item"><a class="page-link" onclick="getAllReplies(++pageNo);">▶</a></li>`;
+         }
+         
+         output += `</ul>`;
+         
+         $('.replyPagination').html(output);
+         
+         
+      }
+   
    
    // 댓글 작성일시 : 방금 전, 몇분 전, 몇시간 전 의 형식으로 출력
    function processPostDate(writtenDate) {
-	   
-	   const postDate = new Date(writtenDate); // 댓글 작성 시간
-	   // 객체는 주소값이 바뀌는 것이 아니라서 const로 선언해도 된다.
-	   
-	   const now = new Date(); // 현재 시간
-	   
-	   let diff = (now - postDate) / 1000; // 시간 차이를 초 단위로 구하기 위해서 1000으로 나눠준다.
-	   
-	   const times = [
-		 {name : "일", time : 60 * 60 * 24},
-		 {name : "시간", time : 60 * 60},
-		 {name : "분", time : 60}
-	   ];
-	   
-	   for(let val of times) {
-		   let betweenTime = Math.floor(diff / val.time); // {name : "일", time : 60 * 60 * 24} 의 time으로 나눠준다.
-		   console.log(writtenDate, diff, betweenTime);
-		   
-		   if(betweenTime > 0 && val.name != "일") {
-			   return betweenTime + val.name + "전";
-		   } else if(betweenTime > 0 && val.name == "일") {
-			   return postDate.toLocaleString();
-		   }
-	   }
-	   
-	   return "방금전";
+      
+      const postDate = new Date(writtenDate); // 댓글 작성 시간
+      // 객체는 주소값이 바뀌는 것이 아니라서 const로 선언해도 된다.
+      
+      const now = new Date(); // 현재 시간
+      
+      let diff = (now - postDate) / 1000; // 시간 차이를 초 단위로 구하기 위해서 1000으로 나눠준다.
+      
+      const times = [
+       {name : "일", time : 60 * 60 * 24},
+       {name : "시간", time : 60 * 60},
+       {name : "분", time : 60}
+      ];
+      
+      for(let val of times) {
+         let betweenTime = Math.floor(diff / val.time); // {name : "일", time : 60 * 60 * 24} 의 time으로 나눠준다.
+         console.log(writtenDate, diff, betweenTime);
+         
+         if(betweenTime > 0 && val.name != "일") {
+            return betweenTime + val.name + "전";
+         } else if(betweenTime > 0 && val.name == "일") {
+            return postDate.toLocaleString();
+         }
+      }
+      
+      return "방금전";
    }
    
    function showReplyInfo(obj) {
-	   $(obj).next().show();
+      $(obj).next().show();
    }
    
    function hideReplyInfo(obj){
-	   $(obj).next().hide();
+      $(obj).next().hide();
    }
 </script>
 <style type="text/css">
@@ -230,12 +271,12 @@
                </div>
             </c:forEach>
 
-            <div class="pagination justify-content-center"
+            <%-- <div class="pagination justify-content-center"
                style="margin: 20px 0">
                <ul class="pagination">
                   <c:if test="${pagingInfo.pageNo > 1}">
                      <li class="page-item"><a class="page-link"
-                        href="/rboard/listAll?pageNo=${pagingInfo.pageNo - 1}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">◀</a>
+                        href="/rboard/listAll?pageNo=${pagingInfo.pageNo - 1}&pagingSize=${param.pagingSize}">◀</a>
                      </li>
                   </c:if>
 
@@ -243,17 +284,17 @@
                      end="${pagingInfo.endPageNo}" var="i">
                      <li class="page-item ${pagingInfo.pageNo == i ? 'active' : ''}">
                         <a class="page-link"
-                        href="/rboard/listAll?pageNo=${i}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">${i}</a>
+                        href="/rboard/listAll?pageNo=${i}&pagingSize=${param.pagingSize}">${i}</a>
                      </li>
                   </c:forEach>
 
                   <c:if test="${pagingInfo.pageNo < pagingInfo.totalPageCnt}">
                      <li class="page-item"><a class="page-link"
-                        href="/rboard/listAll?pageNo=${pagingInfo.pageNo + 1}&pagingSize=${param.pagingSize}&searchType=${search.searchType}&searchWord=${search.searchWord}">▶</a>
+                        href="/rboard/listAll?pageNo=${pagingInfo.pageNo + 1}&pagingSize=${param.pagingSize}">▶</a>
                      </li>
                   </c:if>
                </ul>
-            </div>
+            </div> --%>
 
             <!-- 댓글 작성 폼 -->
             <form action="/rboard/addComment" method="post">
@@ -278,6 +319,10 @@
       
       <div class="replyList">
          
+      </div>
+      
+      <div class="replyPagination">
+      
       </div>
 
       <!-- The Modal -->
