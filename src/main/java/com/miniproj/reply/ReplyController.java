@@ -28,10 +28,12 @@ public class ReplyController {
 	private final ReplyService rService;
 	private final HBoardService hService;
 
-	@GetMapping("/all/{boardNo}/{pageNo}") // @PathVariable : 이 자리에 boardNo가 들어간다는 의미
+	@GetMapping(value="/all/{boardNo}/{pageNo}", produces= {"application/json; charset=utf-8"}) 
+	// produces= {"application/json; charset=utf-8"} 의미 : 이 메소드에서 반환되는 데이터는 utf-8 타입인 json으로 반환된다라고 encoding해주는 것
+	// @PathVariable : 이 자리에 boardNo가 들어간다는 의미
 	public ResponseEntity getAllReplyByBoardNo(@PathVariable("boardNo") int boardNo, @PathVariable("pageNo") int pageNo) {// @ResponseBody List<ReplyVO>
 		// @ResponseBody 는 List<ReplyVO> 을 제이슨으로 만들라는 애이다. 단점이 전송 상태를 같이 못 보내준다.
-		System.out.println(boardNo + "번의 모든 댓글을 얻어오자.");
+		System.out.println(boardNo + "번의 모든 댓글을 얻어오자.(페이지 번호 : " + pageNo + ")");
 
 		ResponseEntity result = null;
 		Map<String, Object> data = null;
