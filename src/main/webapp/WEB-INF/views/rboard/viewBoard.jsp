@@ -65,7 +65,10 @@
          output += `<div class='replyContent'>\${reply.content}</div>`;
          output += `<div class='replyInfo'>`;
          output += `<div class='regDate'>\${reply.regDate}</div>`;
-         output += `<div class='replyer'>\${reply.replyer}</div>`;
+         output += `<div class='replyer' onmouseover='showReplyInfo(this);' onmouseout='hideReplyInfo(this);'>`;
+         output += `\${reply.replyer}</div>`;
+         output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`;
+         
          output += `</div>`;
          
          output += `</div>`;
@@ -78,41 +81,54 @@
       
       $(".replyList").html(output);
    }
+   
+   function showReplyInfo(obj) {
+	   $(obj).next().show();
+   }
+   
+   function hideReplyInfo(obj){
+	   $(obj).next().hide();
+   }
 </script>
 <style type="text/css">
    .replyList {
       margin-top: 15px;
       padding: 10px; 
       
-    }  
-    
+   }
    .replyBody {
       display: flex;
       justify-content: space-between;
       flex-direction: row;
       align-items: center;
-      color : rgba(0,0,0,0.6); /* 60% 불투명하게 색이 나온다. */   
+      font-size: 0.9rem;
+      color: rgba(0,0,0, 0.8);
    }
-   
    .replyBodyArea {
       flex : 1;
-      margin-left: 20px;
+      margin-left: 15px;
    }
-   
    .replyerProfile img {
       width: 50px;
       border-radius: 25px;
-      border : 1px solid lightgray;
-      
+      border: 1px solid lightgray;
+   }
+   .replyInfo {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: 0.6rem;
+      color: rgba(0,0,0, 0.6);
+   }
+   .replyerInfo {
+      display : none;
+      color : white;
+      background-color: #333;
+      padding: 5px;
+      width: 80;
+      border-radius: 4px;
    }
    
-   .replyInfo {
-   	display : flex;
-   	flex-direction : row;
-   	justify-content: space-between;
-   	font-size: 0.7rem;
-   	color : rgba(0,0,0,0.4);
-   }
 </style>
 </head>
 <body>
