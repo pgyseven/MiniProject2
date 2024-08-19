@@ -578,7 +578,15 @@ GROUP BY e.deptNo, d.dname;
 -- ?번 글에 대한 모든 댓글을 얻어오는 쿼리문
 SELECT * FROM replyboard WHERE boardNo=687 order by replyNo limit ?, 4;
 
+-- ?번 글의 댓글 갯수를 얻어오는 쿼리문
 select count(*) from replyboard where boardNo = ?;
+
+-- 모든 댓글 + 댓글 작성자의 프로필 사진
+select r.*, m.userImg, m.userName, m.email
+from replyboard r inner join member m
+on r.replyer =  m.userId 
+where r.boardNo = 687
+order by replyNo desc;
 
 -- ------------------------ 페이징 -------------------------------
 -- 페이징(paging) : 많은 데이터를 일정 단위로 끊어서 출력하는 기법
