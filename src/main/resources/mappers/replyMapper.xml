@@ -5,11 +5,16 @@
 <mapper namespace="com.miniproj.mappers.replyMapper">
 
 	<select id="getReplies" resultType="com.miniproj.model.ReplyVO">
-		select * from replyboard where boardNo=#{boardNo} order by replyNo desc limit #{startRowIndex}, #{viewPostCntPerPage}
+		select r.*, m.userImg, m.userName, m.email
+		from replyboard r inner join member m
+		on r.replyer = m.userId
+		where r.boardNo = #{boardNo}
+		order by replyNo desc limit #{startRowIndex}, #{viewPostCntPerPage}
 	</select>
-	
+
 	<select id="getReplyCount" resultType="int">
-		select count(*) from replyboard where boardNo = #{boardNo}
+		select count(*) from
+		replyboard where boardNo = #{boardNo}
 	</select>
-	
+
 </mapper>
