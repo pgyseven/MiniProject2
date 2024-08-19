@@ -19,9 +19,7 @@
       
       $('.modalCloseBtn').click(function() {
          $('#myModal').hide();
-      });
-      
-      
+      });     
    });
 
    function showRemoveModal() {
@@ -63,8 +61,11 @@
          
          output += `<div class='replyBodyArea'>`;
          output += `<div class='replyContent'>\${reply.content}</div>`;
+         
          output += `<div class='replyInfo'>`;
-         output += `<div class='regDate'>\${reply.regDate}</div>`;
+         let betweenTime = processPostDate(reply.regDate);
+         output += `<div class='regDate'>\${betweenTime}</div>`;
+         
          output += `<div class='replyer' onmouseover='showReplyInfo(this);' onmouseout='hideReplyInfo(this);'>`;
          output += `\${reply.replyer}</div>`;
          output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`;
@@ -80,6 +81,36 @@
       output += `</div>`;
       
       $(".replyList").html(output);
+   }
+   
+   // 댓글 작성일시 : 방금 전, 몇분 전, 몇시간 전 의 형식으로 출력
+   function processPostDate(writtenDate) {
+	   
+	   const postDate = new Date(writtenDate); // 댓글 작성 시간
+	   // 객체는 주소값이 바뀌는 것이 아니라서 const로 선언해도 된다.
+	   
+	   const now = new Date(); // 현재 시간
+	   
+	   let diff = (now - postDate) / 1000; // 시간 차이를 초 단위로 구하기 위해서 1000으로 나눠준다.
+	   
+	   const times = [
+		 {name : "일", time : 60 * 60 * 24},
+		 {name : "시간", time : 60 * 60},
+		 {name : "분", time : 60}
+	   ];
+	   
+	   for(let val of times) {
+		   let betweenTime = Math.floor(diff / val.time); // {name : "일", time : 60 * 60 * 24} 의 time으로 나눠준다.
+		   console.log(writtenDate, diff, betweenTime);
+		   
+		   if(betweenTime > 0 && val.name != "일") {
+			   return betweenTime + val.name + "전";
+		   } else if(betweenTime > 0 && val.name == "일") {
+			   return postDate.toLocaleString();
+		   }
+	   }
+	   
+	   return "방금전";
    }
    
    function showReplyInfo(obj) {
