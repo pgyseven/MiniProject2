@@ -23,4 +23,10 @@ public class ReplyVO {
 	private Timestamp regDate;
 	private int boardNo;
 	
+	
+	// 쿼리문 바꾸면서 추가된 멤버들
+	private String userImg;
+	private String userName;
+	private String email;
+	
 }
