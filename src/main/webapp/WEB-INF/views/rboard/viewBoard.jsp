@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ page session="false"%>
 <html>
@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <title>상세보기</title>
 <script
-   src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
 
@@ -21,6 +21,49 @@
          $('#myModal').hide();
       });     
    });
+   
+   
+   // 댓글을 저장하는 함수
+   function saveReply() {
+	   let boardNo = $('#boardNo').val();
+	   let content = $('#replyContent').val();
+	   let replyer = 'jisoo';
+	   
+	   const newReply = {// 자바스크립트에서 객체를 {}로 표현한다. newReply 객체에 boardNo, content를 담은 것이다.
+			   'boardNo' : boardNo,
+			   'content' : content,
+			   'replyer' : replyer
+	   } ;
+	   
+	   console.log(JSON.stringify(newReply)); // JSON.stringify() : 객체를 json 문자열로만 표현한다.(객체를 문자열로 바꾼 것이다.)
+	   
+	   if (content.length < 1) {
+		   alert('내용이 입력되지 않았습니다.');
+		   return;
+	   } else {
+		   $.ajax({
+		         url : '/reply/' + boardNo,
+		         type : 'post',
+		         data : JSON.stringify(newReply), // 보낼 데이터
+		         headers : {
+		        	 "Content-Type" : "application/json"
+		         }, // 보낼 데이터가 겉보기에는 문자열이지만 json이라고 백엔드단에 알려주는 것
+		         dataType : 'json', // 수신받을 데이터 타입
+		         async : false,
+		         success : function(data) {
+		            console.log(data);	
+		            if (data.resultCode == 200 || data.resultMessage == "SUCCESS"){ // 댓글 저장에 성공했으면 getAllReplies() 호출해서 댓글을 가져와서 다시 출력해줘야 한다.
+		            	$('#replyContent').val(''); // 댓글이 저장되면 댓글 입력창을 비워준다.
+		                outputReplies(1); // 최신댓글은 1페이지에 나오니까 1페이지를 불러와서 다시 출력해준다.
+		             }
+		         },
+		         error : function(data) {
+		            console.log(data);
+		            alert("댓글을 저장하지 못했습니다");
+		         }
+		      });
+	   }
+   }
 
    function showRemoveModal() {
       let boardNo = $('#boardNo').val();
@@ -163,105 +206,128 @@
    }
 </script>
 <style type="text/css">
-   .replyList {
-      margin-top: 15px;
-      padding: 10px; 
-      
-   }
-   .replyBody {
-      display: flex;
-      justify-content: space-between;
-      flex-direction: row;
-      align-items: center;
-      font-size: 0.9rem;
-      color: rgba(0,0,0, 0.8);
-   }
-   .replyBodyArea {
-      flex : 1;
-      margin-left: 15px;
-   }
-   .replyerProfile img {
-      width: 50px;
-      border-radius: 25px;
-      border: 1px solid lightgray;
-   }
-   .replyInfo {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      font-size: 0.6rem;
-      color: rgba(0,0,0, 0.6);
-   }
-   .replyerInfo {
-      display : none;
-      color : white;
-      background-color: #333;
-      padding: 5px;
-      width: 80;
-      border-radius: 4px;
-   }
-   
+.replyList {
+	margin-top: 15px;
+	padding: 10px;
+}
+
+.replyBody {
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+	font-size: 0.9rem;
+	color: rgba(0, 0, 0, 0.8);
+}
+
+.replyBodyArea {
+	flex: 1;
+	margin-left: 15px;
+}
+
+.replyerProfile img {
+	width: 50px;
+	border-radius: 25px;
+	border: 1px solid lightgray;
+}
+
+.replyInfo {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	font-size: 0.6rem;
+	color: rgba(0, 0, 0, 0.6);
+}
+
+.replyerInfo {
+	display: none;
+	color: white;
+	background-color: #333;
+	padding: 5px;
+	width: 80;
+	border-radius: 4px;
+}
+
+.replyInputArea {
+	margin-top : 10px;
+	padding : 10px;
+	display : flex;
+	flex-direction : row;
+	align-items: center;
+	border : 2px;
+}
+
+.replyInputArea input {
+	flex : 1;
+	width : 80%;
+}
+
+.replyInputArea img {
+	margin-left : 5px;
+	border : 2px solid rgba(0,0,255, 0.4);
+	border-radius: 25px;
+}
 </style>
 </head>
 <body>
 
-   <div class="container">
-      <c:import url="../header.jsp"></c:import>
+	<div class="container">
+		<c:import url="../header.jsp"></c:import>
 
-      <div class="content">
-         <h1>게시글 상세 페이지</h1>
-
-
+		<div class="content">
+			<h1>게시글 상세 페이지</h1>
 
 
-         <c:if test="${board.isDelete == 'Y'}">
-            <c:redirect url="/hboard/listAll?status=wrongAccess" />
-         </c:if>
 
 
-         <div class="boardInfo">
-            <div class="mb-3">
-               <label for="boardNo" class="form-label">글 번호</label> <input
-                  type="text" class="form-control" id="boardNo"
-                  value="${board.boardNo}" readonly>
-            </div>
-            <div class="mb-3">
-               <label for="title" class="form-label">글 제목</label> <input
-                  type="text" class="form-control" id="title" value="${board.title}"
-                  readonly>
-            </div>
-            <div class="mb-3">
-               <label for="writer" class="form-label">작성자</label> <input
-                  type="text" class="form-control" id="writer"
-                  value="${board.writer}(${board.email})" readonly>
-            </div>
-
-            <div class="mb-3">
-               <label for="writer" class="form-label">작성일</label> <input
-                  type="text" class="form-control" id="postDate"
-                  value="${board.postDate}" readonly>
-            </div>
-
-            <div class="mb-3">
-               <label for="writer" class="form-label">조회수</label> <input
-                  type="text" class="form-control" id="readCount"
-                  value="${board.readCount}" readonly>
-            </div>
-            <!-- readonly는 수정 불가 -->
+			<c:if test="${board.isDelete == 'Y'}">
+				<c:redirect url="/hboard/listAll?status=wrongAccess" />
+			</c:if>
 
 
-            <div class="mb-3">
-               <label for="content" class="form-label">내용</label>
-               <div class="form-control" id="content" rows="5" readonly>
-                  ${board.content}</div>
-            </div>
-         </div>
+			<div class="boardInfo">
+				<div class="mb-3">
+					<label for="boardNo" class="form-label">글 번호</label> <input
+						type="text" class="form-control" id="boardNo"
+						value="${board.boardNo}" readonly>
+				</div>
+				<div class="mb-3">
+					<label for="title" class="form-label">글 제목</label> <input
+						type="text" class="form-control" id="title" value="${board.title}"
+						readonly>
+				</div>
+				<div class="mb-3">
+					<label for="writer" class="form-label">작성자</label> <input
+						type="text" class="form-control" id="writer"
+						value="${board.writer}(${board.email})" readonly>
+				</div>
 
-         <!-- 댓글 섹션 추가 
+				<div class="mb-3">
+					<label for="writer" class="form-label">작성일</label> <input
+						type="text" class="form-control" id="postDate"
+						value="${board.postDate}" readonly>
+				</div>
+
+				<div class="mb-3">
+					<label for="writer" class="form-label">조회수</label> <input
+						type="text" class="form-control" id="readCount"
+						value="${board.readCount}" readonly>
+				</div>
+				<!-- readonly는 수정 불가 -->
+
+
+				<div class="mb-3">
+					<label for="content" class="form-label">내용</label>
+					<div class="form-control" id="content" rows="5" readonly>
+						${board.content}</div>
+				</div>
+			</div>
+
+			<!-- 댓글 섹션 추가 
          <div class="comments-section">
             <h3>댓글</h3>-->
 
-            <!-- 댓글 목록 
+			<!-- 댓글 목록 
             <c:forEach items="${comments}" var="comment">
                <div class="comment">
                   <p>
@@ -271,7 +337,7 @@
                </div>
             </c:forEach>-->
 
-            <%-- <div class="pagination justify-content-center"
+			<%-- <div class="pagination justify-content-center"
                style="margin: 20px 0">
                <ul class="pagination">
                   <c:if test="${pagingInfo.pageNo > 1}">
@@ -296,7 +362,7 @@
                </ul>
             </div> --%>
 
-            <!-- 댓글 작성 폼 
+			<!-- 댓글 작성 폼 
             <form action="/rboard/addComment" method="post">
                <input type="hidden" name="boardNo" value="${board.boardNo}">
                <div class="form-group">
@@ -308,51 +374,55 @@
             </form>
          </div>-->
 
-         <div calss="btns">
-            <button type="button" class="btn btn-primary"
-               onclick="location.href='/rboard/modifyBoard?boardNo=${board.boardNo}';">
-               글수정</button>
-            <button type="button" class="btn btn-info"
-               onclick="location.href='/rboard/listAll';">리스트페이지로 돌아가기</button>
-         </div>
-      </div>
-      
-      <div class="replyList">
-         
-      </div>
-      
-      <div class="replyPagination">
-      
-      </div>
+			<div calss="btns">
+				<button type="button" class="btn btn-primary"
+					onclick="location.href='/rboard/modifyBoard?boardNo=${board.boardNo}';">글수정</button>
+				<button type="button" class="btn btn-info"
+					onclick="location.href='/rboard/listAll';">리스트페이지로 돌아가기</button>
+			</div>
+		</div>
 
-      <!-- The Modal -->
-      <div class="modal" id="myModal" style="display: none;">
-         <div class="modal-dialog">
-            <div class="modal-content">
+		<!-- form 태그가 아니라서 name속성이 필요가 없다. -->
+		<div class="replyInputArea">
+			
+			<input type="text" class="form-control" id="replyContent" placeholder="댓글을 입력하세요."/>
+			
+			<img src="/resources/images/saveReply.png" onclick="saveReply();" />
+			
+		</div>
 
-               <!-- Modal Header -->
-               <div class="modal-header">
-                  <h4 class="modal-title">MiniProject</h4>
-                  <button type="button" class="btn-close modalCloseBtn"
-                     data-bs-dismiss="modal"></button>
-               </div>
+		<div class="replyList"></div>
 
-               <!-- Modal body -->
-               <div class="modal-body"></div>
+		<div class="replyPagination"></div>
 
-               <!-- Modal footer -->
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-info"
-                     onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
-                  <button type="button" class="btn btn-danger modalCloseBtn"
-                     data-bs-dismiss="modal">취소</button>
-               </div>
+		<!-- The Modal -->
+		<div class="modal" id="myModal" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
 
-            </div>
-         </div>
-      </div>
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title">MiniProject</h4>
+						<button type="button" class="btn-close modalCloseBtn"
+							data-bs-dismiss="modal"></button>
+					</div>
 
-      <c:import url="../footer.jsp"></c:import>
-   </div>
+					<!-- Modal body -->
+					<div class="modal-body"></div>
+
+					<!-- Modal footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info"
+							onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
+						<button type="button" class="btn btn-danger modalCloseBtn"
+							data-bs-dismiss="modal">취소</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<c:import url="../footer.jsp"></c:import>
+	</div>
 </body>
 </html>

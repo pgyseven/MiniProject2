@@ -58,7 +58,7 @@ public class ReplyController {
 	}
 	
 	// @RequestBody : 아래의 saveReply에 넘어오는 데이터가 json 데이터임을 알리는 것
-	@PostMapping(value="/{boardNo}", produces= {"application/json; charset=utf-8"}) // @RequestMapping과 같음.
+	@RequestMapping(value="/{boardNo}", produces= {"application/json; charset=utf-8"}) // @RequestMapping과 같음.
 	public ResponseEntity saveReply(@RequestBody ReplyDTO newReply, @PathVariable("boardNo") int boardNo) {
 		System.out.println(boardNo + "번 게시글의 새로운 댓글 " + newReply.toString() + "을 저장하자");
 		
