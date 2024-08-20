@@ -17,4 +17,6 @@
 		replyboard where boardNo = #{boardNo}
 	</select>
 
+
+		insert into replyboard(replyer, content, boardNo) values(?, ?, ?)
 </mapper>

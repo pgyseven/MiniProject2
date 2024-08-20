@@ -94,6 +94,7 @@
       $(".replyList").html(output);
       
    }
+   
    // 댓글 페이징
    function outputPagination(replies) {
          let output = `<ul class="pagination justify-content-center" style="margin:20px 0">`;
@@ -119,8 +120,7 @@
          output += `</ul>`;
          
          $('.replyPagination').html(output);
-         
-         
+
       }
    
    
@@ -257,11 +257,11 @@
             </div>
          </div>
 
-         <!-- 댓글 섹션 추가 -->
+         <!-- 댓글 섹션 추가 
          <div class="comments-section">
-            <h3>댓글</h3>
+            <h3>댓글</h3>-->
 
-            <!-- 댓글 목록 -->
+            <!-- 댓글 목록 
             <c:forEach items="${comments}" var="comment">
                <div class="comment">
                   <p>
@@ -269,7 +269,7 @@
                   </p>
                   <p>${comment.content}</p>
                </div>
-            </c:forEach>
+            </c:forEach>-->
 
             <%-- <div class="pagination justify-content-center"
                style="margin: 20px 0">
@@ -296,7 +296,7 @@
                </ul>
             </div> --%>
 
-            <!-- 댓글 작성 폼 -->
+            <!-- 댓글 작성 폼 
             <form action="/rboard/addComment" method="post">
                <input type="hidden" name="boardNo" value="${board.boardNo}">
                <div class="form-group">
@@ -306,7 +306,7 @@
                </div>
                <button type="submit" class="btn btn-primary">댓글 작성</button>
             </form>
-         </div>
+         </div>-->
 
          <div calss="btns">
             <button type="button" class="btn btn-primary"

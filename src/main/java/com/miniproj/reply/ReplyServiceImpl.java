@@ -10,7 +10,9 @@ import com.miniproj.reply.ReplyDAO;
 import com.mysql.cj.util.StringUtils;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
+import com.miniproj.model.ReplyDTO;
 import com.miniproj.model.ReplyVO;
+import com.miniproj.persistence.PointLogDAO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyServiceImpl implements ReplyService {
 
 	private final ReplyDAO rDao;
+	private final PointLogDAO pDao;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -52,6 +55,19 @@ public class ReplyServiceImpl implements ReplyService {
 
 		return pi;
 
+	}
+
+	@Override
+	public boolean saveReply(ReplyDTO newReply) throws Exception {
+		
+		// 댓글 저장 insert
+		
+		
+		// 포인트 부여 insert
+		
+		// 포인트를 부여한 멤버 userPoint update
+		
+		return false;
 	}
 
 }

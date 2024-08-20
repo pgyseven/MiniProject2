@@ -8,12 +8,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.miniproj.model.MyResponseWithData;
 import com.miniproj.model.PagingInfoDTO;
+import com.miniproj.model.ReplyDTO;
 import com.miniproj.model.ReplyVO;
 import com.miniproj.model.ResponseType;
 import com.miniproj.service.hboard.HBoardService;
@@ -51,5 +55,15 @@ public class ReplyController {
 		}
 		return result;
 
+	}
+	
+	// @RequestBody : 아래의 saveReply에 넘어오는 데이터가 json 데이터임을 알리는 것
+	@PostMapping(value="/{boardNo}") // @RequestMapping과 같음.
+	public ResponseEntity saveReply(@RequestBody ReplyDTO newReply, @PathVariable("boardNo") int boardNo) {
+		System.out.println(boardNo + "번 게시글의 새로운 댓글 " + newReply.toString() + "을 저장하자");
+		
+		rService.saveReply(newReply);
+		
+		return null;
 	}
 }
