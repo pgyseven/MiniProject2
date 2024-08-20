@@ -6,8 +6,10 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.print.attribute.standard.Destination;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,38 +23,49 @@ import org.springframework.web.util.WebUtils;
 import com.miniproj.model.AutoLoginInfo;
 import com.miniproj.model.MemberVO;
 import com.miniproj.service.member.MemberService;
+import com.miniproj.util.DestinationPath;
 import com.mysql.cj.util.StringUtils;
 
-//직겁 로그인을 하는 동작과정을 인터셉터로 구현 / 지금 우린 리퀘스트 매핑의 벨류는 같고 전송 방식만 다른경우 있는데 인터셉터는 포스트인지 겟인지 구분하는 다른 기능은 없다 그러나
-// get 방식으로 요청된건지, post 방식으로 요청되어서 인터셉터가 동작하는지를 구분해야한다.
+// 직접 로그인하는 동작과정을 인터셉트로 구현
+// get방식 post방식으로 요청되어 인터셉트가 동작하는 것을 구분
 public class LoginInterceptor extends HandlerInterceptorAdapter {
+
 	@Autowired
 	private MemberService service;
 
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
-
 		boolean isLoginPageShow = false;
+		HttpSession ses = request.getSession();
+		// 요청이 GET방식일 때만 수행한다
+		if (request.getMethod().toUpperCase().equals("GET")) {
+			System.out.println("[LoginInterceptor preHandle()호출]");
 
-		if (request.getMethod().toUpperCase().equals("GET")) { // 요청이 GET 방식일때만 수행한다.
-			System.out.println("[LoginInterceptor...preHandle() 호출]");
+			// 이미 로그인이 된 경우 로그인 페이지를 보여줄 필요가 없다
+			// 쿠키가 존재하지 않는다면 로그인페이지로 이동
+			if (request.getParameter("redirectUrl") != null) {
 
-			// 이미 로그인이 되어있는 경우에는 로그인 페이지를 보여줄 필요가 없다.
-			// 로그인이 되어있지 않은 경우에만 로그인 페이지를 보여줘야 한다.
+				// 댓글 작성/수정/삭제 시도하려다 로그인페이지로 인터셉트 되었을 때
+				String uri = request.getParameter("redirectUrl");
+				int boardNo = Integer.parseInt(request.getParameter("boardNo"));
+
+				if (uri.contains("view")) {
+
+					// 로그인 후 이전 페이지로 이동
+					System.out.println("이전 페이지 글번호 : " + boardNo);
+					ses.setAttribute("destPath", "/rboard/viewBoard?boardNo=" + boardNo);
+				}
+			}
 
 			Cookie autoLoginCookie = WebUtils.getCookie(request, "al");
-//			System.out.println(autoLoginCookie.toString());
-			// 쿠키를 검사하여 자동로그인 쿠키가 존재한다면
-			if (autoLoginCookie != null) {
-				System.out.println("로그인 인터셉 쿠키 있을때");
-				// 쿠키가 있을 때
-				String savedCookieSesId = autoLoginCookie.getValue();
+			if (autoLoginCookie != null) { // 쿠키에 저장했던 자동로그인체크 유저의 세션값
 
-				// -> DB에 다녀와서 자동로그인을 체크한 유저를 자동로그인 시켜야 한다. -> 로그인 페이지X
-				MemberVO autoLoginUser = service.checkAutoLogin(savedCookieSesId);
+				// 자동로그인 쿠키가 있을 때
+				String savedCookieSessionId = autoLoginCookie.getValue();
 
-				HttpSession ses = request.getSession();
+				// 쿠키(맵형식)에 자동로그인정보가 있으면 DB에서 일치하는 유저를 자동로그인시킴 > 로그인페이지 건너뛰기
+				MemberVO autoLoginUser = service.checkAutoLogin(savedCookieSessionId);
 
 				ses.setAttribute("loginMember", autoLoginUser);
 
@@ -64,16 +77,13 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 					// 자동로그인 쿠키가 없고, 로그인되어있지 않은 경우에 로그인페이지를 보여줌
 					isLoginPageShow = true;
 				} else {
-					// 쿠키가 없고, 로그인을 한 경우 페이지를 보여주지 않는다
+					// 쿠키가 없고 로그인한 경우
 					isLoginPageShow = false;
 				}
-
 			}
-
 		} else if (request.getMethod().toUpperCase().equals("POST")) {
 			isLoginPageShow = true;
 		}
-
 		return isLoginPageShow;
 	}
 
@@ -81,76 +91,55 @@ public class LoginInterceptor extends HandlerInterceptorAdapter {
 	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
 			ModelAndView modelAndView) throws Exception {
 
-		if (request.getMethod().toUpperCase().equals("POST")) { // POST 방식으로 호출 했을 때만 실행되도록
-			System.out.println("loginIntercepror 의 posthandle호출 ~~~~~~~~~~~~~");
-			super.postHandle(request, response, handler, modelAndView);
+		// 포스트방식으로 호출됐을 때만 이 인터셉트가 실행됨
+		if (request.getMethod().toUpperCase().equals("POST")) {
+			System.out.println("[LoginInterceptor postHandle()호출]");
 			Map<String, Object> model = modelAndView.getModel();
 			MemberVO loginMember = (MemberVO) model.get("loginMember");
+
 			if (loginMember != null) {
-				System.out.println("[loginIntercepror... postHandle() : 로그인 성공]");
-				// 세션에 로그인한 유저의 정보를 넣어주었다..
-				HttpSession ses = request.getSession();
-				ses.setAttribute("loginMember", loginMember);
-				// 만약 자동 로그인을 체크한 유저라면...
+				System.out.println("[LoginInterceptor postHandle() : 로그인 성공]");
+				HttpSession ses = request.getSession(); // 로그인요청으로부터 세션을 얻어온다...
+				ses.setAttribute("loginMember", loginMember); // 로그인한 유저의 정보를 세션에 저장
 
-				/*
-				 * 1)login.jsp에서 체크박스 클릭시 : alert() 띄운다. 2) 로그인 성공 했다면, 자동 로그인 체크 한 유저인지 검사한다.
-				 * 3)
-				 */
-				if (request.getParameter("remember") != null) { // 스프링 프레임워크가 해주는게 갯파람해서 있으면 트로 없으면false 준다.
-					saveAutoLoginInfo(request, response);
-
+				// request에서 자동로그인 체크 여부 확인(로그인 성공한 사람) > 쿠키에 저장
+				if (request.getParameter("remember") != null) { // getParameter : on/null
+					saveAutoLoginInfo(request, response); // 자동로그인 정보 저장 메서드
 				}
-				// 홈
-				// response.sendRedirect("/"); // 이건 그닥 좋은 방법이 아니다. 이건 뷰만 호출하는 형식이다 즉 리다이렉트라는
-				// 이름과 다르게 포워딩이 아니라 컨트롤러단을 거치지 않고 이동시킴 그럼 c:이 문법 자체를 못이해해서 에러남
-
-//            if(ses.getAttribute("destPath") != null) { //사실 무조건 넣어서 널일 가능성 거의 없다 하지만 이렇게 한다고 하신다.
-//               response.sendRedirect((String)ses.getAttribute("destPath")); 
-//            }else {
-//               response.sendRedirect("/");
-//            }
 
 				Object tmp = ses.getAttribute("destPath");
-				System.out.println((String) tmp + "이건 데스트 패스 입니다.");
 				response.sendRedirect((tmp == null) ? "/" : (String) tmp);
 			} else {
-				System.out.println("[loginIntercepror... postHandle() : 로그인 실패]");
-				response.sendRedirect("/member/login?status=fail"); // 시스템 아웃보다 우선 순위가 높다
+				System.out.println("[LoginInterceptor postHandle() : 로그인 실패]");
+				response.sendRedirect("/member/login?status=fail");
 			}
 		}
+
 	}
 
 	private void saveAutoLoginInfo(HttpServletRequest request, HttpServletResponse response) throws Exception {
-		// 자동 로그인을 체크한 유저의 컬럼에 세션값과 만료일 DB에 저장
+		// 자동로그인 체크한 유저의 MemberVO DB에 세션값과 만료일 저장
 		String sesid = request.getSession().getId();
 		MemberVO loginMember = (MemberVO) request.getSession().getAttribute("loginMember");
 		String loginUserId = loginMember.getUserId();
-		Timestamp allimit = new Timestamp(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7)); // 롱타입임 그러면 db는
-																									// 타임스탭프니깐 타입스탬프 객체로
-																									// 바꿔야함 자바api 에서
-																									// 타임스탭프 검사하면 생성자에
-																									// 있는거 쓸거임 / 현재 날짜
-																									// 시간을 밀리 세컨드 단위로
-																									// 가져옴
+		Timestamp allimit = new Timestamp(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 7)); // 현재날짜시간을 ms단위로 가져옴
 
-		Instant instant = allimit.toInstant(); // Instant 추상 클래스 객체임
-		ZonedDateTime gmpDateTime = instant.atZone(ZoneId.of("GMT"));
-		Timestamp gmtAlLimit = Timestamp.from(gmpDateTime.toInstant());
-
-		// SimpleDateFormat sd = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
-		// //EEE, d MMM yyyy HH:mm:ss Z 자바api에서 다른것도 볼 수 있다.
-		// System.out.println(sd.format(new java.sql.Date(System.currentTimeMillis())));
+		//
+//      Instant instant = allimit.toInstant(); // Instant 시간값의 의미를 가지는 추상클래스
+//      ZonedDateTime gmtDateTime = instant.atZone(ZoneId.of("GMT"));
+//      Timestamp gmtAlLimit = Timestamp.from(gmtDateTime.toInstant());
+//      System.out.println(allimit.toString());
+//      SimpleDateFormat sd = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+//      System.out.println(sd.format(new java.sql.Date(System.currentTimeMillis())));
 
 		if (service.saveAutoLoginInfo(new AutoLoginInfo(loginUserId, sesid, allimit))) {
-			// 쿠키가 gmt 인지 utc 인지 체크한다. 지금같은 경우 크롬 저장된거 보니깐gmp 시간같음 mysql은 기본 utc 속성임
-			// 자동 로그인을 체크 했을때의 세션을 쿠키에 넣어둠
-			// 우리의 문제는 한컴터를 두명이상이 쓸때 첫번재 사람은 남은 쿠키로 인해서 로그인이 불가능하다. 이런건 구글은
-			// 쿠키에 암호화된 아이디를 넣둬서 해결한다. 우리는 이건 안한다.
-			Cookie autoLoginCookie = new Cookie("al", sesid);
-			autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 일주일동안 쿠키 유지 (자동 로그인 쿠키)
-			autoLoginCookie.setPath("/"); // 쿠키가 저장될 경로 설정(해당 경로일때 쿠키 확인이 가능)
-			response.addCookie(autoLoginCookie);
+			// 쿠키만들 때는 name, value, Expires
+			// Expires : Session 세션이 유지될 때까지 유효
+			Cookie autoLoginCookie = new Cookie("al", request.getSession().getId());
+			autoLoginCookie.setMaxAge(60 * 60 * 24 * 7); // 일주일동안 쿠키 유지(자동로그인기간)
+			autoLoginCookie.setPath("/"); // 쿠키가 다른 경로에서도 유효하도록 설정
+			response.addCookie(autoLoginCookie); // response객체에 쿠키 저장
+
 		}
 
 	}
