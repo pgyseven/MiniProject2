@@ -149,8 +149,21 @@
             output += `</div>`;
             
             output += `<div class='replyBodyArea'>`;
-            output += `<div class='replyContent'>\${reply.content}</div>`;
+            
+            output += `<div class='replyHeader'><div class='replyContent'>\${reply.content}</div>`;            
+
+            
+            if(reply.replyer != '${sessionScope.loginMember.userId}') { // 작성자와 유저가 같지 않을 때
+              	// $('.replyBtns').empty(); // 태그 안의 자식태그를 비워줘서 빈 태그로 두는 것. hide()는 태그는 살아있고 화면에서만 보이지 않는다는 차이점이 있다.
+              	output += `<div class='replyBtns'></div></div>`;
+              	
+            } else if(reply.replyer == '${sessionScope.loginMember.userId}') { // 작성자와 유저가 같을 때
+            	output += `<div class='replyBtns'><img src="/resources/images/modifyReply.png" width="23px" onclick='modifyReply(\${reply.replyNo});'>`;
+                output += `<img src="/resources/images/remove.png" width="20px" onclick='removeReply(\${reply.replyNo})'></div></div>`;
+            }
+
             output += `<div class='replyInfo'>`;
+            
             
             let betweenTime = processPostDate(reply.regDate);
             output += `<div class='regData'>\${betweenTime}</div>`;
@@ -158,7 +171,7 @@
             output += `<div class='replyer' onmouseover='showReplyInfo(this);' onmouseout='hideReplyInfo(this);'>`;
             output += `\${reply.replyer}</div>`;
             
-            output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`;
+            output += `<div class='replyerInfo'>\${reply.userName}(\${reply.email})</div>`; // 출력을 해야할 때만 \${}로 표현한다. 출력하지 않는다면 그렇게 표현하지 않는다.
             output += `</div>`;
             output += `</div>`;
             
@@ -172,6 +185,20 @@
       output += `</div>`;
       
       $(".replyList").html(output);
+      
+      
+   }
+   
+   function modifyReply(obj) {
+	   let output = `<input type="text" class="form-control" id="modiryReplyContent" value="\${content}"/> <img src="/resources/images/saveReply.png" onclick="modifyReplySave();" />`;
+	   
+	   $(obj).
+	   
+	   $('.replyContent').html(output);
+   }
+   
+   function removeReply(replyNo) {
+	   alert(replyNo + '번 댓글을 삭제하시겠습니까?');
    }
    
    // 댓글의 페이징 작업 
@@ -309,6 +336,18 @@
 	border: 2px solid rgba(0, 0, 255, 0.4);
 	border-radius: 5px;
 }
+
+.replyHeader {
+	display : flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.replyContent {
+	flex : 1;
+}
+
+
 </style>
 
 </head>
@@ -373,7 +412,7 @@
 
 			<div class="replyInputArea">
 				<input type="text" class="form-control" id="replyContent"
-					placeholder="댓글을 입력하33333" /> <img
+					placeholder="댓글을 입력하세요." /> <img
 					src="/resources/images/saveReply.png" onclick="saveReply();" />
 
 			</div>
@@ -384,32 +423,32 @@
 
 		</div>
 
-		<!-- The Modal -->
+		<!-- The Modal 
 		<div class="modal" id="myModal" style="display: none;">
 			<div class="modal-dialog">
-				<div class="modal-content">
+				<div class="modal-content">-->
 
-					<!-- Modal Header -->
+					<!-- Modal Header
 					<div class="modal-header">
 						<h4 class="modal-title">MiniProject</h4>
 						<button type="button" class="btn-close modalCloseBtn"
 							data-bs-dismiss="modal"></button>
-					</div>
+					</div> -->
 
-					<!-- Modal body -->
-					<div class="modal-body"></div>
+					<!-- Modal body
+					<div class="modal-body"></div> -->
 
-					<!-- Modal footer -->
+					<!-- Modal footer
 					<div class="modal-footer">
 						<button type="button" class="btn btn-info"
 							onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
 						<button type="button" class="btn btn-danger modalCloseBtn"
 							data-bs-dismiss="modal">취소</button>
-					</div>
+					</div> -->
 
-				</div>
+				<!-- </div>
 			</div>
-		</div>
+		</div> -->
 
 
 		<c:import url="../footer.jsp" />
