@@ -1,5 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-   pageEncoding="UTF-8"%>
+	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -7,7 +7,7 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <script
-   src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
    let pageNo = 1;
 
@@ -19,21 +19,45 @@
       $('.modalCloseBtn').click(function() {
          $('#myModal').hide();
       });
+      
+      
+      getPreInputReplyContent() 
+      
+      
    
       
       
    }); 
+   
+   function getPreInputReplyContent() {
+		// 로컬(세션) 스토리지에 이전에 저장했던 댓글 내용이 있다면 댓글 내용 입력창에 붙여넣기 한다.
+	 	let replyContent = localStorage.getItem("replyContent");
+	 	if(replyContent != null || replyContent != '') {
+	 		 $('#replyContent').val(replyContent);
+	 		 
+	 		// 로컬(세션) 스토리지에 저장했던 댓글을 삭제한다.
+	 		localStorage.removeItem('replyContent');
+	 	 }
+   }
    
    // 댓글 저장, 수정, 삭제 시 로그인 인증
    function preAuth() {
       let replyer = '${sessionScope.loginMember.userId}';
       if (replyer == '') {
          // 로그인 안했다... -> 로그인 페이지로 이동 (LoginInterceptor가 작동)
+         // 로컬(세션) 스토리지에 댓글 내용이 있다면 저장한다.
+         
+         let replyContent = $('#replyContent').val();
+         if(replyContent != '') {
+        	 localStorage.setItem("replyContent", replyContent);
+         }
+         
+         
          location.href='/member/login?redirectUrl=viewBoard&boardNo=${param.boardNo}';  
       } else {
-         return '${sessionScope.loginMember.userId}';
+    	  return replyer;   	
+    	 }    	           
       }
-   }
    
    // 댓글을 저장하는 함수
    function saveReply() {
@@ -216,178 +240,179 @@
 </script>
 <style>
 .content {
-   margin-top: 10px;
-   margin-bottom: 10px;
-   padding: 10px;
-   border: 1px solid #dee2e6;
-   border-radius: 0.375rem;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 1px solid #dee2e6;
+	border-radius: 0.375rem;
 }
 
 .replyList {
-   margin-top: 15px;
-   padding: 10px;
+	margin-top: 15px;
+	padding: 10px;
 }
 
 .replyBody {
-   display: flex;
-   justify-content: space-between;
-   flex-direction: row;
-   align-items: center;
-   font-size: 0.8rem;
-   color: rgba(0, 0, 0, 0.8);
+	display: flex;
+	justify-content: space-between;
+	flex-direction: row;
+	align-items: center;
+	font-size: 0.8rem;
+	color: rgba(0, 0, 0, 0.8);
 }
 
 .replyerProfile img {
-   width: 50px;
-   border-radius: 25px;
-   border: 1px solid lightgray;
+	width: 50px;
+	border-radius: 25px;
+	border: 1px solid lightgray;
 }
 
 .replyBodyArea {
-   flex: 1;
-   margin-left: 20px;
+	flex: 1;
+	margin-left: 20px;
 }
 
 .replyInfo {
-   display: flex;
-   flex-direction: row;
-   justify-content: space-between;
-   font-size: 0.6rem;
-   color: rgba(0, 0, 0, 0.4);
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	font-size: 0.6rem;
+	color: rgba(0, 0, 0, 0.4);
 }
 
 .replyerInfo {
-   display: none;
-   color: white;
-   background-color: #333;
-   padding: 5px;
-   width: 40;
-   border-radius: 4px;
+	display: none;
+	color: white;
+	background-color: #333;
+	padding: 5px;
+	width: 40;
+	border-radius: 4px;
 }
 
 .replyInputArea {
-   margin-top : 10px;
-   padding : 10px;
-   display: flex;
-   flex-direction: row;
-   align-items: center;
-   border: 1px solid #dee2e6;
-   border-radius: 0.375rem;
+	margin-top: 10px;
+	padding: 10px;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	border: 1px solid #dee2e6;
+	border-radius: 0.375rem;
 }
 
 .replyInputArea input {
-   flex: 1;
-   width: 80%;
+	flex: 1;
+	width: 80%;
 }
 
 .replyInputArea img {
-   margin-left : 5px;
-   border : 2px solid rgba(0,0,255, 0.4);
-   border-radius: 5px;
+	margin-left: 5px;
+	border: 2px solid rgba(0, 0, 255, 0.4);
+	border-radius: 5px;
 }
 </style>
 
 </head>
 <body>
 
-   <div class="container">
-      <c:import url="../header.jsp" />
+	<div class="container">
+		<c:import url="../header.jsp" />
 
-      <div class="content">
-         <h1>게시글 상세 페이지</h1>
+		<div class="content">
+			<h1>게시글 상세 페이지</h1>
 
-         <c:if test="${board.isDelete == 'Y' }">
-            <c:redirect url="/hboard/listAll?status=wrongAccess" />
-         </c:if>
+			<c:if test="${board.isDelete == 'Y' }">
+				<c:redirect url="/hboard/listAll?status=wrongAccess" />
+			</c:if>
 
-         <div class="boardInfo">
-            <div class="mb-3">
-               <label for="title" class="form-label">글 번호</label> <input
-                  type="text" class="form-control" id="boardNo"
-                  value="${board.boardNo}" readonly>
-            </div>
+			<div class="boardInfo">
+				<div class="mb-3">
+					<label for="title" class="form-label">글 번호</label> <input
+						type="text" class="form-control" id="boardNo"
+						value="${board.boardNo}" readonly>
+				</div>
 
-            <div class="mb-3">
-               <label for="title" class="form-label">글제목</label> <input
-                  type="text" class="form-control" id="title"
-                  value="${board.title }" readonly>
-            </div>
+				<div class="mb-3">
+					<label for="title" class="form-label">글제목</label> <input
+						type="text" class="form-control" id="title"
+						value="${board.title }" readonly>
+				</div>
 
-            <div class="mb-3">
-               <label for="writer" class="form-label">작성자</label> <input
-                  type="text" class="form-control" id="writer"
-                  value="${board.writer }(${board.email})" readonly>
-            </div>
+				<div class="mb-3">
+					<label for="writer" class="form-label">작성자</label> <input
+						type="text" class="form-control" id="writer"
+						value="${board.writer }(${board.email})" readonly>
+				</div>
 
-            <div class="mb-3">
-               <label for="writer" class="form-label">작성일</label> <input
-                  type="text" class="form-control" id="postDate"
-                  value="${board.postDate }" readonly>
-            </div>
+				<div class="mb-3">
+					<label for="writer" class="form-label">작성일</label> <input
+						type="text" class="form-control" id="postDate"
+						value="${board.postDate }" readonly>
+				</div>
 
-            <div class="mb-3">
-               <label for="writer" class="form-label">조회수</label> <input
-                  type="text" class="form-control" id="readCount"
-                  value="${board.readCount }" readonly>
-            </div>
+				<div class="mb-3">
+					<label for="writer" class="form-label">조회수</label> <input
+						type="text" class="form-control" id="readCount"
+						value="${board.readCount }" readonly>
+				</div>
 
-            <div class="mb-3">
-               <label for="content" class="form-label">내용</label>
-               <div class='content'>${board.content }</div>
-            </div>
-         </div>
+				<div class="mb-3">
+					<label for="content" class="form-label">내용</label>
+					<div class='content'>${board.content }</div>
+				</div>
+			</div>
 
-         <div class="btns">
-            <button type="button" class="btn btn-primary"
-               onclick="location.href='/rboard/modifyBoard?boardNo=${board.boardNo}';">글
-               수정</button>
+			<div class="btns">
+				<button type="button" class="btn btn-primary"
+					onclick="location.href='/rboard/modifyBoard?boardNo=${board.boardNo}';">글
+					수정</button>
 
-            <button type="button" class="btn btn-secondary"
-               onclick="location.href='/rboard/listAll';">리스트페이지로</button>
-         </div>
-
-
-         <div class="replyInputArea">
-            <input type="text" class="form-control" id="replyContent" placeholder="댓글을 입력하33333"/> 
-            <img src="/resources/images/saveReply.png"  onclick="saveReply();" />
-
-         </div>
+				<button type="button" class="btn btn-secondary"
+					onclick="location.href='/rboard/listAll';">리스트페이지로</button>
+			</div>
 
 
-         <div class="replyList"></div>
-         <div class="replyPagination"></div>
+			<div class="replyInputArea">
+				<input type="text" class="form-control" id="replyContent"
+					placeholder="댓글을 입력하33333" /> <img
+					src="/resources/images/saveReply.png" onclick="saveReply();" />
 
-      </div>
-
-      <!-- The Modal -->
-      <div class="modal" id="myModal" style="display: none;">
-         <div class="modal-dialog">
-            <div class="modal-content">
-
-               <!-- Modal Header -->
-               <div class="modal-header">
-                  <h4 class="modal-title">MiniProject</h4>
-                  <button type="button" class="btn-close modalCloseBtn"
-                     data-bs-dismiss="modal"></button>
-               </div>
-
-               <!-- Modal body -->
-               <div class="modal-body"></div>
-
-               <!-- Modal footer -->
-               <div class="modal-footer">
-                  <button type="button" class="btn btn-info"
-                     onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
-                  <button type="button" class="btn btn-danger modalCloseBtn"
-                     data-bs-dismiss="modal">취소</button>
-               </div>
-
-            </div>
-         </div>
-      </div>
+			</div>
 
 
-      <c:import url="../footer.jsp" />
-   </div>
+			<div class="replyList"></div>
+			<div class="replyPagination"></div>
+
+		</div>
+
+		<!-- The Modal -->
+		<div class="modal" id="myModal" style="display: none;">
+			<div class="modal-dialog">
+				<div class="modal-content">
+
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title">MiniProject</h4>
+						<button type="button" class="btn-close modalCloseBtn"
+							data-bs-dismiss="modal"></button>
+					</div>
+
+					<!-- Modal body -->
+					<div class="modal-body"></div>
+
+					<!-- Modal footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-info"
+							onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
+						<button type="button" class="btn btn-danger modalCloseBtn"
+							data-bs-dismiss="modal">취소</button>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+
+		<c:import url="../footer.jsp" />
+	</div>
 </body>
 </html>
