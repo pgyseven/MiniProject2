@@ -141,7 +141,7 @@
          output += `</div>`;
       } else {
          $.each(replies.data.replyList, function(i, reply) {
-            output += `<a href="#" class="list-group-item list-group-item-action reply">`;
+            output += `<a href="#" id="reply_\${reply.replyNo}" class="list-group-item list-group-item-action reply">`;
             output += `<div class='replyBody'>`;
             
             output += `<div class='replyerProfile'>`;
@@ -189,10 +189,10 @@
       
    }
    
-   function modifyReply(obj) {
+   function modifyReply(replyNo) {
 	   let output = `<input type="text" class="form-control" id="modiryReplyContent" value="\${content}"/> <img src="/resources/images/saveReply.png" onclick="modifyReplySave();" />`;
 	   
-	   $(obj).
+	   
 	   
 	   $('.replyContent').html(output);
    }
