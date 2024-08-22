@@ -615,3 +615,8 @@ SELECT COUNT(*) FROM hboard; -- 337
 -- ------------------------ 0820 ?번 게시글에 댓글을 작성하는 쿼리문 -------------------------------
 use webkgy;
 insert into replyboard(replyer, content, boardNo) values(?, ?, ?);
+
+
+
+-- ?번 댓글을 삭제하는 쿼리문
+delete from replyboard where replyNo = ?;

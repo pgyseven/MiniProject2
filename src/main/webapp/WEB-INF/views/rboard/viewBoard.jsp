@@ -192,7 +192,7 @@
    
    function modifyReply(replyNo) {
 	   let output = `<div class='modifyReplyArea'><input type="text" class="form-control" id="modiryReplyContent"/>`;
-	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave();" /></div>`;
+	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave(\${replyNo});" /></div>`;
 	   
 	   if(!isModifyReplyArea) {
 		   $(output).insertBefore($(`#reply_\${replyNo}`).find('.replyInfo'));
@@ -206,6 +206,7 @@
    function modifyReplySave(replyNo) {
        let content = $('#modiryReplyContent').val();
        let replyer = '${sessionScope.loginMember.userId}';
+       console.log(replyNo);
        
        if (content == '') {
           alert('수정 될 댓글 내용을 입력하세요..');
@@ -233,7 +234,8 @@
                 console.log(data);
                 
                 if (data.resultCode == 200 || data.resultMessage == "SUCCESS") {
-                   getAllReplies(1);  // 최신댓글 불러옴
+                	isModifyReplyArea = false;
+                   	getAllReplies(1);  // 최신댓글 불러옴
                    
                 }
              }, error : function (data) {
@@ -244,7 +246,7 @@
        }
        
       
-   }v
+   }
    
    function removeReply(replyNo) {
 	   alert(replyNo + '번 댓글을 삭제하시겠습니까?');
@@ -385,25 +387,25 @@
 }
 
 .replyHeader {
-	display : flex;
+	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 }
 
 .replyContent {
-	flex : 1;
+	flex: 1;
 }
 
 .modifyReplyArea {
-	margin : 10px 5px;
-	height : 30px;
-	display : flex;
+	margin: 10px 5px;
+	height: 30px;
+	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 }
 
 .modifyReplyArea input {
-	flex : 1;
+	flex: 1;
 }
 </style>
 
@@ -485,17 +487,17 @@
 			<div class="modal-dialog">
 				<div class="modal-content">-->
 
-					<!-- Modal Header
+		<!-- Modal Header
 					<div class="modal-header">
 						<h4 class="modal-title">MiniProject</h4>
 						<button type="button" class="btn-close modalCloseBtn"
 							data-bs-dismiss="modal"></button>
 					</div> -->
 
-					<!-- Modal body
+		<!-- Modal body
 					<div class="modal-body"></div> -->
 
-					<!-- Modal footer
+		<!-- Modal footer
 					<div class="modal-footer">
 						<button type="button" class="btn btn-info"
 							onclick="location.href='/hboard/removeBoard?boardNo=${param.boardNo}';">삭제</button>
@@ -503,7 +505,7 @@
 							data-bs-dismiss="modal">취소</button>
 					</div> -->
 
-				<!-- </div>
+		<!-- </div>
 			</div>
 		</div> -->
 
