@@ -18,4 +18,5 @@ public class ReplyDTO {
 	private String replyer;
 	private String content;
 	private int boardNo;
+	private int replyNo;
 }
