@@ -9,6 +9,10 @@
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+
+
+
+
    let pageNo = 1;
    let isModifyReplyArea = false;
 
@@ -91,6 +95,7 @@
                   console.log(data);
                   if (data.resultCode == 200 || data.resultMessage == "SUCCESS") {
                      $('#replyContent').val(''); // 댓글 입력창 비우기
+                     isModifyReplyArea = false;
                      getAllReplies(1);  // 1페이지(최신 댓글)을 불러와 다시 출력
                   }   
                   
@@ -192,7 +197,7 @@
    
    function modifyReply(replyNo) {
 	   let output = `<div class='modifyReplyArea'><input type="text" class="form-control" id="modiryReplyContent"/>`;
-	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave();" /></div>`;
+	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave(\${replyNo});" /></div>`;
 	   
 	   if(!isModifyReplyArea) {
 		   $(output).insertBefore($(`#reply_\${replyNo}`).find('.replyInfo'));
@@ -206,6 +211,7 @@
    function modifyReplySave(replyNo) {
        let content = $('#modiryReplyContent').val();
        let replyer = '${sessionScope.loginMember.userId}';
+       console.log(replyNo);
        
        if (content == '') {
           alert('수정 될 댓글 내용을 입력하세요..');
@@ -248,6 +254,43 @@
    
    function removeReply(replyNo) {
 	   alert(replyNo + '번 댓글을 삭제하시겠습니까?');
+	   alert  YES 면 삭제 진행 쿼리문 del
+	   /* 
+	   
+	   부모글 삭제의 경우 댓글은 남겨두고 글작성자가 글을 삭제하는경우 댓글 남겨두고 해당글은 삭제되었습니다 뜨게 하기 
+	   추가 숙제 
+	   좋아요 : 다대 다 관계
+	   좋아요는 테이블 하나 추가 생성
+	   좋아요
+
+
+
+	   1) 게시글 (N) - 게시글을 좋아요할 수 있는 Member(M) 이므로, 좋아요처리 하기 위한 테이블을 하나 더 만든다..
+
+	   1-1) heedong이라는 유저가 23번글을 조회할때 (select 좋아요테이블)
+
+	   1-2) 처음엔 heedong이라는 유저가 23번글을 좋아하지 않는다고 가정한다면..
+	   heedong이라는 유저가 23번게시글을 볼때 ♡ 출력
+
+	   2) heedong이라는 유저가 23번글을 좋아요 버튼   -> insert      (언제, 누가, 몇번글을 좋아한다)
+	    -> 23번글에 좋아요 표시♥️
+
+	   3) heedong이라는 유저가 다시 23번글을 볼때는.... 테이블을 조회하여 좋아요 조회기록이 있다면..♥️ 
+	   	없다면... ♡
+
+
+	   4-1) heedong이라는 유저가 23번글을 좋아한다는 기록이 있다(♥️) -> 이 버튼을 또다시 누르면 heedong이가 23번글 좋아요 
+	   취소(delete)
+
+
+
+	   5) 23번글에 대해서 좋아요한사람들을 다 조회
+	   
+	   마이페이지
+	   
+	   관리자 페이지 맴버에 컬럼 하나 더 맹글어서 로그인하고 관리자인지 아닌지 검사
+	   
+	   */
    }
    
    // 댓글의 페이징 작업 
