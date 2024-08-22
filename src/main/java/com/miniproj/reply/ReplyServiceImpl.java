@@ -87,4 +87,15 @@ public class ReplyServiceImpl implements ReplyService {
 		return result;
 	}
 
+	@Override // transactional 안필요함. 쿼리문을 한개만 수행하기 때문이다.
+	public boolean modifyReply(ReplyDTO replyDTO) throws Exception {
+		
+		boolean result = false;
+		
+		if(rDao.updateReply(replyDTO) == 1) {
+			result = true;
+		}		
+		return result;
+	}
+
 }

@@ -44,5 +44,10 @@ public class ReplyDAOImpl implements ReplyDAO {
 	      return ses.insert(NS + ".saveReply", newReplyDTO);
 	   }
 
+	@Override
+	public int updateReply(ReplyDTO modifyReplyDTO) throws Exception {
+		
+		return ses.update(NS + ".modifyReply", modifyReplyDTO);
+	}
 
 }

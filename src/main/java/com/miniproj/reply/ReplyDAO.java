@@ -12,6 +12,8 @@ public interface ReplyDAO {
 	
 	int getTotalPostCnt(int boardNo) throws Exception;
 
-	int insertNewReply(ReplyDTO newReplyDTO)throws Exception;
+	int insertNewReply(ReplyDTO newReplyDTO) throws Exception;
+	
+	int updateReply(ReplyDTO modifyReplyDTO) throws Exception;
 
 }

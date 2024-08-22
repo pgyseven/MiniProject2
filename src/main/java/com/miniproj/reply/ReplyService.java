@@ -12,4 +12,6 @@ public interface ReplyService {
 	Map<String, Object> getAllReplies(int boardNo, PagingInfoDTO pagingInfoDTO) throws Exception;
 
 	boolean saveReply(ReplyDTO newReply) throws Exception;
+	
+	boolean modifyReply(ReplyDTO replyDTO) throws Exception;
 }

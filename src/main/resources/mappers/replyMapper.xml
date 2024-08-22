@@ -23,5 +23,9 @@
 		insert into replyboard (replyer, content, boardNo)
 		values (#{replyer}, #{content}, #{boardNo})
 	</insert>
+	
+	<update id="modifyReply">
+		update replyboard set content = #{content}, regDate = now() where replyNo = #{replyNo}
+	</update>
 
 </mapper>
