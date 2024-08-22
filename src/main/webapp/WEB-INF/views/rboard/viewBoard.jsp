@@ -10,6 +10,7 @@
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
    let pageNo = 1;
+   let isModifyReplyArea = false;
 
    $(function() { // 웹 문서가 로딩되면..
       
@@ -141,7 +142,7 @@
          output += `</div>`;
       } else {
          $.each(replies.data.replyList, function(i, reply) {
-            output += `<a href="#" id="reply_\${reply.replyNo}" class="list-group-item list-group-item-action reply">`;
+            output += `<div id="reply_\${reply.replyNo}" class="list-group-item list-group-item-action reply">`;
             output += `<div class='replyBody'>`;
             
             output += `<div class='replyerProfile'>`;
@@ -176,7 +177,7 @@
             output += `</div>`;
             
             output += `</div>`;
-            output += `</a>`;
+            output += `</div>`;
          });
          
          ouptutPagination(replies);
@@ -190,12 +191,60 @@
    }
    
    function modifyReply(replyNo) {
-	   let output = `<input type="text" class="form-control" id="modiryReplyContent" value="\${content}"/> <img src="/resources/images/saveReply.png" onclick="modifyReplySave();" />`;
+	   let output = `<div class='modifyReplyArea'><input type="text" class="form-control" id="modiryReplyContent"/>`;
+	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave();" /></div>`;
 	   
-	   
-	   
-	   $('.replyContent').html(output);
+	   if(!isModifyReplyArea) {
+		   $(output).insertBefore($(`#reply_\${replyNo}`).find('.replyInfo'));
+		   $(`#reply_\${replyNo}`).find('input').focus();
+	   }
+
+	   isModifyReplyArea = true;
+	    
    }
+   
+   function modifyReplySave(replyNo) {
+       let content = $('#modiryReplyContent').val();
+       let replyer = '${sessionScope.loginMember.userId}';
+       
+       if (content == '') {
+          alert('수정 될 댓글 내용을 입력하세요..');
+       } else {
+         const modifyReply = {
+                 "replyNo" : replyNo,
+                 "content" : content,
+                 "replyer" : replyer
+           };
+         
+        $.ajax({
+             url : '/reply/' + replyNo,  
+             type : 'put', 
+             data : JSON.stringify(modifyReply),
+             headers : {
+                // 송신할 데이터가 Json 임을 백엔드에게 알려주는것
+                "Content-Type" : "application/json",
+                // PUT, DELETE, PATCH 등의 REST에서 사용되는 HTTP method가 동작하지 않는 과거의 웹 브라우저가
+                // POST 방식으로 동작하도록 한다..
+                "X-HTTP-Method_Override" : "POST"
+             },
+             dataType : 'json',          
+             async : false,      
+             success : function (data) { 
+                console.log(data);
+                
+                if (data.resultCode == 200 || data.resultMessage == "SUCCESS") {
+                   getAllReplies(1);  // 최신댓글 불러옴
+                   
+                }
+             }, error : function (data) {
+               console.log(data);
+               alert("댓글을 수정하지 못했습니다");
+             }
+          });
+       }
+       
+      
+   }v
    
    function removeReply(replyNo) {
 	   alert(replyNo + '번 댓글을 삭제하시겠습니까?');
@@ -333,8 +382,6 @@
 
 .replyInputArea img {
 	margin-left: 5px;
-	border: 2px solid rgba(0, 0, 255, 0.4);
-	border-radius: 5px;
 }
 
 .replyHeader {
@@ -347,7 +394,17 @@
 	flex : 1;
 }
 
+.modifyReplyArea {
+	margin : 10px 5px;
+	height : 30px;
+	display : flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
 
+.modifyReplyArea input {
+	flex : 1;
+}
 </style>
 
 </head>
