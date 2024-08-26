@@ -74,7 +74,7 @@ public class LoginlogAOP { //joinpoint 보다 강력하고 더 많이 씀  그�
 		
 		FileWriter fw = new FileWriter(logSavePath + File.separator + "log_"+ when + ".csv", true); //여기서 true 해야지 추가됨 즉 덮어쓰기가 안됨
 		fw.write(this.logContent);
-		fw.write("/n");
+		fw.write("\n");
 		
 		fw.flush();
 		fw.close();
