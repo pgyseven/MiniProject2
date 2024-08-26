@@ -34,6 +34,47 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
+		
+		
+		
+		
+		
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-aop</artifactId>
+<version>${org.springframework-version}</version>
+</dependency>
+
+<!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
+<dependency>
+<groupId>org.springframework</groupId>
+<artifactId>spring-tx</artifactId>
+<version>${org.springframework-version}</version>
+</dependency>
+
+
+<!-- AspectJ (AOP 기능을 적용할 때 사용되는 AspectJ 문법을 이용하기 위해 -->
+<dependency>
+<groupId>org.aspectj</groupId>
+<artifactId>aspectjrt</artifactId>
+<version>${org.aspectj-version}</version>
+</dependency>
+
+<!-- (AOP 기능을 적용할 때 사용되는 AspectJ 문법을 이용하기 위해 -->
+<dependency>
+<groupId>org.aspectj</groupId>
+<artifactId>aspectjtools</artifactId>
+<version>${org.aspectj-version}</version>
+</dependency>
+		
+		
+		
+		
+		
+		
+		
 
 		<!-- AspectJ -->
 		<dependency>

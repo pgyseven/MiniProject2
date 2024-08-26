@@ -13,10 +13,16 @@
 		http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context 
 		http://www.springframework.org/schema/context/spring-context-4.3.xsd
-		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop 
 		 http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx 
 		http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+		<!--위에서 트랜잭션도 포함니깐 이것과 아래것 먼저  aop 배우기도 전에한거다 http://www.springframework.org/schema/aop 
+		 http://www.springframework.org/schema/aop/spring-aop-4.3.xsd -->
+		
+		<!-- AspectJ 라이브러리를 이용해 Proxy 객체를 생성하도록 설정(aop관련 설정) -->
+		<aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+		
 		
 		<!-- transaction 처리를 annotation으로 진행하겠다. -->
 	<tx:annotation-driven/>
@@ -81,5 +87,6 @@
 	<context:component-scan base-package="com.miniproj.util"></context:component-scan>
 	<context:component-scan base-package="com.miniproj.service.member"></context:component-scan>
 	<context:component-scan base-package="com.miniproj.reply"></context:component-scan>
+	<context:component-scan base-package="com.miniproj.aop"></context:component-scan>
 
 </beans>
