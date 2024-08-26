@@ -25,6 +25,7 @@ import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.model.LoginDTO;
 import com.miniproj.service.member.MemberService;
 import com.miniproj.util.FileProcess;
+import com.miniproj.util.GetClientIPAddr;
 import com.miniproj.util.SendMailService;
 import com.mysql.cj.util.StringUtils;
 
@@ -177,14 +178,17 @@ public class MemberController {
    }
    
    @RequestMapping(value="/loginPOST", method=RequestMethod.POST)
-   public void loginPOST(LoginDTO loginDTO, Model model) {
+   public void loginPOST(LoginDTO loginDTO, Model model, HttpServletRequest req) {
 	   System.out.println(loginDTO.toString() + "으로 로그인하자");
+	   
+	   
+	   loginDTO.setIpAddr(GetClientIPAddr.getClientIp(req));
 	   
 	   try {
 		MemberVO loginMember = mService.login(loginDTO);
 		
 		if(loginMember != null) {
-			//System.out.println("MemberController - 로그인 성공");
+			System.out.println("MemberController - 로그인 성공");
 			
 			// 모델 객체에 loginMember를 바인딩 시킨다.
 			model.addAttribute("loginMember", loginMember);
