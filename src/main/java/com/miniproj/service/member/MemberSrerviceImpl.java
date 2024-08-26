@@ -48,8 +48,12 @@ public class MemberSrerviceImpl implements MemberService {
 		boolean result = false;
 		
 		String tmpHobbies = "";
-		for(String hobby : registMember.getHobby()) {
-			tmpHobbies += hobby + ", ";
+		for(int i = 0 ; i < registMember.getHobby().length ; i++) {
+			if (i == registMember.getHobby().length - 1) {
+				tmpHobbies += registMember.getHobby()[i];
+			} else {
+				tmpHobbies += registMember.getHobby()[i] + ",";
+			}
 		}
 		
 		registMember.setHobbies(tmpHobbies);
