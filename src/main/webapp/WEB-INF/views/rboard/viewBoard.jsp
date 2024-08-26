@@ -9,7 +9,14 @@
 <script
    src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <script>
+<<<<<<< HEAD
    // 함수 내부에서 만드는 변수는 지역변수, 외부에서는 전역변수
+=======
+
+
+
+
+>>>>>>> 76701af79d9c06d3fb6193bcd0faa724a805c69b
    let pageNo = 1;
    
    // 웹문서가 로딩되면 실행되는 달라펑션 $(document).ready(function(){}) 이 원형,
@@ -105,6 +112,7 @@
             return;
          } else if (content.length >= 1 && replyer != null){
          $.ajax({
+<<<<<<< HEAD
             url : "/reply/" + boardNo ,    
             type : 'post', 
             dataType : 'json',               // 수신받을 데이터 타입
@@ -118,6 +126,27 @@
                if(data.resultCode == 200 || data.resultMsg == "SUCCESS"){
                   $('#replyContent').val(''); // 댓글입력창 비우고
                   getAllReplies(1); // 댓글 출력하고 1페이지 불러오기
+=======
+               url : '/reply/' + boardNo,  
+               type : 'post', 
+               data : JSON.stringify(newReply),  // 송신할 데이터
+               headers : {
+                  "Content-Type" : "application/json"
+               },  // 송신할 데이터가 json임을 백엔드에게 알려줌
+               dataType : 'json', // 수신받을 데이터 타입
+               async : false,      
+               success : function (data) { 
+                  console.log(data);
+                  if (data.resultCode == 200 || data.resultMessage == "SUCCESS") {
+                     $('#replyContent').val(''); // 댓글 입력창 비우기
+                     isModifyReplyArea = false;
+                     getAllReplies(1);  // 1페이지(최신 댓글)을 불러와 다시 출력
+                  }   
+                  
+               }, error : function (data) {
+                 console.log(data);
+                 alert("댓글을 저장하지 못했습니다");
+>>>>>>> 76701af79d9c06d3fb6193bcd0faa724a805c69b
                }
             },
             error : function(data) {
@@ -173,6 +202,7 @@
    function outputReplies(replies) {
          let output = `<div class="list-group">`;
          
+<<<<<<< HEAD
          if(replies.data.replyList.length == 0) {
             output += `<div class="empty">`;
             output += `<img src ='/resources/images/empty.png'>`;
@@ -183,6 +213,60 @@
             $.each(replies.data.replyList, function(i, reply) {
                 output += `<div class="list-group-item list-group-item-action reply" id="reply_\${reply.replyNo}">`;      
                 output += `<div class='replyBody'>`;
+=======
+         ouptutPagination(replies);
+      }
+      
+      output += `</div>`;
+      
+      $(".replyList").html(output);
+      
+      
+   }
+   
+   function modifyReply(replyNo) {
+	   let output = `<div class='modifyReplyArea'><input type="text" class="form-control" id="modiryReplyContent"/>`;
+	   output += `<img src="/resources/images/saveReply.png" onclick="modifyReplySave(\${replyNo});" /></div>`;
+	   
+	   if(!isModifyReplyArea) {
+		   $(output).insertBefore($(`#reply_\${replyNo}`).find('.replyInfo'));
+		   $(`#reply_\${replyNo}`).find('input').focus();
+	   }
+
+	   isModifyReplyArea = true;
+	    
+   }
+   
+   function modifyReplySave(replyNo) {
+       let content = $('#modiryReplyContent').val();
+       let replyer = '${sessionScope.loginMember.userId}';
+       console.log(replyNo);
+       
+       if (content == '') {
+          alert('수정 될 댓글 내용을 입력하세요..');
+       } else {
+         const modifyReply = {
+                 "replyNo" : replyNo,
+                 "content" : content,
+                 "replyer" : replyer
+           };
+         
+        $.ajax({
+             url : '/reply/' + replyNo,  
+             type : 'put', 
+             data : JSON.stringify(modifyReply),
+             headers : {
+                // 송신할 데이터가 Json 임을 백엔드에게 알려주는것
+                "Content-Type" : "application/json",
+                // PUT, DELETE, PATCH 등의 REST에서 사용되는 HTTP method가 동작하지 않는 과거의 웹 브라우저가
+                // POST 방식으로 동작하도록 한다..
+                "X-HTTP-Method_Override" : "POST"
+             },
+             dataType : 'json',          
+             async : false,      
+             success : function (data) { 
+                console.log(data);
+>>>>>>> 76701af79d9c06d3fb6193bcd0faa724a805c69b
                 
                 output += `<div class='replyerProfile'>`;
                 output += `<img src='/resources/userImg/\${reply.userImg}'/>`;
@@ -199,6 +283,7 @@
                    // 로그인 안 했을 때, 댓글작성자가 아닐 때 replyBtns비우기
                   output += `<div class='replyBtns'></div></div>`
                 }
+<<<<<<< HEAD
                                 
                 output += `<div class='replyInfo'>`;
                 let betweenTime = processPostDate(reply.regDate);
@@ -220,6 +305,57 @@
          output += `</div>`;
          
          $(".replyList").html(output);
+=======
+             }, error : function (data) {
+               console.log(data);
+               alert("댓글을 수정하지 못했습니다");
+             }
+          });
+       }
+       
+      
+   }v
+   
+   function removeReply(replyNo) {
+	   alert(replyNo + '번 댓글을 삭제하시겠습니까?');
+	   alert  YES 면 삭제 진행 쿼리문 del
+	   /* 
+	   
+	   부모글 삭제의 경우 댓글은 남겨두고 글작성자가 글을 삭제하는경우 댓글 남겨두고 해당글은 삭제되었습니다 뜨게 하기 
+	   추가 숙제 
+	   좋아요 : 다대 다 관계
+	   좋아요는 테이블 하나 추가 생성
+	   좋아요
+
+
+
+	   1) 게시글 (N) - 게시글을 좋아요할 수 있는 Member(M) 이므로, 좋아요처리 하기 위한 테이블을 하나 더 만든다..
+
+	   1-1) heedong이라는 유저가 23번글을 조회할때 (select 좋아요테이블)
+
+	   1-2) 처음엔 heedong이라는 유저가 23번글을 좋아하지 않는다고 가정한다면..
+	   heedong이라는 유저가 23번게시글을 볼때 ♡ 출력
+
+	   2) heedong이라는 유저가 23번글을 좋아요 버튼   -> insert      (언제, 누가, 몇번글을 좋아한다)
+	    -> 23번글에 좋아요 표시♥️
+
+	   3) heedong이라는 유저가 다시 23번글을 볼때는.... 테이블을 조회하여 좋아요 조회기록이 있다면..♥️ 
+	   	없다면... ♡
+
+
+	   4-1) heedong이라는 유저가 23번글을 좋아한다는 기록이 있다(♥️) -> 이 버튼을 또다시 누르면 heedong이가 23번글 좋아요 
+	   취소(delete)
+
+
+
+	   5) 23번글에 대해서 좋아요한사람들을 다 조회
+	   
+	   마이페이지
+	   
+	   관리자 페이지 맴버에 컬럼 하나 더 맹글어서 로그인하고 관리자인지 아닌지 검사
+	   
+	   */
+>>>>>>> 76701af79d9c06d3fb6193bcd0faa724a805c69b
    }
    
    // 댓글 페이징 작업
