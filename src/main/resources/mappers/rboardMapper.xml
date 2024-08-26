@@ -41,11 +41,12 @@
 		
 		<result column="userName" property="userName" javaType="String" />
 		<result column="email" property="email" javaType="String" />
+		<result column="hobby" property="hobbies" javaType="String" />
 	</resultMap>
 	
 	<!--  게시글의 상세정보를 담는 조인 문 -->
 	<select id="selectBoardDetailInfoByBoardNo" resultMap="boardDetailInfoMap">
-		select h.boardNo, h.title, h.content, h.writer, h.postDate, h.readCount, h.isDelete, m.userName, m.email
+		select h.boardNo, h.title, h.content, h.writer, h.postDate, h.readCount, h.isDelete, m.userName, m.email, m.hobby
 		from hboard h inner join member m
 		on h.writer = m.userId
 		where h.boardNo = #{boardNo} and boardType = 'rboard'
