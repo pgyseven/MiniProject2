@@ -30,6 +30,7 @@ public class MemberVO {
 	private int userPoint;
 	private String sesid;
 	private Timestamp allimit;
+	private String islock;
 	
 	
 }
