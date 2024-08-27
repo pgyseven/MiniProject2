@@ -173,7 +173,11 @@ public class MemberController {
    }
    
    @RequestMapping("/login")
-   public void loginGet() {
+   public void loginGet(HttpSession ses) {
+	   
+		if(ses.getAttribute("destPath")!= null) {
+			ses.removeAttribute("destPath");
+		}
 	   
    }
    
@@ -186,6 +190,14 @@ public class MemberController {
 	   
 	   try {
 		MemberVO loginMember = mService.login(loginDTO);
+		
+		
+		
+		if (loginMember != null) {
+			// 계정이 잠궈진 유저라면...
+			System.out.println("계정이 잠긴 유저가 로그인 했다~~~~~~~~~~~~~~~~~~~~~~~~~~");
+			
+		}
 		
 		if(loginMember != null) {
 			System.out.println("MemberController - 로그인 성공");
@@ -220,5 +232,10 @@ public class MemberController {
 	   System.out.println("로그아웃 이후의 세션값 : " + session.getId());
 	   
 	   return "redirect:/";
+   }
+   @RequestMapping("/reAuth")
+   public String showReAuth() {
+	   return "/member/reAuth";
+	   
    }
 }
