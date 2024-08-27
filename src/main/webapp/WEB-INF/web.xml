@@ -30,7 +30,7 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 	
-	<!-- utf-8설정 -->
+	<!-- utf-8설정 이것도 proxy 패턴에 의해 작동하는 대표적인 것 중 하나-->
 	<filter>
 		<filter-name>encodingFilter</filter-name>
 		<filter-class> org.springframework.web.filter.CharacterEncodingFilter
