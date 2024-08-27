@@ -43,4 +43,11 @@
 		SELECT * FROM member WHERE sesid = #{sesid} AND allimit > now()
 	</select>
 	
+	<!--  유저의 계정을 잠그는 쿼리문 -->
+	<update id="updateAccountLock">
+    update member set islock = 'Y' where userId = #{userId}
+	</update>
+	
+	
+	
 </mapper>

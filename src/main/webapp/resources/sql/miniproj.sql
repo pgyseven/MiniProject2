@@ -622,5 +622,6 @@ delete from replyboard where replyNo = ?;
 ALTER TABLE `pgy`.`member` 
 ADD COLUMN `islock` VARCHAR(1) NOT NULL DEFAULT 'N' AFTER `allimit`;
 
-
+-- 유저의 계정을 잠그는 쿼리문
+update member set islock = 'Y' where userId = #{userId}
 
