@@ -25,5 +25,6 @@ public interface MemberDAO {
 	// 자동 로그인을 확인하는 메소드
 	MemberVO checkAutoLogin(String savedCookieSesId);
 
-	
+	// 유저의 계정을 잠그는 메서드
+	int updateAccountLock(String userId) throws Exception;
 }

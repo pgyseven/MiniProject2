@@ -53,4 +53,9 @@ public class MemberDAOImpl implements MemberDAO {
 		return ses.selectOne(NS + ".checkAutoLoginUser", savedCookieSesId);
 	}
 
+	@Override
+	public int updateAccountLock(String userId) throws Exception {
+	    return ses.update(NS + ".updateAccountLock", userId);
+	}
+
 }
