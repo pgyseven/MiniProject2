@@ -1,7 +1,7 @@
 
-use webkgy;
+use pgy;
 -- 회원 테이블 생성
-CREATE TABLE `webkgy`.`member` (
+CREATE TABLE `pgy`.`member` (
   `userId` VARCHAR(8) NOT NULL,
   `userPwd` VARCHAR(200) NOT NULL,
   `userName` VARCHAR(12) NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `webkgy`.`member` (
   UNIQUE INDEX `email_UNIQUE` (`email` ASC) VISIBLE);
 
 -- 회원 테이블 수정(회원 포인트 점수 컬럼 부여)
-ALTER TABLE `webkgy`.`member` 
+ALTER TABLE `pgy`.`member` 
 ADD COLUMN `userPoint` INT NULL DEFAULT 100 AFTER `userImg`;
 
 -- DB 서버의 현재날짜와 현재 시간을 출력하는 쿼리문;
@@ -46,7 +46,7 @@ update member set mobile = ? where userId = ?;
 
 
 -- 계층형 게시판 생성
-CREATE TABLE `webkgy`.`hboard` (
+CREATE TABLE `pgy`.`hboard` (
   `boardNo` INT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(20) NOT NULL,
   `content` VARCHAR(2000) NULL,
@@ -81,28 +81,28 @@ insert into hboard(title, content, writer)
 values(?, ?, ?);
 
 -- 유저에게 지급되는 포인트를 정의한 테이블 생성
-CREATE TABLE `webkgy`.`pointdef` (
+CREATE TABLE `pgy`.`pointdef` (
   `pointWhy` VARCHAR(20) NOT NULL,
   `pointScore` INT NULL,
   PRIMARY KEY (`pointWhy`))
 COMMENT = '유저에게 적립할 포인트에 대한 저의 테이블,\n어떤 사유로 몇 포인트를 지급하는지에 대해 정의';
 
 -- pointdef 테이블의 기초 데이터
-INSERT INTO `webkgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('회원가입', '100');
-INSERT INTO `webkgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('로그인', '1');
-INSERT INTO `webkgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('글작성', '10');
-INSERT INTO `webkgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('댓글작성', '2');
-INSERT INTO `webkgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('게시글신고', '-10');
+INSERT INTO `pgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('회원가입', '100');
+INSERT INTO `pgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('로그인', '1');
+INSERT INTO `pgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('글작성', '10');
+INSERT INTO `pgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('댓글작성', '2');
+INSERT INTO `pgy`.`pointdef` (`pointWhy`, `pointScore`) VALUES ('게시글신고', '-10');
 
 
-ALTER TABLE `webkgy`.`pointdef` 
+ALTER TABLE `pgy`.`pointdef` 
 ADD COLUMN `pointdefNo` INT NOT NULL AUTO_INCREMENT FIRST,
 DROP PRIMARY KEY,
 ADD PRIMARY KEY (`pointdefNo`);
 ;
 
 --  유저의 포인트 적립 내역을 기록하는 pointlog 테이블 생성
-CREATE TABLE `webkgy`.`pointlog` (
+CREATE TABLE `pgy`.`pointlog` (
   `pointLogNo` INT NOT NULL AUTO_INCREMENT,
   `pointWho` VARCHAR(8) NOT NULL,
   `pointWhen` DATETIME NULL DEFAULT now(),
@@ -111,7 +111,7 @@ CREATE TABLE `webkgy`.`pointlog` (
   PRIMARY KEY (`pointLogNo`),
   CONSTRAINT `pointdef_member_fk`
     FOREIGN KEY (`pointWho`)
-    REFERENCES `webkgy`.`member` (`userId`)
+    REFERENCES `pgy`.`member` (`userId`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 COMMENT = '어떤 유저에게 어떤 사유로 몇 포인트가 언제 지급 되었는지를 기록하는 테이블 ';
@@ -126,7 +126,7 @@ insert into pointlog(pointWho, pointWhy, pointScore) values(?, ?, (select pointS
 update member set userpoint = userpoint + (select pointScore from pointdef where pointWhy = '글작성') where userId = ?;
 
 -- 게시글의 첨부파일을 저장하는 테이블 생성
-CREATE TABLE `webkgy`.`boardimg` (
+CREATE TABLE `pgy`.`boardimg` (
   `boardImgNo` INT NOT NULL AUTO_INCREMENT,
   `newFileName` VARCHAR(50) NOT NULL,
   `originalFileName` VARCHAR(50) NOT NULL,
@@ -138,25 +138,25 @@ CREATE TABLE `webkgy`.`boardimg` (
   PRIMARY KEY (`boardImgNo`),
   CONSTRAINT `board_boardNo_fk`
     FOREIGN KEY (`boardNo`)
-    REFERENCES `webkgy`.`hboard` (`boardNo`)
+    REFERENCES `pgy`.`hboard` (`boardNo`)
     ON DELETE CASCADE
     ON UPDATE NO ACTION)
 COMMENT = '게시판에 업로드 되는 업로드 파일을 기록하는 테이블';
 
 -- 게시글 첨부 파일 테이블 수정
-ALTER TABLE `webkgy`.`boardimg` 
+ALTER TABLE `pgy`.`boardimg` 
 ADD COLUMN `thumbFileName` VARCHAR(60) NULL AFTER `originalFileName`;
 
 -- 첨부 파일 테이블 이름 변경
-ALTER TABLE `webkgy`.`boardimg` 
-RENAME TO  `webkgy`.`boardupfiles` ;
+ALTER TABLE `pgy`.`boardimg` 
+RENAME TO  `pgy`.`boardupfiles` ;
 
  -- 컬럼명 변경
- ALTER TABLE `webkgy`.`boardupfiles` 
+ ALTER TABLE `pgy`.`boardupfiles` 
 CHANGE COLUMN `boardImgNo` `boardUpFileNo` INT NOT NULL AUTO_INCREMENT ;
 
 -- 컬럼 크기 수정
-ALTER TABLE `webkgy`.`boardupfiles` 
+ALTER TABLE `pgy`.`boardupfiles` 
 CHANGE COLUMN `ext` `ext` VARCHAR(20) NULL DEFAULT NULL ;
 
 -- 방금 insert 된 글의 글번호를 가져오는 쿼리문
@@ -237,7 +237,7 @@ update hboard set readCount = readCount + 1
 where boardNo = ?;
 
 -- 게시판 조회수 증가를 위한 테이블 생성
-CREATE TABLE `webkgy`.`boardreadlog` (
+CREATE TABLE `pgy`.`boardreadlog` (
   `boardReadLogNo` INT NOT NULL AUTO_INCREMENT,
   `readWho` VARCHAR(130) NOT NULL,
   `readWhen` DATETIME NULL DEFAULT now(),
@@ -268,8 +268,8 @@ update boardreadlog set readWhen = now() where readWho = ? and boardNo = ?;
 -- 1) 기존 게시글의 ref 컬럽 값을 boardNo 값으로update(기존의 글들은 모두 부모글이기 때문)
 
 -- 2) 앞으로 정장될 게시글에도 ref 컬럼 값을 boardNo 값으로 update
--- update hboard set ref = #{boardNo} where boardNo = #{boardNo};
--- update hboard set ref = ? where boardNo = ?;
+update hboard set ref = #{boardNo} where boardNo = #{boardNo};
+update hboard set ref = ? where boardNo = ?;
 
 
 -- 2-1) 부모글에 대한 다른 답글이 있는 상태에서, 부모글의 답글이 추가되는 경우, (자리 확보를 위해)기존의 답글의 refOrder 값을 수정해야 한다.
@@ -282,7 +282,7 @@ values(?, ?, ?, ?, ?, ?);
 
 ------------------------------------------------------------------------ 계층판 삭제 작업 ---------------------------------------------------------------------------
 -- hboard테이블에서 삭제한 글인지를 포함할 수 있는 컬럼을 추가한다.
-ALTER TABLE `webkgy`.`hboard` 
+ALTER TABLE `pgy`.`hboard` 
 ADD COLUMN `isDelete` CHAR(1) NULL DEFAULT 'N' AFTER `refOrder`;
 
 -- 1) 실제 파일을 하드디스크에서도 삭제해야 하므로, 삭제 하기 전에 해당글의 첨부파일 정보를 불러와야 한다.
@@ -293,8 +293,8 @@ delete from boardupfiles where boardNo = ?
 
 -- 3) boardNo 번글을 삭제 처리 (delete 문을 ㅅ실행하면, 게층형 게시판 정렬을 위해 만들어 놓은  ref, step, refOrder 컬럼의 정보 또한 삭제 되기 떄문에
 -- 실제로는  update 문을 수행한다. 그리고 삭제 처리된 boardNo 번 글을 접근하지 못하도록 한다.
--- update hboard set isDelete = 'Y', title = '', content=''
--- where boardNo = ? ;
+update hboard set isDelete = 'Y', title = '', content=''
+where boardNo = ? 
 
 -- 4) view 단에서 지워진 파일에 접근 하지 못하도록 해야 한다.
 
@@ -314,7 +314,7 @@ where boardNo = ?;
 delete from boardupfiles where boardUpFileNo = ?
 
 -------------------------------------------------------------------------  인기글 5개 가져오기 ---------------------------------------------------------------------------
-use webkgy;
+use pgy;
 -- 삭제되지 않은 글 중에서 조회수가 높은순, 최신글 순 5개 가져오기
 select * from hboard where isDelete = 'N' order by readCount desc, boardNo desc limit 5;
 
@@ -363,7 +363,7 @@ SELECT COUNT(*) FROM hboard; -- 337
 
 --------------------------------------게시물 검색 기능 구현----------------------------------
 
-use webkgy;
+use pgy;
 
 -- like 검색과 함께 사용하는 와일드 카드
 -- 1) % : 몇자라도~
@@ -411,7 +411,7 @@ select * from hboard where content like '%금산%' order by ref desc, refOrder a
 
 
 --------------------------  회원 가입 기능 구현 ------------------------------
-use webkgy;
+use pgy;
 
 -- 회원 아이디가 중복되는 여부
 select count(*) from member where userId = 'dooly';
@@ -426,7 +426,7 @@ CHANGE COLUMN `userImg` `userImg` VARCHAR(45) NULL DEFAULT 'avatar.png' ;
 
 ALTER TABLE `pgy`.`member` 
 ADD COLUMN `hobby` VARCHAR(60) NULL AFTER `email`;
-
+member
 
 -- 멤버 테이블에 회원 가입 -- userImg 멤버가 값이 null이 아닐때
 -- 프로필 파일을 올렸을때
@@ -451,47 +451,52 @@ select * from member where userId = 'douner' and userPwd = sha1(md5('1234'));
 -- ?번글의 작성자 얻어오는 쿼리문
 select writer from hboard where boardNo = ?
 
---------------------------  자동 로그인 기능 구현 ------------------------------
--- 자동 로그인을 체크한 유저의 경우 아래의 두 컬럼에 자동  로그인을 체크했을 때의 세션값과 만료시간을 저장한다.
--- 향후에 쿠키에 있는 자동 로그인 정보와 DB의 아래 컬럼에 있는 자동 로그인 정보와 비교하여 맞을 때만 자동 로그인을 시켜야 한다.
-ALTER TABLE `webkgy`.`member` 
+------------------------ 자동 로그인 기능 구현 -----------------------------
+-- 자동 로그인을 체크한 유저의 경우에 아래의 두 컬럼에 자동 로그인을 체크 했을때의 세션값과 만료 시간을 저장
+-- 향후에 쿠키에 있는 자동 로그인 정보와 db의 아래 컬럼에 있는 자동 로그인 정보와 비교하여 맞을 때만 자동로그인 시켜야
+ALTER TABLE `pgy`.`member` 
 ADD COLUMN `sesid` VARCHAR(40) NULL AFTER `userPoint`,
 ADD COLUMN `allimit` DATETIME NULL AFTER `sesid`;
 
--- 자동 로그인 정보를 DB에 저장하는 쿼리문
-UPDATE member SET sesid = ?, allimit = ? WHERE userId = ?;
+-- 자동 로그인 정보를 db에 저장하는 쿼리문
+update member set sesid=? , allimit=? where userId=?
 
--- 쿠키에 자동 로그인을 한다고 저장되어 있을 때 자동 로그인을 하는 쿼리문
-SELECT * FROM member WHERE sesid = '쿠키에 저장된 sesid' AND allimit > now();
+-- 쿠키에 자동 로그인 한다고 저장되어 있을때 자동 로그인하는 쿼리문
+select * from member where sesId = '쿠키에 저장된 sesId' and allimit > now();
 
---------------------------  댓글형 게시판 ------------------------------
 
--- 계층형 게시판과 댓글형 게시판의 테이블을 함께 사용하기 ㅜ이해 만든 컬럼. 게시판을 구분하는 용도로 사용할 것임
-ALTER TABLE `webkgy`.`hboard` 
+---------------------------  댓글형 게시판 -------------------------------
+
+ALTER TABLE `pgy`.`hboard` 
+COMMENT ='계층형 게시판, 댓글 게시판';
+
+-- 계층형 게시판과 댓글형 게시판의 테이블을 함계 사용하기 위해 만든 컬럼 4게시판을 구분하는 등으로 사용할 것임
+
+ALTER TABLE `pgy`.`hboard` 
 ADD COLUMN `boardType` VARCHAR(10) NULL AFTER `isDelete`;
 
--- 기존의 글들을 계층형 게시판(boardType = 'hboard)의 글이라고 업데이트, 댓글형 게시판 boardType = 'rboard'
-UPDATE hboard SET boardType = 'hboard' WHERE boardNo <= 677;
 
-UPDATE `webkgy`.`hboard` SET `boardType` = 'rboard' WHERE (`boardNo` = '678');
+-- 기존의 글들을 계층형 게시판(boasrdType = 'hboard')의 글이라고 업데이트, 댓글형 게시판 boardType = 'rboard'
+update hboard set boardType = 'hboard' where boardNo <= 62;
+update `pgy`.`hboard` set `boardType` = 'rboard' where (`boardNo` = 63 );
 
-
--- 조회수 처리 테이블(boardreadlog) 또한 boardType 추가
-ALTER TABLE `webkgy`.`boardreadlog` 
+-- 조회수 처리 테이블 또한 boardType 추가
+ALTER TABLE `pgy`.`boardreadlog` 
 ADD COLUMN `boardType` VARCHAR(10) NULL AFTER `boardNo`;
 
--- content 사이즈를 키워주기 위해서 데이터 타입을 LONGTEXT로 변경함
-ALTER TABLE `webkgy`.`hboard` 
+-- 컨텐츠 사이즈를 키워주기 위해서  타입 변경 4gb 까지임
+ALTER TABLE `pgy`.`hboard` 
 CHANGE COLUMN `content` `content` LONGTEXT NULL DEFAULT NULL ;
 
-
--- boardreadlog 테이블에 불필요한 컬럼 삭제
-ALTER TABLE `webkgy`.`boardreadlog`
+---------
+ALTER TABLE `pgy`.`boardreadlog` 
 DROP COLUMN `boardType`;
 
---------------------------  댓글 기능 구현 ------------------------------
+------------------------- 댓글 기능 구현 ----------------------------
+use pgy;
+
 -- 댓글을 저장하는 테이블 생성
-CREATE TABLE `webkgy`.`replyboard` (
+CREATE TABLE `pgy`.`replyboard` (
   `replyNo` INT NOT NULL AUTO_INCREMENT,
   `replyer` VARCHAR(8) NULL,
   `content` VARCHAR(200) NULL,
@@ -500,79 +505,69 @@ CREATE TABLE `webkgy`.`replyboard` (
   PRIMARY KEY (`replyNo`))
 COMMENT = '댓글을 저장하는 테이블';
 
-use webkgy;
-
 -- replyboard FK 설정
-alter table replyboard 
+alter table replyboard
 add constraint replyer_member_fk foreign key(replyer) references member(userId)
 on delete cascade;
+-- on delete set null 댓글에 아이디를 null 을 넣는다. 그대신 replyer가 null 가능이여야함
+-- on delete cascade 회원 탈퇴하면 댓글도 같이 삭제
 
--- replyboard FK 설정
+-- replyboard fk 설정
 alter table replyboard
 add constraint boardNo_board_fk foreign key(boardNo) references hboard(boardNo);
 
--- 댓글 등록
-INSERT INTO replyboard(replyer, content, boardNo) VALUES('dooly', '뉴진스 왤케 이쁨', 687);
 
--- ?번 글에 대한 모든 댓글을 얻어오는 쿼리문
-SELECT * FROM replyboard WHERE boardNo=?;
+--  댓글 등록
+insert into replyboard(replyer, content, boardNo) values('douner', '세 댓글 테스트입니다.! 1등', 68);
+--  ? 번 글에 대한 모든 댓글을 얻어오는 
+select * from replyboard where boardNo = ?;
+select * from replyboard where boardNo = 63 and boardType = 'rboard';
 
--- ?번 글에 대한 게시글과 함께 모든 댓글을 얻어오는 쿼리문
-SELECT h.*, r.*
-FROM hboard h INNER JOIN replyboard r 
-ON h.boardNo = r.boardNo
-WHERE h.boardNo = 688 AND boardType='rboard';
+-- ? 번 글에 대한 게시글과 모든 댓글을 함께 얻어오는 쿼리문
+select h.*, r.* from hboard h inner join replyboard r 
+on h.boardNo = r.boardNo where h.boardNo = 63;
 
 -- 모든 게시글과 모든 댓글을 함께 얻어오는 쿼리문
 select h.*, r.*
 from hboard h left outer join replyboard r 
-on h.boardNo = r.boardNo
-where boardType='rboard'
-group by h.boardNo;
+on h.boardNo = r.boardNo 
+where boardType = 'rboard';
 
--- ?번 글의 댓글 갯수 얻어오기
-SELECT COUNT(*) FROM replyboard WHERE boardNo=688;
+
+-- ?번 글의 개수 얻어오기
+select count(*) from replyboard where boardNo = 63;
+
 
 -- 댓글 게시판의 데이터와, 그 댓글 게시물에 달려있는 댓글의 갯수를 함께 얻어오는 쿼리문
--- 셀렉트 문을 수행할 때 서브쿼리부터 실행한다.
-select h.boardNo, h.title, h.readCount, h.postDate, (select count(*) from replyboard where r.boardNo = h.boardNo)
+select h.boardNo, h.title, h.readcount, h.postDate, (select count(*) from replyBoard where r.boardNo = h.boardNo)
 from hboard h left outer join replyboard r 
-on h.boardNo = r.boardNo
-where boardType='rboard'
+on h.boardNo = r.boardNo 
+where boardType = 'rboard' 
 group by h.boardNo
 order by h.boardNo desc;
--- 위의 쿼리문은 문제가 있으므로 아래의 쿼리문이 해결방법이다.
-select *
-from hboard
-where boardType='rboard';
-select count(*) from replyboard where boardNo = 688;
 
--- group by 절 : 그룹화를 시킬 때 사용하는 절
--- group by 그룹화를 시킬 컬럼명
--- emp의 모든 사원에 대하여 직무별(job) 급여 총합과 급여 평균을 구해보자.
-SELECT job, SUM(sal), AVG(sal)
-FROM emp 
-GROUP BY job;
+select * from hboard
+where boardType = 'rboard';
 
--- having 절은 group화를 시킨 컬럼에 대해 조건을 부여할 때 사용한다.
--- 직무별 급여 총합이 5000 이상인 직무만 검색하여 직무와 급여 총합을 구하자.
-SELECT job, SUM(sal)
-FROM emp
-GROUP BY job
-HAVING SUM(sal) >= 5000;
--- having 대신 where을 쓰면 에러가 난다. 그룹함수(count, sum, avg)를 쓸 때는 having절을 써야 한다. 그룹함수의 특징은 결과(row)가 하나만 나오는 것이다.
+SELECT h.boardNo, h.title, h.readcount, h.postDate, COUNT(r.boardNo) AS replyCount
+FROM hboard h
+LEFT JOIN replyboard r 
+ON h.boardNo = r.boardNo
+WHERE h.boardType = 'rboard'
+GROUP BY h.boardNo
+ORDER BY h.boardNo DESC;
 
--- 부서별 인원수를 구하여 부서번호와 인원수를 출력하세요.
-SELECT deptNo, COUNT(*) -- 그룹화를 시켰기 때문에 count(*)를 했을 때 그룹별 인원수를 뽑아낼 수 있는 것이다.
-FROM emp
-GROUP BY deptNo;
+-------------------------- 댓글 페이지 ----------------------
+--  ? 번 글에 대한 모든 댓글을 얻어오는 
+select * from replyboard where boardNo = ?;
 
--- 부서별 인원수를 구하여 부서번호와 부서이름, 인원수를 출력하세요.
-SELECT e.deptNo, COUNT(*), d.d
-FROM emp e INNER JOIN dept d
-ON e.deptNo = d.deptNo
-GROUP BY e.deptNo, d.dname;
+select * from replyboard where boardNo = 62 order by replyNo desc limit 6,3;
 
+select count(*) from replyboard where boardNo = ?;
+
+
+-- ? 번 댓글을 삭제하는 쿼리문
+delete from replyboard where replyNo = ?;
 
 --------------------------  댓글 페이징 ------------------------------
 -- ?번 글에 대한 모든 댓글을 얻어오는 쿼리문
@@ -595,7 +590,7 @@ order by replyNo desc;
 -- 최종적으로 mysql에서 페이징을 위해 필요한 쿼리문
 SELECT * FROM hboard order by ref desc, refOrder asc limit 보여주기시작할rowIndex번호, 1페이징에보여줄글의갯수;
 
--- 1) 게시판의 전체 데이터 수를 출력하는 쿼리문
+-- 1) 게시판의 전체 데이터 수를 출력하는 쿼리문member
 use webkgy;
 SELECT COUNT(*) FROM hboard; -- 337
 
@@ -620,3 +615,12 @@ insert into replyboard(replyer, content, boardNo) values(?, ?, ?);
 
 -- ?번 댓글을 삭제하는 쿼리문
 delete from replyboard where replyNo = ?;
+
+
+---------  계정 잠금 기능을 위한 쿼리문
+-- 테이블 수정
+ALTER TABLE `pgy`.`member` 
+ADD COLUMN `islock` VARCHAR(1) NOT NULL DEFAULT 'N' AFTER `allimit`;
+
+
+
