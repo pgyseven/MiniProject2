@@ -76,7 +76,10 @@
 
 			<mapping path="/rboard/showSaveBoardForm" /> <!-- 댓글 게시판의 글 작성 페이지 -->
 			<mapping path="/rboard/modifyBoard" /> <!-- 댓글 게시판의 글 수정 페이지 -->
-
+			
+			
+			<mapping path="/member/myPage" /> <!-- 마이페이지 -->
+			
 			<beans:ref bean="authInterceptor" />
 		</interceptor>
 
