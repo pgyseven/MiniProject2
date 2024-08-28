@@ -12,21 +12,20 @@
 	rel="stylesheet">
 <script
 	src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-	
+
 <style>
+.userArea {
+	display: flex;
+	align-items: center;
+	color: rgba(255, 255, 255, 0.55);
+}
 
-	.userArea {
-		display : flex;
-		align-items : center;
-		color : rgba(255, 255, 255, 0.55);
-	}
-
-	.userProfile {
-		width : 40px;
-		border-radius : 20px;
-		border : 2px solid #595959;
-		padding : 4px;
-	}
+.userProfile {
+	width: 40px;
+	border-radius: 20px;
+	border: 2px solid #595959;
+	padding: 4px;
+}
 </style>
 </head>
 <body>
@@ -39,26 +38,40 @@
 			</button>
 			<div class="collapse navbar-collapse" id="mynavbar">
 				<ul class="navbar-nav me-auto">
-					<li class="nav-item"><a class="nav-link" href="/hboard/listAll">계층형게시판</a></li>
-					<li class="nav-item"><a class="nav-link" href="/rboard/listAll">댓글형게시판</a></li>
-					<li class="nav-item"><a class="nav-link" href="/member/register">회원가입</a></li>
-						
+					<li class="nav-item"><a class="nav-link"
+						href="/hboard/listAll">계층형게시판</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="/rboard/listAll">댓글형게시판</a></li>
+					<li class="nav-item"><a class="nav-link"
+						href="/member/register">회원가입</a></li>
+
 					<c:choose>
 						<c:when test="${sessionScope.loginMember != null}">
-							<li class="nav-item userArea" onclick="location.href='/member/mypage'">
-								<img src="/resources/userImg/${sessionScope.loginMember.userImg}" class="userProfile" />
-								<span class="userName">
-									${sessionScope.loginMember.userName}
-								</span>
-								<a class="nav-link" href="/member/logout" style="margin-left:4px;">로그아웃</a>
+							<li class="nav-item userArea">
+								<!-- <div class="dropdown" class="dropdown-toggle"
+									data-bs-toggle="dropdown">  -->
+									<a href="/member/myPage"> <img
+										src="/resources/userImg/${sessionScope.loginMember.userImg}"
+										class="userProfile" /> <span class="userName">
+											${sessionScope.loginMember.userName} </span>
+									</a>
+									<!-- <ul class="dropdown-menu">
+										<li><a class="dropdown-item" href="#">Link 1</a></li>
+										<li><a class="dropdown-item" href="#">Link 2</a></li>
+										<li><a class="dropdown-item" href="#">Link 3</a></li>
+									</ul>
+
+								</div> --> <a class="nav-link" href="/member/logout"
+								style="margin-left: 4px;">로그아웃</a>
 							</li>
 						</c:when>
 						<c:otherwise>
-							<li class="nav-item"><a class="nav-link" href="/member/login">로그인</a></li>
+							<li class="nav-item"><a class="nav-link"
+								href="/member/login">로그인</a></li>
 						</c:otherwise>
 					</c:choose>
-					
-					 	
+
+
 					<!--<li class="nav-item"><a class="nav-link"
 						href="/weather">오늘의 날씨(연습)</a></li>
 						
