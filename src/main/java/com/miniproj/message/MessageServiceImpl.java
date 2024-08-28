@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.miniproj.model.FriendVO;
+import com.miniproj.model.MessageDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,4 +23,14 @@ public class MessageServiceImpl implements MessageService {
 		
 	}
 
+	@Override
+	public boolean sendMsg(MessageDTO msgDTO) throws Exception {
+		
+		boolean result = false;
+		
+		if(msgDao.insertMessage(msgDTO)==1) {
+		result = true;
+	}
+		 return result;
+}
 }

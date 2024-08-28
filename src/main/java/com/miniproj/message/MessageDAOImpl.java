@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import com.miniproj.model.FriendVO;
+import com.miniproj.model.MessageDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +20,11 @@ public class MessageDAOImpl implements MessageDAO {
 	public List<FriendVO> getFriends(String userId) throws Exception {
 		
 		return ses.selectList(NS + ".getFriends", userId);
+	}
+	@Override
+	public int insertMessage(MessageDTO msgDTO) throws Exception {
+		
+		return ses.insert(NS + ".sendMessage", msgDTO);
 	}
 	
 	

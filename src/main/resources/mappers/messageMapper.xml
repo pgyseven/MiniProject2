@@ -8,4 +8,8 @@
     select userId as friendId, userName as friendName from member where userId != #{userId}
    </select>
 	
+	
+	<insert id="sendMessage">
+	insert into message(receiver, sender, msgContent) value(#{receiver}, #{sender},#{msgContent});
+	</insert>
 </mapper>

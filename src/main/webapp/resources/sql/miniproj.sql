@@ -645,3 +645,24 @@ where m.userId = 'douner';
 select userId as friendId, userName as friendName from member
 where userId != 'dooly';
 
+-- 쪽지 기능을 위한 테이블 생성
+CREATE TABLE `pgy`.`message` (
+  `receiver` VARCHAR(8) NOT NULL,
+  `msgId` INT NOT NULL AUTO_INCREMENT,
+  `sender` VARCHAR(8) NOT NULL,
+  `msgContent` VARCHAR(100) NOT NULL,
+  `msgWrittenDate` DATETIME NULL DEFAULT now(),
+  `isRead` VARCHAR(1) NULL DEFAULT 'N',
+  PRIMARY KEY (`msgId`))
+COMMENT = '회원간에 서로 주고 받은 쪽지를 기록하는 테이블';
+
+-- fk 설정
+alter table message
+add constraint msg_member_fk foreign key(sender) references member(userId);
+
+alter table message
+add constraint msg_receiver_member_fk foreign key(receiver) references member(userId);
+
+
+-- 메세지 발송 쿼리문
+insert into message(receiver, sender, msgContent) value(?, ?, ?);
