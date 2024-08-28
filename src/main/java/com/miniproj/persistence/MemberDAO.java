@@ -27,4 +27,7 @@ public interface MemberDAO {
 
 	// 유저의 계정을 잠그는 메서드
 	int updateAccountLock(String userId) throws Exception;
+	
+	// 유저의 정보를 얻어오는 메서드
+	MemberVO selectMemberByUserId(String userId) throws Exception;
 }

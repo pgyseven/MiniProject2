@@ -238,4 +238,18 @@ public class MemberController {
 	   return "/member/reAuth";
 	   
    }
+   @RequestMapping("/myPage")
+   public String showMyPage(HttpSession ses, Model model) {
+	   MemberVO member = (MemberVO)ses.getAttribute("loginMember" );
+	   try {
+		   member = mService.getUserInfo(member.getUserId());
+		   model.addAttribute("memberInfo", member);
+	} catch (Exception e) {
+		
+		e.printStackTrace();
+	}
+	   return "/member/myPage";
+   }
+   
+   
 }

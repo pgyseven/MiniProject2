@@ -19,4 +19,7 @@ public interface MemberService {
 
 	// 자동로그인을 체크한 유저를 확인하는 메소드
 	MemberVO checkAutoLogin(String savedCookieSesId) throws Exception;
+	
+	// 아이디로 유저의 정보를 얻어오는 메서드
+	MemberVO getUserInfo(String userId) throws Exception;
 }

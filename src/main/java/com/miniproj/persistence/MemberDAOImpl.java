@@ -58,4 +58,10 @@ public class MemberDAOImpl implements MemberDAO {
 	    return ses.update(NS + ".updateAccountLock", userId);
 	}
 
+	@Override
+	public MemberVO selectMemberByUserId(String userId) throws Exception {
+		
+		return ses.selectOne(NS + ".getUserInfoByUserId", userId);
+	}
+
 }
