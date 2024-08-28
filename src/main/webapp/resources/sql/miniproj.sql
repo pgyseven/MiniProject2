@@ -623,5 +623,25 @@ ALTER TABLE `pgy`.`member`
 ADD COLUMN `islock` VARCHAR(1) NOT NULL DEFAULT 'N' AFTER `allimit`;
 
 -- 유저의 계정을 잠그는 쿼리문
-update member set islock = 'Y' where userId = #{userId}
+update member set islock = 'Y' where userId = ?;
+
+select * from member where userId = 'dooly';
+
+select * from pointlog where pointWho = 'dooly';
+
+select * from hboard where writer = 'dooly';
+
+-- 유저의 정보를 불러오는 쿼리문 + 유저의 포인트 내역 + 유저가 쓴 글(크로스 조인처럼 되버린다)
+select m.*, p.*, hb.*
+from member m inner join pointlog p
+on m.userId = p.pointWho
+inner join hboard hb
+on m.userId = hb.writer
+where m.userId = 'douner';
+
+------------------- 쪽지 기능 구현 ------------------------
+
+-- 받는 사람 아이디 얻어온다.
+select userId as friendId, userName as friendName from member
+where userId != 'dooly';
 
