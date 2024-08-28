@@ -91,4 +91,10 @@
 		</interceptor>
 	</interceptors>
 
+
+<!--  아래의 패키지를 조사하여 필요한 컨트롤러 객체를 컨테이너에 적재-->
+
+	<context:component-scan base-package="com.miniproj.reply"></context:component-scan>
+	<context:component-scan base-package="com.miniproj.controler"></context:component-scan>
+		<context:component-scan base-package="com.miniproj.message"></context:component-scan>
 </beans:beans>
