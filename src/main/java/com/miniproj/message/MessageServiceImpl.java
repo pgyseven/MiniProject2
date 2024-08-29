@@ -48,6 +48,17 @@ public class MessageServiceImpl implements MessageService {
 			
 			
 		}
+		
+		
+		
 		return list;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public int getMessageCount(String userId) throws Exception {
+		
+		return msgDao.selectMessageCount(userId);
+		
 	}
 }

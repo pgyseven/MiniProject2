@@ -22,4 +22,9 @@
 	<update id="updateIsRead">
 		update message set isRead = 'Y' where msgId = #{msgId}
 	</update>
+	
+	
+	<select id="getMessageCount" resultType="int">
+	select count(*) from message where receiver = #{userId} and isRead ='N'
+	</select>
 </mapper>

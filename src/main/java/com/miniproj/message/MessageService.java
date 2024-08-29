@@ -14,4 +14,6 @@ public interface MessageService {
 
 	List<MessageVO> getReceivedMessage(String receiver) throws Exception;
 
+	int getMessageCount(String userId) throws Exception;
+
 }

@@ -37,6 +37,11 @@ public class MessageDAOImpl implements MessageDAO {
 		
 		return ses.update(NS + ".updateIsRead", msgId);
 	}
+	@Override
+	public int selectMessageCount(String userId) throws Exception {
+		
+		return ses.selectOne(NS + ".getMessageCount", userId);
+	}
 	
 	
 	
