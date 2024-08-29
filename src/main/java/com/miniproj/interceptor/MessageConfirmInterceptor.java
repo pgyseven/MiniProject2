@@ -25,6 +25,8 @@ public class MessageConfirmInterceptor extends HandlerInterceptorAdapter { // ex
 		// 로그인을 했을 때, 본인에게 온 메세지의 개수를 가져온다.
 
 		HttpSession ses = request.getSession();
+		
+		System.out.println(request.getRequestURL());
 
 		if (ses.getAttribute("loginMember") != null) {
 			// 로그인 했다.
