@@ -2,6 +2,8 @@ package com.miniproj.message;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,13 +79,21 @@ public class MessageController {
 
 	
 	@GetMapping(value="/receive/{userId}") 
-	public ResponseEntity getReceivedMessage(@PathVariable("userId") String receiver) {
+	public ResponseEntity getReceivedMessage(@PathVariable("userId") String receiver, HttpSession ses) {
 		
 		System.out.println(receiver + " 에 온 쪽지를 가져오자");
 		ResponseEntity result = null;
 		
 		try {
 			List<MessageVO> list = msgService.getReceivedMessage(receiver);
+			
+			if(list.size() > 0 ) {
+				
+				ses.removeAttribute("unReadMsgCnt");
+				
+				
+				
+			}
 			result = new ResponseEntity(MyResponseWithData.success(list),HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
