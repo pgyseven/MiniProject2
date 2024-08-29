@@ -666,3 +666,15 @@ add constraint msg_receiver_member_fk foreign key(receiver) references member(us
 
 -- 메세지 발송 쿼리문
 insert into message(receiver, sender, msgContent) value(?, ?, ?);
+
+
+-- 나에게 온 쪽지를 가져오는 쿼리문
+select msgId, sender, msgContent, msgWrittenDate message where receiver = 'dooly';
+
+-- 가져온 쪽지의 isRead를 Y로 업데이트
+update message set isRead = 'Y'
+where msgId = 지금가져온 메세지의 pk;
+
+
+-- 읽지 않은 쪽지의 갯수를 얻어오는 쿼리문
+select count(*) from message where receiver = 'dooly' and isRead ='N';

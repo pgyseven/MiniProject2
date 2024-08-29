@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.miniproj.model.FriendVO;
 import com.miniproj.model.MessageDTO;
+import com.miniproj.model.MessageVO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +26,16 @@ public class MessageDAOImpl implements MessageDAO {
 	public int insertMessage(MessageDTO msgDTO) throws Exception {
 		
 		return ses.insert(NS + ".sendMessage", msgDTO);
+	}
+	@Override
+	public List<MessageVO> selectMessages(String receiver) throws Exception {
+		
+		return ses.selectList(NS + ".getMessages", receiver);
+	}
+	@Override
+	public int updateIsRead(int msgId) throws Exception {
+		
+		return ses.update(NS + ".updateIsRead", msgId);
 	}
 	
 	

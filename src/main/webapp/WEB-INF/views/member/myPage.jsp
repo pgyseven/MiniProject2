@@ -91,10 +91,58 @@
       $('.myBoard').hide();
       $('.message').show();
       
-      getRecieveUsers();
+      getReceivedMessage();
+      getReceiveUsers();
    }
    
-   function getRecieveUsers() {
+ //나에게 도착한 쪽지를 가져옴
+   function getReceivedMessage() {
+	   
+	   $.ajax({
+           url : '/message/receive/' + '${sessionScope.loginMember.userId}',    
+           type : 'get', 
+           dataType : 'json',
+           async : false,
+           success : function(data) {    
+              console.log(data);
+              if(data.resultCode == 200){
+            	  outputMessage(data);
+              }
+              
+
+           },
+           error : function(data) {
+              console.log(data);
+           }
+        });
+	   
+	   
+	   
+	   
+   }
+ 
+   function outputMessage(data) {
+	    let output = `<table class="table table-striped">`;
+	    output += `<thead><tr><th>#</th><th>보낸사람</th><th>내용</th><th>시간</th></tr></thead>`;
+	    
+	    // $.each를 사용할 때, 첫 번째 인자는 인덱스, 두 번째 인자는 값입니다
+	    $.each(data.data, function(i, msg) {
+	        output += `<tr>`;
+	        output += `<td>\${msg.msgId}</td>`;
+	        output += `<td>\${msg.sender}</td>`;
+	        output += `<td>\${msg.msgContent}</td>`;
+	        output += `<td>\${msg.msgWrittenDate}</td>`;
+	        output += `</tr>`;
+	    });
+	    
+	    output += `</table>`;
+	    
+	    // 결과를 지정된 HTML 요소에 삽입합니다
+	    $('.outputMsgArea').html(output);
+	}
+   
+   // 쪽지를 보낼 수 있는 유저의 목록을 가져옴
+   function getReceiveUsers() {
       $.ajax({
             url : '/message/getFriends/' + '${sessionScope.loginMember.userId}',    
             type : 'get', 
@@ -172,6 +220,13 @@
             </li>
             <li class="nav-item"><a href="#" class="nav-link" onclick="showMessage();">쪽지 보내기</a>
                <div class="message">
+               
+               <div class="outputMsgArea">
+               </div>
+               
+               
+               
+               
                   <div class="msgInputArea">
                   
                      <div class="msgContentLength"><span class="curLength"></span> / 100</div>
