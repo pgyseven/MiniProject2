@@ -54,6 +54,11 @@
 
 	</beans:bean>
 
+	<beans:bean id="messageInterceptor"
+		class="com.miniproj.interceptor.MessageConfirmInterceptor">
+
+	</beans:bean>
+
 	<!-- 인터셉터가 동작하는 매핑 설정 -->
 	<interceptors>
 		<interceptor> <!-- "/sampleInterceptor" uri로 매핑이 들어오면 "sampleInterceptor" 객체가 동작하도록 한다. -->
@@ -67,6 +72,28 @@
 			<beans:ref bean="loginInterceptor" />
 		</interceptor>
 
+
+		<!-- 아래의 uri 에 접근해 있고, 로그인을 했다면, 본인한테 온 쪽지의 개수를 가져와 출력하도록 한다. -->
+		<interceptor>
+			<mapping path="/" />
+			<mapping path="/hboard/listAll" />
+			<mapping path="/rboard/listAll" />
+			<mapping path="/hboard/saveBoard" /> <!-- 글작성 -->
+			<mapping path="/hboard/modifyBoard" /> <!-- 글&댓글 수정 -->
+			<mapping path="/hboard/removeBoard" /> <!-- 글&댓글 삭제 -->
+			<mapping path="/hboard/showReplyForm" /> <!-- 댓글작성 -->
+			<mapping path="/hboard/viewBoard" /> <!-- 댓글작성 -->
+			<mapping path="/rboard/viewBoard" /> <!-- 댓글작성 -->
+
+			<mapping path="/rboard/showSaveBoardForm" /> <!-- 댓글 게시판의 글 작성 페이지 -->
+			<mapping path="/rboard/modifyBoard" /> <!-- 댓글 게시판의 글 수정 페이지 -->
+
+
+			<mapping path="/member/myPage" /> <!-- 마이페이지 -->
+			<beans:ref bean="messageInterceptor" />
+
+		</interceptor>
+
 		<!-- 로그인 인증이 필요한 페이지 : 글작성, 글수정, 글삭제, 댓글작성/수정/삭제, 관리자 페이지의 모든 기능 -->
 		<interceptor>
 			<mapping path="/hboard/saveBoard" /> <!-- 글작성 -->
@@ -76,10 +103,10 @@
 
 			<mapping path="/rboard/showSaveBoardForm" /> <!-- 댓글 게시판의 글 작성 페이지 -->
 			<mapping path="/rboard/modifyBoard" /> <!-- 댓글 게시판의 글 수정 페이지 -->
-			
-			
+
+
 			<mapping path="/member/myPage" /> <!-- 마이페이지 -->
-			
+
 			<beans:ref bean="authInterceptor" />
 		</interceptor>
 
@@ -92,9 +119,12 @@
 	</interceptors>
 
 
-<!--  아래의 패키지를 조사하여 필요한 컨트롤러 객체를 컨테이너에 적재-->
+	<!-- 아래의 패키지를 조사하여 필요한 컨트롤러 객체를 컨테이너에 적재 -->
 
-	<context:component-scan base-package="com.miniproj.reply"></context:component-scan>
-	<context:component-scan base-package="com.miniproj.controler"></context:component-scan>
-		<context:component-scan base-package="com.miniproj.message"></context:component-scan>
+	<context:component-scan
+		base-package="com.miniproj.reply"></context:component-scan>
+	<context:component-scan
+		base-package="com.miniproj.controler"></context:component-scan>
+	<context:component-scan
+		base-package="com.miniproj.message"></context:component-scan>
 </beans:beans>
