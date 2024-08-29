@@ -49,13 +49,17 @@
 						<c:when test="${sessionScope.loginMember != null}">
 							<li class="nav-item userArea">
 								<!-- <div class="dropdown" class="dropdown-toggle"
-									data-bs-toggle="dropdown">  -->
-									<a href="/member/myPage"> <img
-										src="/resources/userImg/${sessionScope.loginMember.userImg}"
-										class="userProfile" /> <span class="userName">
-											${sessionScope.loginMember.userName} </span>
-									</a>
-									<!-- <ul class="dropdown-menu">
+									data-bs-toggle="dropdown">  --> <a href="/member/myPage"> <img
+									src="/resources/userImg/${sessionScope.loginMember.userImg}"
+									class="userProfile" /> <span class="userName">
+										${sessionScope.loginMember.userName} </span>
+										
+										<c:if test="${sessionScope.unReadMsgCnt != null}">
+									<button type="button" class="btn btn-primary">
+										Messages <span class="badge bg-danger">${sessionScope.unReadMsgCnt }</span>
+									</button>
+									</c:if>
+							</a> <!-- <ul class="dropdown-menu">
 										<li><a class="dropdown-item" href="#">Link 1</a></li>
 										<li><a class="dropdown-item" href="#">Link 2</a></li>
 										<li><a class="dropdown-item" href="#">Link 3</a></li>
