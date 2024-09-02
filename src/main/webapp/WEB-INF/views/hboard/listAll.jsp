@@ -8,6 +8,11 @@
 <title>Insert title here</title>
 <script
 	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+	
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dongle:wght@300;400;700&display=swap" rel="stylesheet">
+	
 <script>
 
    $(function(){
@@ -127,6 +132,11 @@
    }
 
 </script>
+<style>
+	*{
+	font-family: "Dongle", sans-serif;
+	}
+</style>
 </head>
 <body>
 	<div class="container">
