@@ -20,6 +20,7 @@ import com.miniproj.model.PagingInfo;
 import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.PointLogDTO;
 import com.miniproj.model.SearchCriteriaDTO;
+import com.miniproj.model.SeoulTempVO;
 import com.miniproj.persistence.HBoardDAO;
 import com.miniproj.persistence.MemberDAO;
 import com.miniproj.persistence.PointLogDAO;
@@ -239,6 +240,14 @@ public class HBoardServiceImpl implements HBoardService {
 	public List<HBoardVO> getPopularBoards() throws Exception {
 		
 		return bDao.selectPopularBoards();
+	}
+
+	@Override
+	@Transactional(readOnly=true)
+	public List<SeoulTempVO> getSeoulTemp() throws Exception {
+
+		return bDao.getSeoulTemp();
+	
 	}
 
 }

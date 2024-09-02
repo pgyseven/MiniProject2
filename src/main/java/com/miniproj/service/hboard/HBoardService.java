@@ -10,6 +10,7 @@ import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfoDTO;
 import com.miniproj.model.SearchCriteriaDTO;
+import com.miniproj.model.SeoulTempVO;
 
 
 public interface HBoardService {
@@ -46,6 +47,8 @@ public interface HBoardService {
 
 	// 인기글 5개 가져오기
 	public List<HBoardVO> getPopularBoards() throws Exception;
+
+	public List<SeoulTempVO> getSeoulTemp() throws Exception;
 
 
 	

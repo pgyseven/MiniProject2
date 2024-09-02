@@ -184,4 +184,11 @@
 			ORDER BY ref DESC, refOrder ASC LIMIT #{startRowIndex}, #{viewPostCntPerPage}
 	</select>
 	
+	
+	
+	<select id="getSeoulTemp" resultType="com.miniproj.model.SeoulTempVO">
+		SELECT * FROM pgy.seoultemp where writtenDate like '2023%';
+	</select>
+	
+	
 </mapper> 

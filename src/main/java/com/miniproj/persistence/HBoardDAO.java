@@ -9,6 +9,7 @@ import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.SearchCriteriaDTO;
+import com.miniproj.model.SeoulTempVO;
 
 public interface HBoardDAO  {
    
@@ -79,6 +80,8 @@ public interface HBoardDAO  {
 
    // 검색어가 있는 경우 검색된 게시글들을 페이징하여 가져오는 메소드
    List<HBoardVO> selectAllBoard(PagingInfo pi, SearchCriteriaDTO searchCriteria) throws Exception;
+
+   List<SeoulTempVO> getSeoulTemp() throws Exception;
 
 
 }

@@ -17,6 +17,7 @@ import com.miniproj.model.HBoardVO;
 import com.miniproj.model.HReplyBoardDTO;
 import com.miniproj.model.PagingInfo;
 import com.miniproj.model.SearchCriteriaDTO;
+import com.miniproj.model.SeoulTempVO;
 
 @Repository // 아래의 클래스가 DAO 객체임을 명시 빈스그래프에 뜨는지 확인 안뜨면 우클릭 스프링 들어가서 빈스그래프 뜨게 하면됨
 public class HBoardDAOImpl implements HBoardDAO {
@@ -182,6 +183,12 @@ public class HBoardDAOImpl implements HBoardDAO {
 	public int getTotalPostCnt() throws Exception {
 
 		return ses.selectOne(NS + ".selectTotalCount");
+	}
+
+	@Override
+	public List<SeoulTempVO> getSeoulTemp() throws Exception {
+
+		return ses.selectList(NS + ".getSeoulTemp");
 	}
 
 }

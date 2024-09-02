@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import com.miniproj.model.HBoardVO;
+import com.miniproj.model.MyResponseWithData;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.service.hboard.HBoardService;
 
@@ -131,7 +132,28 @@ public class HomeController {
 	   
 	   @RequestMapping("/chartEx1")
 	   public String showCartPage() {
-		   return "/chartEx2";
+		   return "/chartEx3";
 	   }
+	   
+	   
+	   
+	   @RequestMapping(value="/seoulTemp" , produces = "application/json; charset=UTF-8;")
+	   public ResponseEntity getSeoulTemp() {
+		   
+		   ResponseEntity result = null;
+		   
+		    try {
+				hbService.getSeoulTemp();
+				
+				result = new ResponseEntity(MyResponseWithData.success(hbService.getSeoulTemp()), HttpStatus.OK);
+			} catch (Exception e) {
+				
+				e.printStackTrace();
+				result = new ResponseEntity(MyResponseWithData.fail(), HttpStatus.BAD_REQUEST);
+			}
+		   
+		   return result;
+	   }
+	   
 	   
 	}

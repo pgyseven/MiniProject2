@@ -677,4 +677,19 @@ where msgId = 지금가져온 메세지의 pk;
 
 
 -- 읽지 않은 쪽지의 갯수를 얻어오는 쿼리문
-select count(*) from message where receiver = 'dooly' and isRead ='N';
+pointlogselect count(*) from message where receiver = 'dooly' and isRead ='N';
+
+-- 자바스크립트로 차트 그리기
+SELECT * FROM pgy.seoultemp
+where writtenDate like '2023%';
+
+-- 2023년도의 월별 최고기온의 평균 기온을 추출해보자
+select date_format(writtenDate, '%Y-%m') tempDate, avg(maxTemp)
+FROM pgy.seoultemp
+where writtenDate like '2023%'
+group by tempDate;
+
+
+select count(*), islock
+FROM pgy.member
+group by islock;
