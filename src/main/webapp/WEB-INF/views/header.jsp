@@ -42,6 +42,10 @@
 						href="/hboard/listAll">계층형게시판</a></li>
 					<li class="nav-item"><a class="nav-link"
 						href="/rboard/listAll">댓글형게시판</a></li>
+
+					<li class="nav-item"><a class="nav-link"
+						href="/chartEx1">chart 연습</a></li>
+						
 					<li class="nav-item"><a class="nav-link"
 						href="/member/register">회원가입</a></li>
 
@@ -52,12 +56,11 @@
 									data-bs-toggle="dropdown">  --> <a href="/member/myPage"> <img
 									src="/resources/userImg/${sessionScope.loginMember.userImg}"
 									class="userProfile" /> <span class="userName">
-										${sessionScope.loginMember.userName} </span>
-										
-										<c:if test="${sessionScope.unReadMsgCnt != null}">
-									<button type="button" class="btn btn-primary">
-										Messages <span class="badge bg-danger">${sessionScope.unReadMsgCnt }</span>
-									</button>
+										${sessionScope.loginMember.userName} </span> <c:if
+										test="${sessionScope.unReadMsgCnt != null}">
+										<button type="button" class="btn btn-primary">
+											Messages <span class="badge bg-danger">${sessionScope.unReadMsgCnt }</span>
+										</button>
 									</c:if>
 							</a> <!-- <ul class="dropdown-menu">
 										<li><a class="dropdown-item" href="#">Link 1</a></li>

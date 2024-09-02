@@ -129,4 +129,9 @@ public class HomeController {
 		   // /sampleInterceptor.jsp를 찾아 response
 	   }
 	   
+	   @RequestMapping("/chartEx1")
+	   public String showCartPage() {
+		   return "/chartEx2";
+	   }
+	   
 	}
