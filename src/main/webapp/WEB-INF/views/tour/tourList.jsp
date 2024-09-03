@@ -23,14 +23,19 @@
 	
 	
 	function getTourList() {
+		$('.loading').show()
+		
 		  $.ajax({
-		         url : `https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=\${serviceKey}&numOfRows=20&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&listYN=Y&arrange=A&contentTypeId=39&areaCode=1`,             
+		         url : `https://apis.data.go.kr/B551011/KorService1/areaBasedList1?serviceKey=\${serviceKey}&numOfRows=100&pageNo=1&MobileOS=ETC&MobileApp=AppTest&_type=json&listYN=Y&arrange=A&contentTypeId=39&areaCode=1`,             
 		         type : 'GET',                                     
 		         dataType : 'json',                                
 		         success : function (data) {                      
 		            console.log(data);
 		  			outpurTours(data);
-		         }
+		         },
+		         complete : function(){
+					$('.loading').hide()
+				 }
 		      });
 		
 		
@@ -64,6 +69,16 @@
 	   }
 </script>
 <style>
+
+div.content {
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+}
+
 div.tourList {
 	margin: 20px auto;
 }
@@ -76,7 +91,7 @@ div.tour {
 }
 
 div.tourTumbImg img {
-	width: 100%;
+	width: 100%; 
 }
 
 div.tour:hover {
@@ -107,11 +122,29 @@ div.myfooter {
 
 		<div class="content">
 			<h1>위치기반 관광정보</h1>
-			<div class="tourList"></div>
+			
+			
+			<div class="loading" sytle="display:none;">
+		 <img src="/resources/images/loading.gif"  width="400px" />
+        
+		</div>
+			
+			
+			<div class="tourList">
+			
+			
+			
 		</div>
 
 		<c:import url="../footer.jsp" />
+		
+		</div>
+		
+		
 	</div>
+
+
+
 
 
 </body>
