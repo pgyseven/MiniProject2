@@ -161,4 +161,11 @@ public class HomeController {
 		   return "/tour/tourList";
 	   }
 	   
+	   
+	   @RequestMapping("/tourSub")
+	   public String showMapEx1Subfd() {
+		   return "/tour/tourSub";
+	   }
+	   
+	   
 	}
