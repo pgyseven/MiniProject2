@@ -43,9 +43,22 @@
 					<li class="nav-item"><a class="nav-link"
 						href="/rboard/listAll">댓글형게시판</a></li>
 
-					<li class="nav-item"><a class="nav-link"
-						href="/chartEx1">chart 연습</a></li>
-						
+					<li class="nav-item"><a class="nav-link" href="/chartEx1">chart
+							연습</a></li>
+
+		<div class="dropdown">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+    지도연습
+  </button>
+  <ul class="dropdown-menu">
+    <li><a class="dropdown-item" href="/mapEx1">연습 1</a></li>
+    <li><a class="dropdown-item" href="#">연습 2</a></li>
+  </ul>
+</div>
+		
+		
+
+
 					<li class="nav-item"><a class="nav-link"
 						href="/member/register">회원가입</a></li>
 

@@ -156,4 +156,9 @@ public class HomeController {
 	   }
 	   
 	   
+	   @RequestMapping("/mapEx1")
+	   public String showMapEx1() {
+		   return "/tour/tourList";
+	   }
+	   
 	}
