@@ -51,8 +51,8 @@
     지도연습
   </button>
   <ul class="dropdown-menu">
-    <li><a class="dropdown-item" href="/mapEx1">연습 1</a></li>
-    <li><a class="dropdown-item" href="#">연습 2</a></li>
+    <li><a class="dropdown-item" href="/mapEx1">지도연습</a></li>
+    <li><a class="dropdown-item" href="/bookSearch">백엔드통신연습</a></li>
   </ul>
 </div>
 		
