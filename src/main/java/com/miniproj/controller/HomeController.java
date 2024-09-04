@@ -33,9 +33,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.google.gson.Gson;
 import com.miniproj.model.HBoardVO;
 import com.miniproj.model.MyResponseWithData;
 import com.miniproj.model.MyResponseWithoutData;
+import com.miniproj.model.SearchBookJSON;
 import com.miniproj.service.hboard.HBoardService;
 
 /**
@@ -204,7 +206,16 @@ public class HomeController {
 		
 		// 이 결과에 나오는 책들은 DB 에 없으므로 ... insert를 시킨다. -> DTO 객체로 변환(json문자열 -> 자바객체)
 
+		makeJavaObject(responseBody);
+		
 		return responseBody;
+	}
+
+	private void makeJavaObject(String responseBody) {
+		Gson gson = new Gson();
+		SearchBookJSON obj = gson.fromJson(responseBody, SearchBookJSON.class);
+		System.out.println(obj.toString());
+		
 	}
 
 	private String get(String apiURL, Map<String, String> requestHeaders) {
