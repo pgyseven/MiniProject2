@@ -26,6 +26,14 @@
 		
 		<!-- transaction 처리를 annotation으로 진행하겠다. -->
 	<tx:annotation-driven/>
+	
+	
+	
+	<!-- classpath 에서 dbconfig.properties 파일의 내용을 읽어와 속성으로 세팅 / mysql 시작전 bean 시작전에 classpath 스프링 우리 소스코드와 함께 같이 컴파일 되는 경로임  -->
+	<context:property-placeholder location="classpath:dbconfig.properties"/>
+	
+	
+	
 	<!-- mysql 데이터베이스 연결 	-->	
 	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
@@ -33,10 +41,10 @@
 			value="com.mysql.cj.jdbc.Driver">
 		</property>
 		<property name="url"
-			value="jdbc:mysql://127.0.0.1:3306/pgy?useSSL=false">
+			value="${db.url}">
 		</property>
-		<property name="username" value="root"></property>
-		<property name="password" value="1234"></property>
+		<property name="username" value="${db.username}"></property>
+		<property name="password" value="${db.password}"></property>
 	</bean>
 	 
 	
