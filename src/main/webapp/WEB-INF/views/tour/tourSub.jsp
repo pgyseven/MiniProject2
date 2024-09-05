@@ -24,41 +24,42 @@
 		getTour();
 		getAdditionalImages();
 
-		$('.next').click(function() {
+		/* 		$('.next').click(function() {
 
-			$('.carousel-item').eq(slideNo).removeClass('active');
-			$('.carousel-indicators button').eq(slideNo).removeClass('active');
-			$('.carousel-indicators button').eq(slideNo).removeAttr("aria-current");
-			
-			if (++slideNo == $('.carousel-item').length) {
+		 $('.carousel-item').eq(slideNo).removeClass('active');
+		 $('.carousel-indicators button').eq(slideNo).removeClass('active');
+		 $('.carousel-indicators button').eq(slideNo).removeAttr("aria-current");
+		
+		 if (++slideNo == $('.carousel-item').length) {
 
-				slideNo = 0; // 슬라이드의 마지막 이미지일 경우 다시 처음 이미지지가 출력되도록
+		 slideNo = 0; // 슬라이드의 마지막 이미지일 경우 다시 처음 이미지지가 출력되도록
 
-			}
-			$('.carousel-item').eq(slideNo).addClass('active');
-			$('.carousel-indicators button').eq(slideNo).addClass('active');
-			$('.carousel-indicators button').eq(slideNo).attr("aria-current", "true");
+		 }
+		 $('.carousel-item').eq(slideNo).addClass('active');
+		 $('.carousel-indicators button').eq(slideNo).addClass('active');
+		 $('.carousel-indicators button').eq(slideNo).attr("aria-current", "true");
 
-		});
+		 });
 
-		$('.prev').click(function() {
+		 $('.prev').click(function() {
 
-			$('.carousel-item').eq(slideNo).removeClass('active');
-			$('.carousel-indicators button').eq(slideNo).removeClass('active');
-			$('.carousel-indicators button').eq(slideNo).removeAttr("aria-current");
-			if (slideNo == 0) {
+		 $('.carousel-item').eq(slideNo).removeClass('active');
+		 $('.carousel-indicators button').eq(slideNo).removeClass('active');
+		 $('.carousel-indicators button').eq(slideNo).removeAttr("aria-current");
+		 if (slideNo == 0) {
 
-				slideNo = $('.carousel-item').length; // 슬라이드의 첫 이미지일 경우 다시 마지막 이미지 출력
+		 slideNo = $('.carousel-item').length; // 슬라이드의 첫 이미지일 경우 다시 마지막 이미지 출력
 
-			}
-			$('.carousel-item').eq(--slideNo).addClass('active');
-			
-			
-			$('.carousel-indicators button').eq(slideNo).addClass('active');
-			$('.carousel-indicators button').eq(slideNo).addClass('active');
-			$('.carousel-indicators button').eq(slideNo).attr("aria-current", "true");
+		 }
+		 $('.carousel-item').eq(--slideNo).addClass('active');
+		
+		
+		 $('.carousel-indicators button').eq(slideNo).addClass('active');
+		 $('.carousel-indicators button').eq(slideNo).addClass('active');
+		 $('.carousel-indicators button').eq(slideNo).attr("aria-current", "true");
 
-		});
+		 }); */
+
 	});
 
 	function getTour() {
@@ -121,23 +122,30 @@
 				.each(
 						images,
 						function(i, image) {
-							output += `<div class="carousel-item">`;
+							if (i == 0) {
+								output += `<div class="carousel-item active">`;
+								indicatorOutput += `<button type="button" data-bs-target="#carousel"
+									data-bs-slide-to="\${i}" class="active"></button>`;
+							} else {
+
+								output += `<div class="carousel-item">`;
+								indicatorOutput += `<button type="button" data-bs-target="#carousel"
+									data-bs-slide-to="\${i}"></button>`;
+							}
+
 							output += `<img src="\${image.originimgurl}" alt="\${image.imgname}" class="d-block w-100">`;
 							output += `</div>`
-
-							indicatorOutput += `<button type="button" data-bs-target="#carousel"
-									data-bs-slide-to="\${i}"></button>`;
 
 						});
 
 		$('.carousel-inner').html(output);
-
+		 
 		$('.carousel-indicators').html(indicatorOutput);
-
+		/*
 		$('.carousel-item').eq(slideNo).addClass('active'); //제이쿼리에서 몇번째를 뜻하는것 eq
 		
 		$('.carousel-indicators button').eq(slideNo).addClass('active');
-		$('.carousel-indicators button').eq(slideNo).attr("aria-current", "true");
+		$('.carousel-indicators button').eq(slideNo).attr("aria-current", "true"); */
 	}
 
 	function showMap(mapx, mapy, mlevel) {
