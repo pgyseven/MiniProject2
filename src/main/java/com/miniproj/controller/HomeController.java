@@ -39,6 +39,7 @@ import com.miniproj.model.MyResponseWithData;
 import com.miniproj.model.MyResponseWithoutData;
 import com.miniproj.model.SearchBookJSON;
 import com.miniproj.service.hboard.HBoardService;
+import com.miniproj.util.PropertiesTask;
 
 /**
  * Handles requests for the application home page.
@@ -57,6 +58,16 @@ public class HomeController {
 		if (ses.getAttribute("destPath") != null) {
 			ses.removeAttribute("destPath");
 		}
+		
+		try {
+			System.out.println(PropertiesTask.getPropertiesValue("naverApiKey"));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		
 //		logger.info("Welcome home! The client locale is {}.", locale);
 //		
 //		Date date = new Date();
