@@ -6,128 +6,166 @@
 <meta charset="UTF-8">
 <title>기상청 API 데이터와 카카오맵 결합</title>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9699b3370a9cf5aa1be6da13bb92aa7f"></script> <!-- 여기에 본인의 카카오맵 앱키를 넣어야 합니다. -->
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9699b3370a9cf5aa1be6da13bb92aa7f"></script>
 
 <script>
 
-
     $(document).ready(function() {
-    	let span = $('.overlayClose');    
-    	let overlay = $('.wrap'); 
-    	
-        getWeatherData();
-        
-        span.on('click', function() {
-        	overlay.hide(); 
-        });        
-        
-        
+        loadICData();
     });
-    
 
+    // 도로공사 API에서 IC 데이터 가져오기
+    function loadICData() {
+        const apiKey = "3131669207";  // 도로공사 API 인증키
+        const url = `https://data.ex.co.kr/openapi/locationinfo/locationinfoUnit?key=\${apiKey}&type=json&numOfRows=1000&pageNo=1`;
 
-
-    
-
-    function getWeatherData() {
-        const serviceKey = "RRgow1c7tvWE17qrOIVAUIwK8wz6qyNEWm3tRCuSiQ07UUrux%2BH9Uk6lP37qeLXDTrr7Toht5t52ZdjR6Dh4SA%3D%3D";
-        const baseDate = "20241008";  // 현재 날짜 (하드코딩된 값)
-        const baseTime = "0630";  // 발표 시각 (HHMM 형식)
-        const nx = 55;  // x 좌표
-        const ny = 127;  // y 좌표
-
-        // 기상청 API 호출 URL 생성
-        const url = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=\${serviceKey}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=\${baseDate}&base_time=\${baseTime}&nx=\${nx}&ny=\${ny}`;
-
-        console.log("API 호출 URL:", url);
-
-        // 기상청 API 호출
         $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                console.log("기상청 API 응답 데이터:", data);  // 전체 응답 데이터 콘솔에 출력
-                if (data.response && data.response.header.resultCode === "00") {
-                    alert("기상청 API 데이터 호출 성공!");
-                    displayWeatherOnMap(data.response.body.items.item);  // 데이터를 지도에 표시
+                if (data && data.code === "SUCCESS") {
+                    // 영업소 위치 데이터가 성공적으로 수신되면 해당 위치에 마커 표시
+                    const icData = data.list;
+                    displayMarkersOnMap(icData);
                 } else {
-                    alert("기상청 API 호출 실패! 응답 코드: " + data.response.header.resultCode + ", 메시지: " + data.response.header.resultMsg);
+                    alert("영업소 위치 데이터 호출 실패: " + data.message);
                 }
             },
             error: function(xhr, status, error) {
-                alert(`날씨 데이터를 가져오는 데 실패했습니다. 상태: ${status}, 에러: ${error}`);
+                alert(`도로공사 API 데이터를 가져오는 데 실패했습니다. 상태: ${status}, 에러: ${error}`);
                 console.log("에러 세부 정보:", xhr);
             }
         });
     }
 
-    // 지도에 날씨 정보를 표시하는 함수
-    function displayWeatherOnMap(items) {
-        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
-            mapOption = { 
-                center: new kakao.maps.LatLng(37.5665, 126.9780), // 지도의 중심좌표 (서울)
-                level: 5 // 지도의 확대 레벨
+    // 지도에 마커와 날씨 정보를 표시하는 함수
+function displayMarkersOnMap(icData) {
+    var mapContainer = document.getElementById('map'),
+        mapOption = { 
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 7
+        };
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    map.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC); // 교통정보 추가
+
+    const icListEl = document.getElementById('icList'); // IC 목록을 표시할 UL 엘리먼트 찾기
+
+    icData.forEach(ic => {
+        const xValue = parseFloat(ic.xValue);
+        const yValue = parseFloat(ic.yValue);
+
+        if (!isNaN(xValue) && !isNaN(yValue)) {
+            const markerPosition = new kakao.maps.LatLng(yValue, xValue);
+            const marker = new kakao.maps.Marker({
+                map: map,
+                position: markerPosition,
+                title: ic.unitName // 마커의 title 속성에 영업소 이름 추가
+            });
+
+            marker.customOverlay = null;
+
+            // 마커 클릭 시 오버레이 표시
+            kakao.maps.event.addListener(marker, 'click', function() {
+                if (marker.customOverlay && marker.customOverlay.getMap()) {
+                    marker.customOverlay.setMap(null);
+                    marker.customOverlay = null;
+                } else {
+                    getWeatherDataForLocation(markerPosition, ic.unitName, map, marker);
+                }
+            });
+
+            // 1. IC 목록에 리스트 항목 추가
+            const listItem = document.createElement('li');
+            listItem.innerHTML = ic.unitName;
+            listItem.style.cursor = "pointer";
+            listItem.onclick = function() {
+                map.panTo(markerPosition); // 클릭 시 해당 위치로 지도 이동
+                kakao.maps.event.trigger(marker, 'click');  // 클릭 시 마커의 클릭 이벤트 트리거
             };
-
-        // 지도를 생성합니다.
-        var map = new kakao.maps.Map(mapContainer, mapOption);
-
-        // 날씨 데이터를 바탕으로 커스텀 오버레이 내용 생성
-        let weatherContent = '<div class="wrap">' + 
-                             '    <div class="info">' + 
-                             '        <div class="title">날씨 정보<span class="overlayClose">&times;</span></div>' +
-                             '        <div class="body">' + 
-                             '            <div class="img">' +
-                             '                <img src="https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/thumnail.png" width="60" height="60" style="float: left; margin-right: 10px;">' + // 이미지 크기 및 위치 수정
-                             '            </div>' + 
-                             '            <div class="desc">' + 
-                             '                <ul class="weather-list">';
-
-        // 데이터를 반복하여 HTML 내용 생성 (각 category의 첫 번째 데이터만 표시)
-        const firstItemsByCategory = getFirstForecastByCategory(items);
-        for (const category in firstItemsByCategory) {
-            const item = firstItemsByCategory[category];
-            const categoryName = getCategoryName(item.category); // 카테고리 이름을 가져옴
-			const imgRoot = imgCheck(categoryName, item.fcstValue);
-            // categoryName이 null이 아닐 때만 HTML을 생성
-            if (categoryName) {
-                weatherContent += `<li>\${categoryName}: <img src="\${imgRoot}" alt="날씨 이미지" width="20" height="20"></li>`;
-            }
+            icListEl.appendChild(listItem);  // IC 목록에 항목 추가
         }
+    });
+}
 
-        weatherContent += '                </ul>' +
-                          '            </div>' + 
-                          '        </div>' + 
-                          '    </div>' + 
-                          '</div>';
+	
+	// 특정 위치에 대한 기상청 날씨 데이터를 가져와서 마커에 표시하는 함수
+	function getWeatherDataForLocation(position, unitName, map, marker) {
+	    const serviceKey = "RRgow1c7tvWE17qrOIVAUIwK8wz6qyNEWm3tRCuSiQ07UUrux%2BH9Uk6lP37qeLXDTrr7Toht5t52ZdjR6Dh4SA%3D%3D";
+	    const baseDate = "20241008";
+	    const baseTime = "0630";
+	    const ny = Math.round(position.getLng());
+	    const nx = Math.round(position.getLat());
+	
+	    const weatherUrl = `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtFcst?serviceKey=\${serviceKey}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=\${baseDate}&base_time=\${baseTime}&nx=\${nx}&ny=\${ny}`;
+		console.log(weatherUrl);
+	    $.ajax({
+	        url: weatherUrl,
+	        type: 'GET',
+	        dataType: 'json',
+	        success: function(data) {
+	            if (data.response && data.response.header.resultCode === "00") {
+	                // 오버레이를 표시할 때 마커도 전달하여 해당 마커에 연결된 오버레이로 관리
+	                displayWeatherOverlay(data.response.body.items.item, unitName, position, map, marker);
+	            }
+	        }
+	    });
+	}
+	
+	// 지도에 날씨 정보를 표시하는 함수
+	function displayWeatherOverlay(items, unitName, position, map, marker) {
+	    let weatherContent = '<div class="wrap">' + 
+	                         '    <div class="info">' + 
+	                         '        <div class="title">' + unitName + ' 날씨 정보</div>' +
+	                         '        <div class="body">' + 
+	                         '            <div class="img">' +
+	                         '                <img src="/resources/images/car.gif" width="60" height="60" style="float: left; margin-right: 10px;">' + 
+	                         '            </div>' + 
+	                         '            <div class="desc">' + 
+	                         '                <ul class="weather-list">';
+	
+	    const firstItemsByCategory = getFirstForecastByCategory(items);
+	    for (const category in firstItemsByCategory) {
+	        const item = firstItemsByCategory[category];
+	        const categoryName = getCategoryName(item.category);
+	        const imgRoot = imgCheck(categoryName, item.fcstValue);
+	        const weatherValue = valueCheck(categoryName, item.fcstValue);
+	
+	        if (categoryName) {
+	            weatherContent += `<li>\${categoryName}: <div>\${weatherValue}</div> <img src="\${imgRoot}" alt="날씨 이미지" width="30" height="30"></li>`;
+	        }
+	    }
+	
+	    weatherContent += '                </ul>' +
+	                      '            </div>' + 
+	                      '        </div>' + 
+	                      '    </div>' + 
+	                      '</div>';
+	
+	    // 오버레이 생성
+	    const customOverlay = new kakao.maps.CustomOverlay({
+	        position: position,
+	        content: weatherContent,
+	        xAnchor: 0.5,
+	        yAnchor: 1.5,
+	        map: map
+	    });
+	
+	    // 기존 오버레이가 있으면 닫기
+	    if (marker.customOverlay) {
+	        marker.customOverlay.setMap(null);
+	    }
+	
+	    // 새 오버레이를 마커의 속성으로 저장
+	    marker.customOverlay = customOverlay;
+	
+	    // 오버레이 표시
+	    customOverlay.setMap(map);
+	}
 
-        // 커스텀 오버레이가 표시될 위치 (서울)
-        var position = new kakao.maps.LatLng(37.5665, 126.9780); 
 
-        // 지도에 마커를 표시합니다 
-        var marker = new kakao.maps.Marker({
-            map: map, 
-            position: position
-        });
 
-        // 커스텀 오버레이 생성
-        var customOverlay = new kakao.maps.CustomOverlay({
-            position: marker.getPosition(),
-            content: weatherContent,
-            map: map
-        });
-
-        // 커스텀 오버레이를 지도에 표시
-        customOverlay.setMap(map);
-
-        // 마커를 클릭하면 커스텀 오버레이를 표시하도록 설정
-        kakao.maps.event.addListener(marker, 'click', function() {
-            customOverlay.setMap(map);
-        });
-    }
-
-    // 카테고리별 첫 번째 예보 값을 추출하는 함수
     function getFirstForecastByCategory(items) {
         return items.reduce((acc, item) => {
             if (!acc[item.category]) {
@@ -212,86 +250,167 @@
 
         return '/resources/images/없음.gif';  // 기본 이미지로 설정
     }
+    
+    function valueCheck(category, value) {
+        // 기상 값에 따라 이미지를 선택하는 로직
+        console.log("값확인을 위한 콘솔로그"+category, value);
 
+        if (category === "낙뢰") {
+                return value + "kA(킬로암페어)";
+        }
 
+        if (category === "강수 형태") {
+            switch (value) {
+                case '0':
+                    return "강수 없음";
+                case '1':
+                    return "비";
+                case '2':
+                    return "비 또는 눈";
+                case '3':
+                    return "눈";
+                case '5':
+                    return "빗방울";
+                case '6':
+                    return "빗방울,눈날림";
+                default:
+                    return '/resources/images/없음.gif';  // 기본 이미지 설정
+            }
+        }
+
+        if (category === "하늘 상태") {
+            switch (value) {
+                case '1':
+                    return "맑음";
+                case '3':
+                    return "구름많음";
+                case '4':
+                    return "흐림";
+                default:
+                    return '/resources/images/없음.gif';  // 기본 이미지 설정
+            }
+        }
+
+        if (category === "기온") {
+            return  value + "℃";
+        }
+
+        if (category === "습도") {
+            return value + "%";
+        }
+
+        if (category === "풍속") {
+            return value + "m/s";
+        }
+
+        return '/resources/images/없음.gif';  // 기본 이미지로 설정
+    }
 </script>
 <style>
     .wrap {
         position: absolute;
         left: 0;
         bottom: 40px;
-        width: 400px; /* 오버레이 너비 확대 */
-        height: 200px; /* 오버레이 높이 조정 */
-        margin-left: -175px;
-        text-align: left;
-        overflow: hidden;
-        font-size: 10px; /* 글씨 크기 조절 */
+        width: 400px;
+        height: 220px;
+        margin-left: -200px;
         font-family: 'Malgun Gothic', dotum, '돋움', sans-serif;
-        line-height: 1.3;
-    }
-    .wrap * {
-        padding: 0;
-        margin: 0;
+        line-height: 1.5;
+        
     }
     .wrap .info {
-        width: 348px;
-        height: 180px; /* 오버레이 높이 조정 */
+        width: 360px;
+        height: 200px;
         border-radius: 5px;
-        border-bottom: 2px solid #ccc;
-        border-right: 1px solid #ccc;
-        overflow: hidden;
+        border: 1px solid #ccc;
         background: #fff;
+        overflow: hidden;
+        border-radius: 20px;
+        background-color: rgba(255, 255, 255, 0.9); /* 배경색만 투명하게 설정 */
+        
     }
     .info .title {
-        padding: 5px 0 0 10px;
-        height: 30px;
-        background: #eee;
-        border-bottom: 1px solid #ddd;
-        font-size: 14px;
-        font-weight: bold;
+		padding: 5px 10px 5px 10px; /* 좌우 여백 조정 */
+	    background: #eee;
+	    font-size: 15px;
+	    font-weight: bold;
+	    text-align: left;
+	    position: relative; /* 닫기 버튼 위치 조정을 위해 position 추가 */
+	    
     }
-    .info .body {
-        position: relative;
-        overflow: hidden;
+    .info .desc {
+        margin: 1px 0 0 50px;
+        height: 150px;
+        overflow-y: auto;
     }
-	.info .desc {
-	    position: relative;
-	    margin: 10px 0 0 80px;  /* 텍스트가 이미지 오른쪽에 위치하도록 조정 */
-	    height: 100px; /* 본문 영역의 높이 축소 */
-	    max-height: 100px; /* 최대 높이 지정 */
-	    overflow-y: scroll; /* 스크롤바 항상 표시에서 auto로 변경 */
+    .info .desc .weather-list li {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px;
+    }
+    /* CSS 수정 부분 */
+
+	.overlayClose {
+	    position: absolute;
+	    right: 8px;  /* 닫기 버튼을 제목 오른쪽에 위치하도록 조정 */
+	    top: 8px;    /* 닫기 버튼이 제목 상단에 맞게 조정 */
+	    font-size: 14px;  /* 닫기 버튼의 크기 조정 */
+	    cursor: pointer;  /* 마우스 커서를 손가락 모양으로 변경 */
+	    color: #333;
 	}
-    .info .desc .weather-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-	.info .desc .weather-list li {
-	    display: flex; /* 수평 정렬을 위해 flex 사용 */
-	    justify-content: space-between; /* 텍스트와 이미지를 일정 간격으로 배치 */
-	    align-items: center; /* 수직 정렬 */
-	    margin: 5px 0; /* 위아래 여백 */
-	    padding: 5px 0;
+	.img img {
+		margin-left: 30px;
+		margin-top: 45px;
 	}
+	#menu_wrap {
+    position: absolute;
+    top: 120px;   /* 상단 여백을 줄여서 지도의 상단에 맞춤 */
+    left: 10px;
+    height: 680px;  /* 지도 높이와 일치하도록 설정 */
+    width: 250px;
+    margin: 0;  /* 여백 제거 */
+    padding: 5px;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 10;  /* z-index 값을 지도보다 높게 설정 */
+    font-size: 12px;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.5); /* 배경색만 투명하게 설정 */
+}
+
+
+
+#icList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+}
+
+#icList li {
+    padding: 8px;
+    border-bottom: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.3); /* 배경색만 투명하게 설정 */
+}
+#icList li:hover {
+    background-color: #e0e0e0;
+}
 	
-	.info .desc .weather-list li span {
-	    flex-grow: 1; /* 텍스트가 일정한 공간을 차지하도록 설정 */
-	    text-align: left; /* 텍스트는 왼쪽 정렬 */
-	}
-	
-	.info .desc .weather-list li img {
-	    margin-right: 50px; /* 이미지와 텍스트 사이 간격 */
-	}
 </style>
 </head>
 <body>
-    <h2>기상청 API와 카카오맵 연동 예제</h2>
-    <p>현재 서울의 날씨 정보입니다.</p>
-
-    <!-- 지도를 표시할 영역 -->
+    <h2>기상청 API와 한국도로공사 API를 활용하여 카카오맵 연동한 예제</h2>
+    <p>각 IC(도로공사 영업소 기준) 날씨 정보입니다.</p>
+    <div id="menu_wrap" class="bg_white">
+    <div class="option">
+        <b>영업소 목록</b>
+    </div>
+    <hr>
+    <ul id="icList"></ul> <!-- IC 목록을 표시할 UL 태그 추가 -->
+</div>
+    
     <div id="map" style="width:100%;height: 700px;"></div>
-
-    <!-- 날씨 데이터를 화면에 표시할 영역 -->
-    <div id="weatherDataOutput" style="margin-top: 20px;">날씨 데이터를 불러오는 중...</div>
 </body>
 </html>
